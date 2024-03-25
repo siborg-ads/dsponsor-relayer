@@ -22,20 +22,24 @@ export async function GET(
         })
     }
 
-    const nft = admin.getDSponsorNFT(offer.nftContract);
-    const ads = await nft.getAds();
+    const validatedAds = await admin.getValidatedAdsFromOfferId(offer.offerId);
 
-    const selectedAd = ads.find(ad => ad.tokenId === tokenId);
+    const selectedAd = validatedAds.find(ad => ad.tokenId === tokenId);
     if (!selectedAd) {
         return new Response('Ad not found', {
             status: 404
         })
     }
 
+    if(!selectedAd.records.imageURL){
+        return new Response('Ad has no validated image', {
+            status: 404
+        });
+    }
     const ogConfig = {
         width: imageSize,
         height: imageSize,
-        title: selectedAd.records.title,
+        title: selectedAd?.records?.title,
     }
 
     return new ImageResponse(
