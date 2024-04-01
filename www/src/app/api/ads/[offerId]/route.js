@@ -12,7 +12,7 @@ export async function GET(
     const sdk = new DSponsorSDK();
     const admin = await sdk.getDSponsorAdmin();
 
-    const ads = await admin.getValidatedAdsFromOfferId(offerId) || [];
+    const ads = await admin.getValidatedAds({offerId}) || [];
 
     return new Response(JSON.stringify({
         ads,

@@ -15,14 +15,14 @@ export async function GET(
 
     const sdk = new DSponsorSDK();
     const admin = await sdk.getDSponsorAdmin();
-    const offer = await admin.getOffer(offerId)
+    const offer = await admin.getOffer({offerId})
     if (!offer) {
         return new Response('Offer not found', {
             status: 404
         })
     }
 
-    const validatedAds = await admin.getValidatedAdsFromOfferId(offer.offerId);
+    const validatedAds = await admin.getValidatedAds({offerId:offer.offerId});
 
     const selectedAd = validatedAds.find(ad => ad.tokenId === tokenId);
     if (!selectedAd) {
@@ -49,7 +49,7 @@ export async function GET(
                     width: imageSize,
                     height: imageSize,
                 }}
-                src={selectedAd.records.imageURL}
+                src={selectedAd.records.imageURL.value}
             />
         ),ogConfig)
 }
