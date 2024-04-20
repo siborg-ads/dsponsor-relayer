@@ -28,7 +28,7 @@ export async function GET(
         sdk = new DSponsorSDK({
             chain: {
                 chainId,
-                alchemyAPIKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
+                alchemyAPIKey: process.env.NEXT_ALCHEMY_API_KEY
             },
         });
     } catch (e) {
