@@ -1,5 +1,5 @@
 import {DSponsorSDK} from "@dsponsor/sdk";
-import queryBuilder from "@/app/api/graph/[chainId]/query/queryBuilder";
+import queryBuilder from "./queryBuilder";
 import {cacheExchange, createClient, fetchExchange} from "urql";
 
 export async function GET(
