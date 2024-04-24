@@ -11,13 +11,13 @@ export async function GET(
         address
     } = context.params
 
-    if(!chainId) {
+    if (!chainId) {
         return new Response('No chainId provided', {
             status: 400
         })
     }
 
-    if(!address || address.length !== 42 || !address.startsWith("0x")) {
+    if (!address || address.length !== 42 || !address.startsWith("0x")) {
         return new Response('Invalid address provided', {
             status: 400
         })
@@ -39,10 +39,10 @@ export async function GET(
 
     let data = null;
     let tokens = [];
-    let response = null;
+    let response = [];
     let client;
 
-    if(sdk && sdk?.chain.graphApiUrl){
+    if (sdk && sdk?.chain.graphApiUrl) {
         const url = sdk.chain.graphApiUrl;
         client = createClient({
             url,
@@ -50,7 +50,7 @@ export async function GET(
         });
     }
 
-    if(sdk && sdk?.chain?.alchemy){
+    if (sdk && sdk?.chain?.alchemy) {
         try {
             const nftsForOwner = await sdk.chain.alchemy.nft.getNftsForOwner(address);
 
@@ -85,14 +85,12 @@ export async function GET(
             //For every token, we can fetch the metadata
             const computedQuery = queryBuilder(queryParams)
 
-            if(client?.query){
+            if (client?.query) {
                 const queryRequest = await client.query(computedQuery).toPromise()
 
-                if(queryRequest?.data){
-                    if(queryRequest.data?.adOffers){
-                        response = queryRequest.data.adOffers;
-
-                        for(let adOffer of response){
+                if (queryRequest?.data) {
+                    if (queryRequest.data?.adOffers) {
+                        for (let adOffer of queryRequest.data.adOffers) {
                             const nftContractAddress = adOffer.nftContract.id.toLowerCase();
                             const nftTokens = adOffer.nftContract.tokens;
                             // We only keep the tokens that match the possibleTokens
@@ -102,21 +100,33 @@ export async function GET(
                                 });
                             });
                             adOffer.nftContract.tokens = tokensForContract;
+                            response.push(adOffer);
                         }
                     }
                 }
             }
-        } catch (e){
+        } catch (e) {
             error = e?.message
         }
     }
 
-    return new Response(JSON.stringify({
-        response,
-        error,
-    }, null, 4), {
+    if(error) {
+        console.trace("GET /api/graph/[chainId]", {
+            error,
+        });
+        return new Response(JSON.stringify({
+            error: error?.message,
+        }, null, 4), {
+            headers: {
+                "content-type": "application/json",
+            },
+        });
+    }
+
+    return new Response(JSON.stringify(response, null, 4), {
         headers: {
             "content-type": "application/json",
         },
     });
+
 }
