@@ -1,4 +1,6 @@
 import {DSponsorSDK} from "@dsponsor/sdk";
+import queryBuilder from "@/app/api/[chainId]/graph/query/queryBuilder";
+import {cacheExchange, createClient, fetchExchange} from "urql";
 
 export async function GET(
     request,
@@ -36,6 +38,18 @@ export async function GET(
     }
 
     let data = null;
+    let tokens = [];
+    let response = null;
+    let client;
+
+    if(sdk && sdk?.chain.graphApiUrl){
+        const url = sdk.chain.graphApiUrl;
+        client = createClient({
+            url,
+            exchanges: [cacheExchange, fetchExchange]
+        });
+    }
+
     if(sdk && sdk?.chain?.alchemy){
         try {
             const nftsForOwner = await sdk.chain.alchemy.nft.getNftsForOwner(address);
@@ -43,27 +57,62 @@ export async function GET(
             let possibleTokens = [];
             for (let nft of nftsForOwner.ownedNfts) {
                 if (nft.tokenId) {
+                    // console.log(nft);
                     possibleTokens.push({
                         tokenId: nft.tokenId,
                         tokenUri: nft.tokenUri,
-                        nftContractAddress: nft.contract.address,
+                        nftContractAddress: nft.contract.address.toLowerCase(),
                         ownerAddress: address,
                         name: nft.contract.name,
                         symbol: nft.contract.symbol,
                         balance: nft.balance,
                         timeLastUpdated: nft.timeLastUpdated,
                     });
+
+                    // If we have a tokenUri, we can fetch the metadata
+
                 }
             }
 
-            data = possibleTokens;
+            // Using tokenId and nftContractAddress
+            const queryParams = {
+                where: {
+                    nftContract_in: possibleTokens.map(({nftContractAddress}) => nftContractAddress),
+                }
+            };
+
+            // Debug: only show the last token
+            //For every token, we can fetch the metadata
+            const computedQuery = queryBuilder(queryParams)
+
+            if(client?.query){
+                const queryRequest = await client.query(computedQuery).toPromise()
+
+                if(queryRequest?.data){
+                    if(queryRequest.data?.adOffers){
+                        response = queryRequest.data.adOffers;
+
+                        for(let adOffer of response){
+                            const nftContractAddress = adOffer.nftContract.id.toLowerCase();
+                            const nftTokens = adOffer.nftContract.tokens;
+                            // We only keep the tokens that match the possibleTokens
+                            const tokensForContract = nftTokens.filter(token => {
+                                return possibleTokens.find(possibleToken => {
+                                    return possibleToken.tokenId === token.tokenId && possibleToken.nftContractAddress === nftContractAddress;
+                                });
+                            });
+                            adOffer.nftContract.tokens = tokensForContract;
+                        }
+                    }
+                }
+            }
         } catch (e){
             error = e?.message
         }
     }
 
     return new Response(JSON.stringify({
-        ...data,
+        response,
         error,
     }, null, 4), {
         headers: {

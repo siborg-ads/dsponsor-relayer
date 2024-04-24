@@ -1,10 +1,14 @@
 function createQueryPart(key, value) {
+    console.log({key, value});
     if (key === 'block') {
         return `${key}: { number: ${value} }`;
     } else if (key === 'orderDirection' || key === 'orderBy') {
         return `${key}: "${value}"`;
     } else {
-        return `${key}: ${value}`;
+        const stringValue = JSON.stringify(value);
+        // Remove quotes from stringified JSON on key pairs (e.g. { "key": "value" } => { key: "value" })
+        // We need to keep it for the value itself;
+        return `${key}: ${stringValue.replace(/"([^"]+)":/g, '$1:')}`;
     }
 }
 
@@ -14,6 +18,7 @@ function queryBuilder(queryParams) {
         .filter(key => queryParams[key])
         .map(key => createQueryPart(key, queryParams[key]));
 
+    console.log(queryParts);
     if (queryParts.length === 0) {
         queryParts.push('first: 10');
     }
