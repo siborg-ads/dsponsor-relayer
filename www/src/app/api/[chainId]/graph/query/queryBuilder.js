@@ -1,24 +1,44 @@
 function createQueryPart(key, value) {
-    console.log({key, value});
     if (key === 'block') {
-        return `${key}: { number: ${value} }`;
+        // Handle block number as a numerical value
+        return `${key}: { number: ${parseInt(value, 10)} }`;
     } else if (key === 'orderDirection' || key === 'orderBy') {
+        // Keep order-related strings
         return `${key}: "${value}"`;
+    } else if (key === 'where') {
+        // Special handling for 'where' clause
+        try {
+            const objValue = typeof value === 'string' ? JSON.parse(decodeURIComponent(value)) : value;
+            const whereClause = JSON.stringify(objValue).replace(/"([^"]+)":/g, '$1:');
+            return `${key}: ${whereClause}`;
+        } catch (e) {
+            console.error('Failed to parse where clause:', value);
+            return `${key}: {}`; // Fallback to an empty object on failure
+        }
+    } else if (key === 'first' || key === 'skip') {
+        // Ensure 'first' and 'skip' are treated as integers
+        const numValue = parseInt(value, 10);
+        if (isNaN(numValue)) {
+            console.warn(`Expected a number for ${key}, but got: ${value}`);
+            return `${key}: 0`; // Fallback to 0 if not a valid number
+        }
+        return `${key}: ${numValue}`;
     } else {
-        const stringValue = JSON.stringify(value);
-        // Remove quotes from stringified JSON on key pairs (e.g. { "key": "value" } => { key: "value" })
-        // We need to keep it for the value itself;
-        return `${key}: ${stringValue.replace(/"([^"]+)":/g, '$1:')}`;
+        // Handle booleans and arrays
+        if (typeof value === 'boolean' || Array.isArray(value)) {
+            return `${key}: ${JSON.stringify(value).replace(/"([^"]+)":/g, '$1:')}`;
+        }
+
+        // For all other cases, assume the value is a string
+        return `${key}: "${value}"`;
     }
 }
-
 function queryBuilder(queryParams) {
     const queryKeys = ['first', 'skip', 'orderDirection', 'block', 'where', 'orderBy']
     let queryParts = queryKeys
         .filter(key => queryParams[key])
         .map(key => createQueryPart(key, queryParams[key]));
 
-    console.log(queryParts);
     if (queryParts.length === 0) {
         queryParts.push('first: 10');
     }

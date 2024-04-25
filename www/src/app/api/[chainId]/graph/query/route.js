@@ -36,15 +36,11 @@ export async function GET(
 
             const searchParams = requestUrl.searchParams;
 
-
             // Special query not for the graph
             if(searchParams.get("withMetadata")) {
                 withMetadata = true;
             }
 
-            if(searchParams.get("limit")) {
-                queryParams.limit = searchParams.get("limit")
-            }
             if(searchParams.get("orderBy")) {
                 queryParams.orderBy = searchParams.get("orderBy")
             }
@@ -53,6 +49,9 @@ export async function GET(
             }
             if(searchParams.get("where")) {
                 queryParams.where = searchParams.get("where")
+            }
+            if(searchParams.get("first")) {
+                queryParams.first = searchParams.get("first")
             }
             if(searchParams.get("skip")) {
                 queryParams.skip = searchParams.get("skip")
