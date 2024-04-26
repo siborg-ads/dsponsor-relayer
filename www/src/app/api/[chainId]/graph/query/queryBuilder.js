@@ -13,7 +13,16 @@ function queryBuilder(queryParams) {
         .map(key => createQueryPart(key, queryParams[key]));
 
     if (queryParts.length === 0) {
-        queryParts.push('first: 10');
+        switch (method) {
+            case 'adOffers':
+                // By default, we want to fetch 25 adOffers
+                queryParts.push('first: 25');
+                break;
+            case 'adProposals':
+            case 'adParameters':
+            default:
+                queryParts.push('first: 100');
+        }
     }
 
     switch (method) {
