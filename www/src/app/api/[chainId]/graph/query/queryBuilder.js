@@ -57,7 +57,9 @@ function queryBuilder(queryParams) {
         admins
         creationTimestamp
         adParameters {
-          id
+            adParameter {  
+                id 
+            }
         }
         nftContract {
           id
