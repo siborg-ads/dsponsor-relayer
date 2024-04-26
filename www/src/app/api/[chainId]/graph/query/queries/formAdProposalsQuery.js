@@ -5,20 +5,26 @@ function formAdProposalsQuery(formedQueryParts) {
         ${formedQueryParts}
       ) {
         id
+        
+        token {
+          tokenId
+        }
+        adOffer {
+          id 
+        }
+        
+         adParameter {
+          id
+          base
+          variants
+        }
+        
         data
         status
         rejectReason
         creationTimestamp
         lastUpdateTimestamp
-        token {
-          tokenId
-        }
-        adParameter {
-          id
-          base
-          variants
-        }
-      
+       
         status
     }
     }`;

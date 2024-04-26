@@ -51,6 +51,7 @@ export async function GET(
             switch (queryParams.method) {
                 case "adOffers":
                 case "adProposals":
+                case "adParameters":
                     validQueryParams.push("orderBy")
                     validQueryParams.push("orderDirection")
                     validQueryParams.push("where")
@@ -96,7 +97,8 @@ export async function GET(
         });
     }
 
-    if(withMetadata){
+    if(withMetadata && error === undefined && data?.adOffers){
+        // Only for adOffers and if requested
         const promises = data?.adOffers?.map(async (offer) => {
             const metadataRequest = await fetch(offer.metadataURL, {
                 headers: {

@@ -2,6 +2,7 @@ import formAdProposalsQuery from "@/app/api/[chainId]/graph/query/queries/formAd
 import formDefaultQuery from "@/app/api/[chainId]/graph/query/queries/formDefaultQuery";
 import formAdOffersQuery from "@/app/api/[chainId]/graph/query/queries/formAdOffersQuery";
 import createQueryPart from "@/app/api/[chainId]/graph/query/queries/createQueryPart";
+import formAdParametersQuery from "@/app/api/[chainId]/graph/query/queries/formAdParametersQuery";
 
 function queryBuilder(queryParams) {
     const method = queryParams?.method || 'adOffers';
@@ -20,6 +21,8 @@ function queryBuilder(queryParams) {
             return formAdOffersQuery(queryParts.join(',\n'));
         case 'adProposals':
             return formAdProposalsQuery(queryParts.join(',\n'));
+        case 'adParameters':
+            return formAdParametersQuery(queryParts.join(',\n'));
         default:
             return formDefaultQuery(method, queryParts.join(',\n'));
     }
