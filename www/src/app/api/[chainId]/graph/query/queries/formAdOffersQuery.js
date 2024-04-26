@@ -1,5 +1,5 @@
 function formAdOffersQuery(formedQueryParts) {
-    const query = `
+  const query = `
     query {
       adOffers(
         ${formedQueryParts}
@@ -12,7 +12,7 @@ function formAdOffersQuery(formedQueryParts) {
         validators
         admins
         creationTimestamp
-        adParameters {
+        adParameters(where: { enable: true }) {
             adParameter {  
                 id 
                 base
@@ -22,7 +22,7 @@ function formAdOffersQuery(formedQueryParts) {
         nftContract {
           id
           maxSupply
-          prices {
+          prices(where: { enabled: true }) {
             currency
             amount
             enabled
@@ -58,7 +58,7 @@ function formAdOffersQuery(formedQueryParts) {
                 rejectReason
               }
             }
-            allProposals {
+            allProposals(orderBy: creationTimestamp, orderDirection: desc) {
               token {
                 tokenId
               }
@@ -77,9 +77,9 @@ function formAdOffersQuery(formedQueryParts) {
         }
       }
     }
-  `;
+  `
 
-    return query;
+  return query
 }
 
-export default formAdOffersQuery;
+export default formAdOffersQuery
