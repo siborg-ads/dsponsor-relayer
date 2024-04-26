@@ -41,35 +41,48 @@ export async function GET(
                 withMetadata = true;
             }
 
-            if(searchParams.get("orderBy")) {
-                queryParams.orderBy = searchParams.get("orderBy")
-            }
-            if(searchParams.get("orderDirection")) {
-                queryParams.orderDirection = searchParams.get("orderDirection")
-            }
-            if(searchParams.get("where")) {
-                queryParams.where = searchParams.get("where")
-            }
-            if(searchParams.get("first")) {
-                queryParams.first = searchParams.get("first")
-            }
-            if(searchParams.get("skip")) {
-                queryParams.skip = searchParams.get("skip")
-            }
-            if(searchParams.get("block")) {
-                queryParams.block = searchParams.get("block")
+            queryParams.method = "adOffers"
+
+            if(searchParams.get("method")) {
+                queryParams.method = searchParams.get("method")
             }
 
-            const computedQuery = queryBuilder(queryParams)
+            let validQueryParams = []
+            switch (queryParams.method) {
+                case "adOffers":
+                case "adProposals":
+                    validQueryParams.push("orderBy")
+                    validQueryParams.push("orderDirection")
+                    validQueryParams.push("where")
+                    validQueryParams.push("first")
+                    validQueryParams.push("skip")
+                    validQueryParams.push("block")
+                    break;
+                default:
+                    error = `Invalid method ${queryParams.method}`;
+                    break;
+            }
 
-            const startRequest = new Date().getTime();
-            const client = createClient({
-                url,
-                exchanges: [cacheExchange, fetchExchange]
-            })
-            const queryRequest = await client.query(computedQuery).toPromise()
-            endRequest = new Date().getTime();
-            data = queryRequest.data;
+            validQueryParams.forEach((param) => {
+                // Special query for the graph
+                // e.g. ?where=...
+                if(searchParams.get(param)) {
+                    queryParams[param] = searchParams.get(param)
+                }
+            });
+
+            if(error=== undefined) {
+                const computedQuery = queryBuilder(queryParams)
+
+                const startRequest = new Date().getTime();
+                const client = createClient({
+                    url,
+                    exchanges: [cacheExchange, fetchExchange]
+                })
+                const queryRequest = await client.query(computedQuery).toPromise()
+                endRequest = new Date().getTime();
+                data = queryRequest.data;
+            }
         } catch (e) {
             error = e;
         }
