@@ -1,5 +1,5 @@
 function formAdProposalsQuery(formedQueryParts) {
-    const query = `
+  const query = `
     query {
       adProposals(
         ${formedQueryParts}
@@ -13,7 +13,7 @@ function formAdProposalsQuery(formedQueryParts) {
           id 
         }
         
-         adParameter {
+        adParameter {
           id
           base
           variants
@@ -26,10 +26,10 @@ function formAdProposalsQuery(formedQueryParts) {
         lastUpdateTimestamp
        
         status
-    }
-    }`;
+     }
+    }`
 
-    return query;
+  return query
 }
 
-export default formAdProposalsQuery;
+export default formAdProposalsQuery
