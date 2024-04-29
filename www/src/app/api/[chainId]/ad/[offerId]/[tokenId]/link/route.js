@@ -1,8 +1,6 @@
-// import {AdSpaceRenderer, DSponsorSDK} from "@dsponsor/sdk";
-import {AdSpaceRenderer, DSponsorSDK} from "../../../../../../../../../../d-sponsor-sdk/dist/index";
-import {ImageResponse} from "@vercel/og";
-import getLastValidatedAdLinkQuery from "@/app/queries/getLastValidatedAdLinkQuery";
-import executeQuery from "@/app/queries/executeQuery";
+import {AdSpaceRenderer, DSponsorSDK} from "@dsponsor/sdk";
+import getLastValidatedAdLinkQuery from "@/queries/getLastValidatedAdLinkQuery";
+import executeQuery from "@/queries/executeQuery";
 
 export async function GET(
     request,

@@ -1,6 +1,6 @@
 'use server'
-import executeQuery from "@/app/queries/executeQuery";
-import getLastValidatedAdImageQuery from "@/app/queries/getLastValidatedAdImageQuery";
+import executeQuery from "@/queries/executeQuery";
+import getLastValidatedAdImageQuery from "@/queries/getLastValidatedAdImageQuery";
 import {DSponsorSDK} from "@dsponsor/sdk";
 
 export default async function fetchImageUrlActions(chainId, offerId, tokenId) {

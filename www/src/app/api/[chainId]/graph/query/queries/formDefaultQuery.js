@@ -1,10 +1,10 @@
-function formDefaultQuery(method, formedQueryParts) {
+function formDefaultQuery(method, formedQueryParts, formedReturnParts) {
     const query = `
       query {
           ${method}(
             ${formedQueryParts}
           ) {
-            id
+            ${formedReturnParts}
           }
     }`;
 

@@ -1,7 +1,7 @@
 'use server'
-import executeQuery from "@/app/queries/executeQuery";
+import executeQuery from "@/queries/executeQuery";
 import {DSponsorSDK} from "@dsponsor/sdk";
-import getLastValidatedAdLinkQuery from "@/app/queries/getLastValidatedAdLinkQuery";
+import getLastValidatedAdLinkQuery from "@/queries/getLastValidatedAdLinkQuery";
 
 export default async function fetchLinkUrlActions(chainId, offerId, tokenId) {
     'use server';

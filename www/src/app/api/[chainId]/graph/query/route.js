@@ -6,6 +6,7 @@ export async function GET(
     request,
     context,
 ) {
+
     const {
         chainId,
     } = context.params
@@ -49,6 +50,9 @@ export async function GET(
 
             let validQueryParams = []
             switch (queryParams.method) {
+                case "raw":
+                    validQueryParams.push("query")
+                    break;
                 case "adOffers":
                 case "adProposals":
                 case "adParameters":
@@ -73,9 +77,13 @@ export async function GET(
             });
 
             if(error=== undefined) {
-                const computedQuery = queryBuilder(queryParams)
+                let computedQuery;
+                if(queryParams.method === 'raw'){
+                    computedQuery = searchParams.get('query');
+                } else {
+                    computedQuery = queryBuilder(queryParams,searchParams.get('response'));
+                }
 
-                const startRequest = new Date().getTime();
                 const client = createClient({
                     url,
                     exchanges: [cacheExchange, fetchExchange]
