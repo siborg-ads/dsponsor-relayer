@@ -11,7 +11,7 @@ export async function GET(
 
     const sdk = new DSponsorSDK();
     const admin = await sdk.getDSponsorAdmin();
-    const offer = await admin.getOffer(offerId)
+    const offer = await admin.getOffer({offerId:parseInt(offerId)})
 
     if (!offer) {
         return new Response('Offer not found', {
