@@ -49,9 +49,9 @@ const Ad = ({ ad,admin }) => {
 
     return (
         <div className="border border-blue-500 overflow-hidden h-12 w-12 flex justify-center items-center bg-blue-300 text-black rounded hover:bg-blue-600">
-            <a href={ad.records.linkURL} target="_blank" onClick={handleAdClick} className="no-underline text-black flex justify-center items-center w-full h-full">
+            <a href={ad.records.linkURL} target="_blank" className="no-underline text-black flex justify-center items-center w-full h-full">
                 {ad.records.imageURL && (
-                    <img src={ad.records.imageURL} alt="Ad image" className="object-cover w-full h-full" />
+                    <img src={ad.records.imageURL} alt="Ad image" className="object-fit w-full h-full" />
                 )}
                 {!ad.records.imageURL && (
                     <p>{ad.records.text || 'Buy'}</p>
