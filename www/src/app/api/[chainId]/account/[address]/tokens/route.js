@@ -81,6 +81,14 @@ export async function GET(
                 }
             };
 
+            // Ensure we remove duplicates
+            possibleTokens = possibleTokens.filter((token, index, self) =>
+                index === self.findIndex((t) => (
+                    t.tokenId === token.tokenId && t.nftContractAddress === token.nftContractAddress
+                ))
+            );
+
+
             // Debug: only show the last token
             //For every token, we can fetch the metadata
             const computedQuery = queryBuilder(queryParams)
