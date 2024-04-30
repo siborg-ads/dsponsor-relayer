@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {AdSpaceRenderer, DSponsorSDK} from "@dsponsor/sdk";
 import './index.css';
 
-const Ad = ({ad, admin}) => {
+const Ad = ({ad, admin }) => {
     const handleAdClick = async (e) => {
         // If the ad is already bought, do nothing
         const options = {};
@@ -49,7 +49,7 @@ const Ad = ({ad, admin}) => {
 
     return (
         <div
-            className="border border-blue-500 overflow-hidden h-14 w-14 flex justify-center items-center bg-blue-300 text-black rounded hover:bg-blue-600">
+            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-blue-300 text-black rounded hover:bg-blue-600">
             <a href={ad.records.linkURL} target="_blank"
                className="no-underline text-black flex justify-center items-center w-full h-full">
                 {ad.records.imageURL && (
@@ -66,7 +66,7 @@ const Ad = ({ad, admin}) => {
 const AdPlaceholder = () => {
     return (
         <div
-            className="border border-blue-500 overflow-hidden h-14 w-14 flex justify-center items-center bg-blue-300 text-black rounded">
+            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-blue-300 text-black rounded hover:bg-blue-600">
             <p>Buy</p>
         </div>
     );
@@ -74,7 +74,6 @@ const AdPlaceholder = () => {
 
 const IframePage = (req) => {
     const {offerId} = req.params;
-
 
     const [loaded, setLoaded] = useState(false);
     const [adRows, setAdRows] = useState([]);
@@ -104,22 +103,22 @@ const IframePage = (req) => {
     const gridContent = loaded ? adRows.flat().map((ad, index) => (
         <Ad key={index} ad={ad} admin={admin}/>
     )) : new Array(8).fill(null).map((_, index) => ( // assuming a grid of 2 rows and 4 columns as default
-        <AdPlaceholder key={index}/>
+        <AdPlaceholder key={index} />
     ));
 
     return (
-        <div className={'max-w-72'}>
-            <div className="flex flex-col space-y-1 p-2 m-2 bg-blue-800 text-white border border-blue-400 rounded-md">
+        <div className={`w-screen max-w-full`}>
+            <div className="flex flex-col space-y-1 p-1 bg-blue-800 text-white border border-blue-400">
                 <div className="grid grid-rows-2 grid-cols-4 gap-1 grow">
                     {gridContent}
                 </div>
-            </div>
-            <div className="col-span-4 flex justify-end">
+                <div className="col-span-4 flex justify-end">
                 <span className="text-[0.65em] text-right pr-2 text-orange-300 hover:text-orange-500">
                     <a href="https://dsponsor.com" target="_blank" rel="noreferrer">
                         Powered by DSponsor
                     </a>
                 </span>
+                </div>
             </div>
         </div>
     );
