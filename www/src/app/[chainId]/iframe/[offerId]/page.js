@@ -49,14 +49,14 @@ const Ad = ({ad, admin }) => {
 
     return (
         <div
-            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-[#00143e] text-black rounded hover:bg-blue-600">
+            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-[#00143e] text-black rounded hover:bg-[#353f75] hover:border-[#9abffb]">
             <a href={ad.records.linkURL} target="_blank"
-               className="no-underline text-black flex justify-center items-center w-full h-full">
+               className="no-underline text-black flex justify-center items-center w-full h-full hover:bg-[#353f75] hover:border-[#9abffb]">
                 {ad.records.imageURL && (
-                    <img src={ad.records.imageURL} alt="Ad image" className="object-fit w-full h-full"/>
+                    <img src={ad.records.imageURL} alt="Ad image" className="object-contain w-full h-full"/>
                 )}
                 {!ad.records.imageURL && (
-                    <img src="/available.webp" alt="Ad image" className="object-fit w-full h-full"/>
+                    <img src="/available.webp" alt="Ad image" className="object-contain w-full h-full"/>
                 )}
             </a>
         </div>
@@ -71,8 +71,8 @@ const metadata = {
 const AdPlaceholder = () => {
     return (
         <div
-            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-blue-300 text-black rounded hover:bg-blue-600">
-            <img src="/available.webp" alt="Ad image" className="object-fit w-full h-full"/>
+            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-[#00143e] text-black rounded hover:bg-[#353f75] hover:border-[#9abffb]">
+            <img src="/available.webp" alt="Ad image" className="object-contain w-full h-full"/>
         </div>
     );
 };
