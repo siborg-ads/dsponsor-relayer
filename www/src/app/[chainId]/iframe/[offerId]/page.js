@@ -63,11 +63,16 @@ const Ad = ({ad, admin }) => {
     );
 };
 
+const metadata = {
+    title: 'DSponsor - Ad Space',
+    description: 'DSponsor ads space for the offer page',
+}
+
 const AdPlaceholder = () => {
     return (
         <div
             className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-blue-300 text-black rounded hover:bg-blue-600">
-            <p>Buy</p>
+            <img src="/available.webp" alt="Ad image" className="object-fit w-full h-full"/>
         </div>
     );
 };
