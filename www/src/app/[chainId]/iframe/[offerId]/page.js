@@ -56,7 +56,7 @@ const Ad = ({ad, admin }) => {
                     <img src={ad.records.imageURL} alt="Ad image" className="object-fit w-full h-full"/>
                 )}
                 {!ad.records.imageURL && (
-                    <p>{ad.records.text || 'Buy'}</p>
+                    <img src="/available.webp" alt="Ad image" className="object-fit w-full h-full"/>
                 )}
             </a>
         </div>
@@ -108,7 +108,7 @@ const IframePage = (req) => {
 
     return (
         <div className={`w-screen max-w-full`}>
-            <div className="flex flex-col space-y-1 p-1 bg-blue-800 text-white border border-blue-400">
+            <div className="flex flex-col space-y-1 p-1 bg-[#00012b] text-white border border-blue-400">
                 <div className="grid grid-rows-2 grid-cols-4 gap-1 grow">
                     {gridContent}
                 </div>
