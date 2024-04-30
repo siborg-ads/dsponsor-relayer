@@ -49,7 +49,7 @@ const Ad = ({ad, admin }) => {
 
     return (
         <div
-            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-blue-300 text-black rounded hover:bg-blue-600">
+            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-[#00143e] text-black rounded hover:bg-blue-600">
             <a href={ad.records.linkURL} target="_blank"
                className="no-underline text-black flex justify-center items-center w-full h-full">
                 {ad.records.imageURL && (
