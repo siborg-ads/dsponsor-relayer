@@ -44,22 +44,12 @@ export async function generateMetadata({params, searchParams}, parent) {
 
 export default async function IframePage(req) {
     const {offerId} = req.params;
-    // const {searchParams} = req;
-
 
     // User can pass along a background color (bgColor) to customize the iframe
-    // const bgColor = searchParams?.get('bgColor') || '#f5f5f5';
-    const bgColor = `#${req?.searchParams?.bgColor}` || '#f5f5f5';
-
-    console.log('bgColor', bgColor);
-
-    // We apply to the whole body
-    const style = `
-        body {
-            background-color: ${bgColor};
-        }
-    `;
-
+    let bgColor = '#0d102d';
+    if (req?.searchParams?.bgColor) {
+        bgColor = `#${req?.searchParams?.bgColor}`;
+    }
 
     const response = await getOfferData(offerId);
 
