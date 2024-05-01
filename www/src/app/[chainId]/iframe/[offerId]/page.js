@@ -1,134 +1,131 @@
-'use client';
+'use server';
 import React from 'react';
-import {useEffect, useState} from "react";
-import {AdSpaceRenderer, DSponsorSDK} from "@dsponsor/sdk";
-import './index.css';
+import AdDynamicGrid from "@/components/AdDynamicGrid";
+import {DSponsorSDK} from "@dsponsor/sdk";
+import getValidatedAdProposalsQuery from "@/queries/getValidatedAdProposalsQuery";
+import executeQuery from "@/queries/executeQuery";
+import styles from './index.css';
 
-const Ad = ({ad, admin }) => {
-    const handleAdClick = async (e) => {
-        // If the ad is already bought, do nothing
-        const options = {};
-        if (ad?.getRecord) {
-            return;
-        }
-        e.preventDefault();
 
-        const imageURL = window.prompt('Enter the imageURL');
-        if (!prompt) {
-            return;
-        }
-        const linkURL = window.prompt('Enter the linkURL');
-        if (!linkURL) {
-            return;
-        }
-        console.log('AdSpaceRenderer: Buying ad space...');
-        let tokenId = ad.tokenId;
-        const adParameters = ["imageURL", "linkURL"]
-        const tokenData = options.tokenData || '0x';
-        const valuePrice = BigInt(self.prices[0]);
-        const bps = self.bps;
-        const fee = (valuePrice * BigInt(bps)) / BigInt(10000); // Calculate fee based on BPS
-        const feeAndValue = valuePrice + fee; // Total value including the fee
+// Is memoized
+async function getOfferData(offerId) {
+    const dsponsor = new DSponsorSDK();
+    const endpoint = dsponsor.chain.graphApiUrl;
+    const admin = dsponsor.getDSponsorAdmin();
+    const query = getValidatedAdProposalsQuery({offerId: parseInt(offerId)});
+    const queryResponse = await executeQuery(endpoint, query);
+    if (!queryResponse?.adOffers) {
+        return null;
+    }
+    if (queryResponse.adOffers.length === 0) {
+        return null;
+    }
 
-        const mintParameters = {
-            tokenId,
-            to: self.signer.getAddress(),
-            currency: self.currencies[0],
-            tokenData,
-            offerId: self.offerId,
-            adParameters,
-            adDatas: [imageURL, linkURL],
-            referralAdditionalInformation: options?.referral ?? self.referral
-        }
-        try {
-            await admin.mintAndSubmit(mintParameters, {value: feeAndValue.toString()});
-        } catch (e) {
-            console.error('AdSpaceRenderer: Error buying ad space', e);
-        }
-    };
+    const response = queryResponse.adOffers[0];
 
-    return (
-        <div
-            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-[#00143e] text-black rounded hover:bg-[#353f75] hover:border-[#9abffb]">
-            <a href={ad.records.linkURL} target="_blank"
-               className="no-underline text-black flex justify-center items-center w-full h-full hover:bg-[#353f75] hover:border-[#9abffb]">
-                {ad.records.imageURL && (
-                    <img src={ad.records.imageURL} alt="Ad image" className="object-contain w-full h-full"/>
-                )}
-                {!ad.records.imageURL && (
-                    <img src="/available.webp" alt="Ad image" className="object-contain w-full h-full"/>
-                )}
-            </a>
-        </div>
-    );
-};
+    // fetch contractURI
+    const contractURI = response?.nftContract?.contractURI;
 
-const metadata = {
-    title: 'DSponsor - Ad Space',
-    description: 'DSponsor ads space for the offer page',
+    response.contractURIMetadata = await fetch(contractURI).then(res => res.json());
+
+    return response;
 }
 
-const AdPlaceholder = () => {
-    return (
-        <div
-            className="aspect-square w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-[#00143e] text-black rounded hover:bg-[#353f75] hover:border-[#9abffb]">
-            <a href="#" target="_blank">
-                 <img src="/available.webp" alt="Ad image" className="object-contain w-full h-full"/>
-            </a>
-        </div>
-    );
-};
+export async function generateMetadata({params, searchParams}, parent) {
+    const offerId = params.offerId;
+    const response = await getOfferData(offerId);
+    return {
+        title: `${response?.contractURIMetadata?.name} - DSponsor`,
+        description: response?.contractURIMetadata?.description || 'Unlock smarter monetization for your content.',
+        keyword: response?.contractURIMetadata?.keyword || `${response?.contractURIMetadata?.name} monetization, ${response?.contractURIMetadata?.name} ads`,
+    };
+}
 
-const IframePage = (req) => {
+
+export default async function IframePage(req) {
     const {offerId} = req.params;
+    // const {searchParams} = req;
 
-    const [loaded, setLoaded] = useState(false);
-    const [adRows, setAdRows] = useState([]);
 
-    const dsponsor = new DSponsorSDK();
-    const admin = dsponsor.getDSponsorAdmin();
+    // User can pass along a background color (bgColor) to customize the iframe
+    // const bgColor = searchParams?.get('bgColor') || '#f5f5f5';
+    const bgColor = `#${req?.searchParams?.bgColor}` || '#f5f5f5';
 
-    const sponsoredItem = AdSpaceRenderer.fromOffer(offerId, {
-        selector: 'dsponsor',
-    })
+    console.log('bgColor', bgColor);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!loaded) {
-                await sponsoredItem.preload();
-                const selectedAds = sponsoredItem.select();
-                setAdRows(selectedAds);
-                setLoaded(true);
+    // We apply to the whole body
+    const style = `
+        body {
+            background-color: ${bgColor};
+        }
+    `;
+
+
+    const response = await getOfferData(offerId);
+
+    if (!response) {
+        return (
+            <div>
+                <h1>Offer not found</h1>
+            </div>
+        )
+    }
+
+    const allowedTokens = [];
+    if (response?.nftContract?.allowList) {
+        const maxSupply = response?.nftContract?.maxSupply;
+        allowedTokens.push(...Array.from({length: maxSupply}, (_, i) => i.toString()));
+    }
+
+    // Two cases:
+    // If we had available slots, we need to fill them with placeholders and replace when we have an ad
+    // If we don't have available slots, we only push the ad that are available
+    function transformToAd(tokenData) {
+        const isMinted = !!tokenData.mint && tokenData?.transactionHash !== null;
+
+        let imageURL = '/available.webp';
+        let linkURL = `https://app.dsponsor.com/offer/${offerId}/${tokenData.tokenId}`;
+        if (isMinted) {
+            imageURL = '/reserved.webp';
+            const currentProposals = tokenData?.currentProposals;
+            for (const proposal of currentProposals) {
+                if (proposal.adParameter?.id === 'imageURL') {
+                    imageURL = proposal?.acceptedProposal?.data;
+                }
+                if (proposal.adParameter?.id === 'linkURL') {
+                    linkURL = proposal?.acceptedProposal?.data;
+                }
             }
         }
-        fetchData();
-    }, []);
 
+        return {
+            offerId: offerId,
+            tokenId: tokenData.tokenId,
+            minted: isMinted,
+            records: {
+                linkURL: linkURL,
+                imageURL: imageURL,
+            }
+        }
+    }
 
-    // Prepare the grid content, displaying placeholders if not loaded
-    // Ensure we have link direct to the token on the DSPonsor dashboard
-    const gridContent = loaded ? adRows.flat().map((ad, index) => (
-        <Ad key={index} ad={ad} admin={admin}/>
-    )) : new Array(8).fill(null).map((_, index) => ( // assuming a grid of 2 rows and 4 columns as default
-        <AdPlaceholder key={index} />
-    ));
-
+    const flatAdList = [...response?.nftContract?.tokens.map(transformToAd)];
     return (
-        <div className={`w-screen max-w-full`}>
-            <div className="flex flex-col space-y-1 p-1 bg-[#00012b] text-white border border-blue-400">
-                <div className="grid grid-rows-2 grid-cols-4 gap-1 grow">
-                    {gridContent}
-                </div>
-                <div className="col-span-4 flex justify-end">
-                <span className="text-[0.65em] text-right pr-2 text-orange-300 hover:text-orange-500">
-                    <a href="https://dsponsor.com" target="_blank" rel="noreferrer">
-                        Powered by DSponsor
-                    </a>
-                </span>
-                </div>
-            </div>
-        </div>
-    );
+        <html>
+        <head/>
+        <body style={{backgroundColor: bgColor}}>
+        <AdDynamicGrid offerId={offerId} ads={flatAdList}/>
+        </body>
+        </html>
+    )
 };
 
-export default IframePage;
+
+IframePage.getLayout = function getLayout(page) {
+    return (
+        <html>
+        <head/>
+        <body className='bg-gray-800'>{page}</body>
+        </html>
+    )
+}
