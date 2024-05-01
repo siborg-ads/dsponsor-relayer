@@ -47,6 +47,11 @@ export default async function IframePage(req) {
 
     // User can pass along a background color (bgColor) to customize the iframe
     let bgColor = '#0d102d';
+    let sizes = [];
+    if (req?.searchParams?.sizes) {
+        sizes = req?.searchParams?.sizes.split(',');
+        sizes = new Array(5).fill(0).map((_, i) => parseInt(sizes[i]) || parseInt(sizes.slice(-1)[0]));
+    }
     if (req?.searchParams?.bgColor) {
         bgColor = `#${req?.searchParams?.bgColor}`;
     }
@@ -104,7 +109,7 @@ export default async function IframePage(req) {
         <html>
         <head/>
         <body style={{backgroundColor: bgColor}}>
-        <AdDynamicGrid offerId={offerId} ads={flatAdList}/>
+        <AdDynamicGrid offerId={offerId} ads={flatAdList} sizes={sizes}/>
         </body>
         </html>
     )
