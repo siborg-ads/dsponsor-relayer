@@ -56,6 +56,12 @@ export default async function IframePage(req) {
         bgColor = `#${req?.searchParams?.bgColor}`;
     }
 
+    const preview = {
+        image: (req?.searchParams?.previewImage || '').replace(/ /g, '+'),
+        link: req?.searchParams?.previewLink || '',
+        tokenId: req?.searchParams?.previewPosition,
+    }
+
     const response = await getOfferData(offerId);
 
     if (!response) {
@@ -105,6 +111,13 @@ export default async function IframePage(req) {
     }
 
     const flatAdList = [...response?.nftContract?.tokens.map(transformToAd)];
+
+    if(preview.image && preview.link) {
+        flatAdList.find(ad => ad.tokenId === preview.tokenId).records = {
+            linkURL: preview.link,
+            imageURL: preview.image,
+        };
+    }
     return (
         <html>
         <head/>
