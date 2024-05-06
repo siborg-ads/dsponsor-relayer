@@ -110,7 +110,7 @@ export default async function IframePage(req) {
         }
     }
 
-    const flatAdList = [...response?.nftContract?.tokens.map(transformToAd)];
+    const flatAdList = [...response?.nftContract?.tokens.map(transformToAd)].sort((a, b) => a.tokenId - b.tokenId);
 
     if(preview.image && preview.link) {
         flatAdList.find(ad => ad.tokenId === preview.tokenId).records = {

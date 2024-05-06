@@ -112,7 +112,7 @@ export async function GET(
                 headers: {
                     "content-type": "application/json",
                 },
-                cache: "force-cache",
+                cache: "no-cache",
             });
             const metadata = await metadataRequest.json();
             offer.metadata = metadata;
