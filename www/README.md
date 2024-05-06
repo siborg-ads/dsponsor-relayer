@@ -1,4 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Relayer
+
+Relayer is a simple relay server that forwards requests to a key protected GraphQL endpoint.  
+It provides additional features like caching, rate limiting, and request logging.
+
+### Features
+
+- [{chainID}/ad/0/0/image] - Get the image of the NFT with the given chainID, offerId and tokenID.
+- [{chainID}/ad/0/0/link] - Get the link of the NFT with the given chainID, offerId and tokenID.
+
+Iframe Embedding
+
+- [{chainID}/iframe/5] - Get the iframe of the NFT with the given chainID and offerId.
+
+### Example
+
+```html
+<table>
+    <tr>
+        <td>
+        <a href="https://relayer.dsponsor.com/11155111/ad/5/0/link">
+            <img src="https://relayer.dsponsor.com/11155111/ad/5/0/image"/>
+        </a>        
+        </td>
+    </tr>
+</table>
+```
+
+<table>
+    <tr>
+        <td>
+        <a href="https://relayer.dsponsor.com/11155111/ad/5/0/link">
+            <img src="https://relayer.dsponsor.com/11155111/ad/5/0/image"/>
+        </a>        
+        </td>
+    </tr>
+</table>
+
 
 ## Getting Started
 
