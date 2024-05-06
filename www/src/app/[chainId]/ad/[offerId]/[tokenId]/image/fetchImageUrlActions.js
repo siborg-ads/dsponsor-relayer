@@ -10,9 +10,12 @@ export default async function fetchImageUrlActions(chainId, offerId, tokenId) {
             chainId
         }
     });
+
     const query = getLastValidatedAdImageQuery({offerId: parseInt(offerId), tokenId: parseInt(tokenId)});
     const endpoint = sdk.chain.graphApiUrl;
+
     const response = await executeQuery(endpoint, query);
+
     if (!response?.adProposals) {
         return 'https://via.placeholder.com/500';
     }

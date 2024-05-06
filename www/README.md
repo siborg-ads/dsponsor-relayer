@@ -1,4 +1,136 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Relayer
+
+Relayer is a simple relay server that forwards requests to a key protected GraphQL endpoint.  
+It provides additional features like caching, rate limiting, and request logging.
+
+### Features
+
+- [{chainID}/ad/0/0/image] - Get the image of the NFT with the given chainID, offerId and tokenID.
+- [{chainID}/ad/0/0/link] - Get the link of the NFT with the given chainID, offerId and tokenID.
+
+Iframe Embedding
+
+- [{chainID}/iframe/5] - Get the iframe of the NFT with the given chainID and offerId.
+
+### Example
+
+```html
+
+<table>
+    <tr>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/0/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/0/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/1/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/1/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/2/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/2/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/3/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/3/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/4/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/4/image"/>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/5/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/5/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/6/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/6/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/7/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/7/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/8/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/8/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/9/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/9/image"/>
+            </a>
+        </td>
+    </tr>
+</table>
+```
+
+<table>
+    <tr>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/0/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/0/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/1/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/1/image"/>
+            </a>     
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/2/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/2/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/3/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/3/image"/>
+            </a>     
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/4/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/4/image"/>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/5/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/5/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/6/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/6/image"/>
+            </a>     
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/7/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/7/image"/>
+            </a>
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/8/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/8/image"/>
+            </a>     
+        </td>
+        <td>
+            <a href="https://relayer.dsponsor.com/11155111/ad/3/9/link">
+                <img src="https://relayer.dsponsor.com/11155111/ad/3/9/image"/>
+            </a>
+        </td>
+    </tr>
+</table>
+
 
 ## Getting Started
 

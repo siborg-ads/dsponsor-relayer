@@ -1,23 +1,11 @@
-'use client';
+'use server';
 
 import Image from "next/image";
-import {useEffect, useState} from "react";
 import fetchImageUrlActions from "@/app/[chainId]/ad/[offerId]/[tokenId]/image/fetchImageUrlActions";
 
-const ImagePage = ({ params }) => {
+const ImagePage = async ({ params }) => {
     const { offerId, tokenId, chainId } = params;
-
-    let [url, setUrl] = useState(null);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const url = await fetchImageUrlActions(chainId, offerId, tokenId);
-            setUrl(url);
-        }
-        fetchData();
-
-    }, []);
-
+    const url = await fetchImageUrlActions(chainId, offerId, tokenId);
 
     if(!url){
         return <div>Loading...</div>
