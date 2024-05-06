@@ -44,7 +44,7 @@ const handleAdClick = async (e) => {
 const Ad = ({ad}) => {
     return (
         <div className="aspect-w-1 aspect-h-1 min-w-[50px] max-w-[300px] w-full border border-blue-500 overflow-hidden flex justify-center items-center bg-[#00143e] hover:bg-[#353f75] hover:border-[#9abffb] rounded text-black">
-            <a href={ad.records.linkURL} target="_blank" rel="noopener noreferrer"
+            <a href={ad.records.linkURL ?? `https://app.dsponsor.com/offer/${ad.offerId}/${ad.tokenId}`} target="_blank" rel="noopener noreferrer"
                className="no-underline text-black flex justify-center items-center w-full h-full">
                 {ad.records.imageURL ? (
                     <img src={ad.records.imageURL} alt="Ad image" className="object-contain w-full h-full aspect-square"/>
