@@ -4,7 +4,7 @@ import AdDynamicGrid from "@/components/AdDynamicGrid";
 import {DSponsorSDK} from "@dsponsor/sdk";
 import getValidatedAdProposalsQuery from "@/queries/getValidatedAdProposalsQuery";
 import executeQuery from "@/queries/executeQuery";
-import styles from './index.css';
+// import styles from './index.css';
 
 
 // Is memoized

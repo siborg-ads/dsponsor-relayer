@@ -49,7 +49,7 @@ const Ad = ({ad}) => {
                 {ad.records.imageURL ? (
                     <img src={ad.records.imageURL} alt="Ad image" className="object-contain w-full h-full aspect-square"/>
                 ) : (
-                    <img src="/available.webp" alt="Ad image" className="object-contain w-full h-full"/>
+                    <img src="/available.webp" alt="Ad image" className="object-contain w-full h-full aspect-square"/>
                 )}
             </a>
         </div>

@@ -22,11 +22,9 @@ export default async function executeQuery(url, query, variables) {
         body: JSON.stringify({query: query, variables: variables}),
     });
     const result = await request.json();
-    console.log("result", result);
     if(result.data) {
         return result.data;
     }
-
     console.error(result);
 
     return result;
