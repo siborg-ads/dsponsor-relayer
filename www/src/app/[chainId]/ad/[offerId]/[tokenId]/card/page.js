@@ -6,8 +6,8 @@ const ImagePage = async ({ params }) => {
     const { offerId, tokenId, chainId } = params;
     const response = await fetchCardUrlActions(chainId, offerId, tokenId);
 
-    const url = response.find(ad => ad.adParameter.base === 'linkURL').data
-    const imageSrc = response.find(ad => ad.adParameter.base === 'imageURL').data
+    const url = response?.find(ad => ad.adParameter.base === 'linkURL')?.data
+    const imageSrc = response?.find(ad => ad.adParameter.base === 'imageURL')?.data
 
     if(!url){
         return <div>Loading...</div>

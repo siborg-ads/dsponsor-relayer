@@ -2,6 +2,7 @@ import {NextResponse} from "next/server";
 import fetchImageUrlActions from "@/app/[chainId]/ad/[offerId]/[tokenId]/image/fetchImageUrlActions";
 import * as path from "path";
 import { readFile } from "fs/promises";
+import fetchCardUrlActions from "@/app/[chainId]/ad/[offerId]/[tokenId]/card/fetchCardUrlActions";
 
 
 export async function GET(
@@ -13,14 +14,22 @@ export async function GET(
         tokenId,
         chainId
     } = context.params
-    const url = await fetchImageUrlActions(chainId, offerId, tokenId);
+
+    const response = await fetchCardUrlActions(chainId, offerId, tokenId);
+
+    const url = response.find(ad => ad.adParameter.base === 'linkURL').data
+    const imageSrc = response.find(ad => ad.adParameter.base === 'imageURL').data
 
     let blob;
-    if(url){
-        const res = await fetch(url);
+    if(imageSrc){
+        const res = await fetch(imageSrc);
         blob = await res.blob()
     } else {
-        blob = await readFile(path.join(process.cwd(), "public/available.webp"));
+        if(url){
+            blob = await readFile(path.join(process.cwd(), "public/reserved.webp"));
+        } else {
+            blob = await readFile(path.join(process.cwd(), "public/available.webp"));
+        }
     }
     const headers = new Headers()
     headers.set('Content-Type', 'image/*')

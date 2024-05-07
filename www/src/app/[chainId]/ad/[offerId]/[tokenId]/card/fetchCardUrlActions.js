@@ -17,5 +17,5 @@ export default async function fetchCardUrlActions(chainId, offerId, tokenId) {
 
     const response = await executeQuery(endpoint, query);
 
-    return response.adProposals;
+    return response?.adProposals ?? [];
 }
