@@ -12,12 +12,10 @@ export default async function executeQuery(url, query, variables) {
         body: JSON.stringify({query: query, variables: variables}),
         next: { revalidate: 180 }
     });
-    console.log(request);
     const result = await request.json();
     if(result.data) {
         return result.data;
     }
-    console.error(result);
 
     return result;
 }

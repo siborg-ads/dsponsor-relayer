@@ -5,8 +5,6 @@ const queryParams = {
     limit: 10
 }
 
-console.log(queryBuilder(queryParams))
-
 
 const APIURL = 'https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest/'
 const client = createClient({
