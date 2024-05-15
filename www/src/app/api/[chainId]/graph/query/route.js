@@ -108,16 +108,24 @@ export async function GET(
     if(withMetadata && error === undefined && data?.adOffers){
         // Only for adOffers and if requested
         const promises = data?.adOffers?.map(async (offer) => {
-            const metadataRequest = await fetch(offer.metadataURL, {
-                headers: {
-                    "content-type": "application/json",
-                },
-                cache: "no-cache",
-            });
-            const metadata = await metadataRequest.json();
-            offer.metadata = metadata;
+            try {
+                // http or https
+                if(!offer.metadataURL || !offer.metadataURL.match(/^http(s)?:\/\//)){
+                    return;
+                }
+                const metadataRequest = await fetch(offer.metadataURL, {
+                    headers: {
+                        "content-type": "application/json",
+                    },
+                    cache: "no-cache",
+                });
+                const metadata = await metadataRequest.json();
+                offer.metadata = metadata;
+            } catch (e) {
+                console.log(offer);
+                console.error(`Error fetching metadata for ${offer.metadataURL}`, e);
+            }
         });
-
         await Promise.all(promises);
     }
 
