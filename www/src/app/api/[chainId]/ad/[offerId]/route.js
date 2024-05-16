@@ -1,27 +1,25 @@
-import {AdSpaceRenderer, DSponsorSDK} from "@dsponsor/sdk";
-import {ImageResponse} from "@vercel/og";
+import { DSponsorSDK } from "@dsponsor/sdk";
 
-export async function GET(
-    request,
-    context,
-) {
-    const {
-        offerId,
-    } = context.params
+export async function GET(request, context) {
+  const { chainId, offerId } = context.params;
 
-    const sdk = new DSponsorSDK();
-    const admin = await sdk.getDSponsorAdmin();
-    const offer = await admin.getOffer({offerId:parseInt(offerId)})
-
-    if (!offer) {
-        return new Response('Offer not found', {
-            status: 404
-        })
+  const sdk = new DSponsorSDK({
+    chain: {
+      chainId
     }
+  });
+  const admin = await sdk.getDSponsorAdmin();
+  const offer = await admin.getOffer({ offerId: parseInt(offerId) });
 
-    return new Response(JSON.stringify(offer, null, 4), {
-        headers: {
-            "content-type": "application/json",
-        },
+  if (!offer) {
+    return new Response("Offer not found", {
+      status: 404
     });
+  }
+
+  return new Response(JSON.stringify(offer, null, 4), {
+    headers: {
+      "content-type": "application/json"
+    }
+  });
 }

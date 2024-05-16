@@ -1,62 +1,59 @@
 /* Reset all margin / padding */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-
-
 
 /* Body Reset */
 body {
-    background-color: transparent;
-    background-image: none;
+  background-color: transparent;
+  background-image: none;
 }
 
 /* Body Specifics */
 
-
 /*Ads Specifics*/
 .ad-container {
-    display: grid;
-    max-width: 310px;
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-    gap: 5px;
+  display: grid;
+  max-width: 310px;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 5px;
 }
 .ad {
-    border: 1px solid black;
-    overflow: hidden;
-    height: 50px;
-    width: 50px;
-    justify-content: center;
-    align-items: center;
+  border: 1px solid black;
+  overflow: hidden;
+  height: 50px;
+  width: 50px;
+  justify-content: center;
+  align-items: center;
 }
 
 .ad-container.blue-theme {
-    color: white;
-    background-color: #2d4258;
-    border: 1px solid blue;
-    border-radius: 5px;
-    padding: 10px;
+  color: white;
+  background-color: #2d4258;
+  border: 1px solid blue;
+  border-radius: 5px;
+  padding: 10px;
 }
 .ad-container.blue-theme .ad {
-    background-color: #7dd3fc;
-    color: black;
-    border: 1px solid blue;
-    border-radius: 5px;
-    padding: 1px;
-    margin: 5px;
+  background-color: #7dd3fc;
+  color: black;
+  border: 1px solid blue;
+  border-radius: 5px;
+  padding: 1px;
+  margin: 5px;
 }
 .ad-container.blue-theme .ad a {
-    color: black;
-    text-decoration: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
+  color: black;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
 }
 .ad-container.blue-theme .ad:hover {
-    background-color: #4d7f9b;
-    color: black;
+  background-color: #4d7f9b;
+  color: black;
 }

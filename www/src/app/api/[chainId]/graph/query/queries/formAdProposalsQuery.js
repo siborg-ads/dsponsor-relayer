@@ -27,9 +27,9 @@ function formAdProposalsQuery(formedQueryParts) {
        
         status
      }
-    }`
+    }`;
 
-  return query
+  return query;
 }
 
-export default formAdProposalsQuery
+export default formAdProposalsQuery;

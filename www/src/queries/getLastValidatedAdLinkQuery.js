@@ -1,5 +1,5 @@
-export default function getLastValidatedAdLinkQuery({offerId, tokenId}) {
-    return `
+export default function getLastValidatedAdLinkQuery({ offerId, tokenId }) {
+  return `
     query {
          adProposals(
             first:1,
