@@ -83,11 +83,8 @@ export async function GET(request, context) {
           exchanges: [cacheExchange, fetchExchange]
         });
 
-        console.log({ computedQuery });
-
         const queryRequest = await client.query(computedQuery).toPromise();
 
-        console.log("OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
         endRequest = new Date().getTime();
         data = queryRequest.data;
       }
