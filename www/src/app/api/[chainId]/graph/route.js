@@ -12,7 +12,7 @@ export async function POST(request, context) {
     });
   }
 
-  return new Response(JSON.stringify(graphResult), {
+  return new Response(JSON.stringify(graphResult, null, 4), {
     headers: {
       "content-type": "application/json"
     }

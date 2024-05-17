@@ -4,9 +4,7 @@ export async function GET(request, context) {
   const { chainId, offerId } = context.params;
 
   const sdk = new DSponsorSDK({
-    chain: {
-      chainId
-    }
+    chainId: chainId
   });
   const admin = await sdk.getDSponsorAdmin();
   const offer = await admin.getOffer({ offerId: parseInt(offerId) });
@@ -17,7 +15,7 @@ export async function GET(request, context) {
     });
   }
 
-  return new Response(JSON.stringify(offer, null, 4), {
+  return new Response(JSON.stringify(offer), {
     headers: {
       "content-type": "application/json"
     }

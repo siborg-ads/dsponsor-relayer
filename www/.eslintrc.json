@@ -2,6 +2,9 @@
   "env": {
     "es6": true
   },
+  "globals": {
+    "BigInt": true
+  },
   "extends": ["next/core-web-vitals", "eslint:recommended", "prettier"],
   "rules": {
     "no-html-link-for-pages": "off"

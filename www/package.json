@@ -12,6 +12,7 @@
   "dependencies": {
     "@dsponsor/sdk": "^5.0.2",
     "@vercel/og": "^0.6.2",
+    "ethers": "^6.12.1",
     "graphql": "^16.8.1",
     "next": "14.2.2",
     "react": "^18",
