@@ -1,62 +1,79 @@
-export async function populateAdOffers(queryResult) {
-  // memoïze metadata per offerId
-  const offerMetadata = {};
+import { isObject } from "@/utils";
 
-  async function populateAdOffer(adOffer) {
-    const { id, metadataURL, nftContract } = adOffer;
+async function tokenMetadataReplace(tokenMetadata, tokenData) {
+  let res = null;
+  if (tokenData && tokenMetadata) {
+    try {
+      res = JSON.parse(JSON.stringify(tokenMetadata).replace(/\{tokenData\}/g, tokenData));
+    } catch (e) {
+      console.error(`Error with token metadata ${tokenMetadata}`, e);
+    }
+  }
+  return res;
+}
 
-    if (id) {
-      if (offerMetadata[id]) {
-        adOffer.metadata = offerMetadata[id];
-      } else {
-        if (metadataURL) {
-          try {
-            const metadataRequest = await fetch(metadataURL, {
-              headers: {
-                "content-type": "application/json"
-              }
-            });
-            adOffer.metadata = await metadataRequest.json();
+async function populateTokens(token) {
+  const adOffer = token?.nftContract?.adOffers?.length ? token.nftContract.adOffers[0] : null;
 
-            if (nftContract?.tokens?.length) {
-              for (let i = 0; i < nftContract.tokens.length; i++) {
-                const tokenData = nftContract.tokens[i].mint?.tokenData;
-                const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
-                if (tokenData && tokenMetadata) {
-                  try {
-                    adOffer.nftContract.tokens[i].metadata = JSON.parse(
-                      JSON.stringify(tokenMetadata).replace(/\{tokenData\}/g, tokenData)
-                    );
-                  } catch (e) {
-                    console.error(`Error with token metadata ${tokenMetadata}`, e);
-                  }
-                }
-              }
-            }
+  if (adOffer) {
+    await populateAdOffer(token.nftContract.adOffers[0]);
 
-            offerMetadata[id] = adOffer;
-          } catch (e) {
-            console.error(`Error fetching metadata for ${metadataURL}`);
+    const tokenData = token?.mint?.tokenData;
+    const tokenMetadata = token.nftContract.adOffers[0]?.metadata?.offer?.token_metadata;
+
+    token.metadata = await tokenMetadataReplace(tokenMetadata, tokenData);
+  }
+}
+
+async function populateAdOffer(adOffer) {
+  const { id, metadataURL, nftContract } = adOffer;
+
+  if (id) {
+    if (metadataURL) {
+      try {
+        const metadataRequest = await fetch(metadataURL, {
+          headers: {
+            "content-type": "application/json"
+          },
+          cache: "force-cache"
+        });
+        adOffer.metadata = await metadataRequest.json();
+
+        if (nftContract?.tokens?.length) {
+          for (let i = 0; i < nftContract.tokens.length; i++) {
+            const tokenData = nftContract.tokens[i].mint?.tokenData;
+            const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
+            adOffer.nftContract.tokens[i].metadata = await tokenMetadataReplace(
+              tokenMetadata,
+              tokenData
+            );
           }
         }
+      } catch (e) {
+        console.error(`Error fetching metadata for ${metadataURL}`);
       }
     }
   }
+}
 
-  // Helper function to check if a value is an object
-  function isObject(value) {
-    return value && typeof value === "object" && !Array.isArray(value);
-  }
-
+export async function populateSubgraphResult(queryResult) {
   // Recursive function to traverse the object
   async function traverse(current) {
     if (isObject(current.adOffer)) {
       await populateAdOffer(current.adOffer);
     }
+    if (isObject(current.token)) {
+      await populateTokens(current.token);
+    }
 
     if (Array.isArray(current.adOffers)) {
       for (let key in current.adOffers) {
         await populateAdOffer(current.adOffers[key]);
+      }
+    }
+    if (Array.isArray(current.tokens)) {
+      for (let key in current.tokens) {
+        await populateTokens(current.tokens[key]);
       }
     }
 
@@ -68,11 +85,11 @@ export async function populateAdOffers(queryResult) {
       }
       // If the property is an array, iterate through its elements
       if (Array.isArray(current[key])) {
-        current[key].forEach(async (item) => {
-          if (isObject(item)) {
-            await traverse(item);
+        for (let i = 0; i < current[key].length; i++) {
+          if (isObject(current[key][i])) {
+            await traverse(current[key][i]);
           }
-        });
+        }
       }
     }
   }

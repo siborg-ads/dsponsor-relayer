@@ -1,5 +1,6 @@
 import config from "@/config";
-import { populateAdOffers } from "@/queries/populate";
+import { populateSubgraphResult } from "@/queries/populate";
+import fragments from "@/queries/fragments";
 
 export async function executeQuery(chainId, query, variables, options) {
   const url = config ? config[chainId]?.subgraphURL : null;
@@ -7,6 +8,11 @@ export async function executeQuery(chainId, query, variables, options) {
   if (!url) {
     return null;
   }
+
+  query = /* GraphQL */ `
+    ${fragments.join("\n")}
+    ${query}
+  `;
 
   const requestInit = {
     method: "POST",
@@ -21,13 +27,17 @@ export async function executeQuery(chainId, query, variables, options) {
     requestInit.next = options.next;
   }
 
+  if (options?.cache) {
+    requestInit.cache = options.cache;
+  }
+
   const request = await fetch(url, requestInit);
 
   const result = await request.json();
 
-  if (options?.populate && result?.data) {
-    await populateAdOffers(result);
-  }
+  // if (options?.populate && result?.data) {
+  await populateSubgraphResult(result);
+  // }
 
   return result;
 }

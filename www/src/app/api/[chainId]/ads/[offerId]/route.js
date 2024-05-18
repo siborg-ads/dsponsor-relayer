@@ -1,5 +1,5 @@
 import { getValidatedAds } from "@/queries/ads";
-import { stringToUint256 } from "@/queries/tokens";
+import { normalizeString, stringToUint256 } from "@/utils";
 
 export async function GET(request, context) {
   const { chainId, offerId } = context.params;
@@ -13,6 +13,7 @@ export async function GET(request, context) {
     : tokenData
       ? tokenData.split(",").map((t) => stringToUint256(t))
       : undefined;
+  const _tokenData = tokenData ? tokenData.split(",").map(normalizeString) : undefined;
 
   const result = await getValidatedAds(chainId, offerId, _tokenIds);
 
@@ -22,7 +23,7 @@ export async function GET(request, context) {
     });
   }
 
-  return new Response(JSON.stringify(Object.assign(result, { _tokenIds }), null, 4), {
+  return new Response(JSON.stringify(Object.assign(result, { _tokenIds, _tokenData }), null, 4), {
     headers: {
       "content-type": "application/json"
     }
