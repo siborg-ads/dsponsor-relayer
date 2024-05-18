@@ -1,14 +1,40 @@
 import { isObject } from "@/utils";
 
-async function tokenMetadataReplace(tokenMetadata, tokenData) {
+async function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
   let res = null;
-  if (tokenData && tokenMetadata) {
+  if (
+    tokenData &&
+    tokenMetadata &&
+    tokenMetadata.name &&
+    tokenMetadata.description &&
+    tokenMetadata.image
+  ) {
     try {
       res = JSON.parse(JSON.stringify(tokenMetadata).replace(/\{tokenData\}/g, tokenData));
     } catch (e) {
       console.error(`Error with token metadata ${tokenMetadata}`, e);
     }
+    if (!res) {
+      if (tokenMetadata) {
+        res = tokenMetadata;
+      }
+    }
   }
+
+  if (!res) {
+    if (offerMetadata.name && offerMetadata.description && offerMetadata.image) {
+      res = offerMetadata;
+    }
+  }
+
+  if (!res) {
+    res = {
+      name: "Untitled token",
+      description: "No description for this token",
+      image: "https://via.placeholder.com/500x500?text=Unknown%20token"
+    };
+  }
+
   return res;
 }
 
@@ -18,41 +44,50 @@ async function populateTokens(token) {
   if (adOffer) {
     await populateAdOffer(token.nftContract.adOffers[0]);
 
-    const tokenData = token?.mint?.tokenData;
+    const offerMetadata = token.nftContract.adOffers[0]?.metadata?.offer;
     const tokenMetadata = token.nftContract.adOffers[0]?.metadata?.offer?.token_metadata;
+    const tokenData = token?.mint?.tokenData;
 
-    token.metadata = await tokenMetadataReplace(tokenMetadata, tokenData);
+    token.metadata = await tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData);
   }
 }
 
 async function populateAdOffer(adOffer) {
-  const { id, metadataURL, nftContract } = adOffer;
+  const { metadataURL, nftContract } = adOffer;
 
-  if (id) {
-    if (metadataURL) {
-      try {
-        const metadataRequest = await fetch(metadataURL, {
-          headers: {
-            "content-type": "application/json"
-          },
-          cache: "force-cache"
-        });
-        adOffer.metadata = await metadataRequest.json();
+  if (metadataURL) {
+    try {
+      const metadataRequest = await fetch(metadataURL, {
+        headers: {
+          "content-type": "application/json"
+        },
+        cache: "force-cache"
+      });
+      adOffer.metadata = await metadataRequest.json();
 
-        if (nftContract?.tokens?.length) {
-          for (let i = 0; i < nftContract.tokens.length; i++) {
-            const tokenData = nftContract.tokens[i].mint?.tokenData;
-            const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
-            adOffer.nftContract.tokens[i].metadata = await tokenMetadataReplace(
-              tokenMetadata,
-              tokenData
-            );
-          }
+      if (nftContract?.tokens?.length) {
+        for (let i = 0; i < nftContract.tokens.length; i++) {
+          const offerMetadata = adOffer.metadata?.offer;
+          const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
+          const tokenData = nftContract.tokens[i].mint?.tokenData;
+          adOffer.nftContract.tokens[i].metadata = await tokenMetadataReplace(
+            offerMetadata,
+            tokenMetadata,
+            tokenData
+          );
         }
-      } catch (e) {
-        console.error(`Error fetching metadata for ${metadataURL}`);
       }
+    } catch (e) {
+      console.error(`Error fetching metadata for ${metadataURL}`);
     }
+  }
+
+  if (!adOffer.metadata) {
+    adOffer.metadata = {
+      name: "Untitled",
+      description: "No description",
+      image: "https://via.placeholder.com/500x500?text=Unknown"
+    };
   }
 }
 
