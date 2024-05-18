@@ -1,9 +1,10 @@
+import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
 
 export const getValidatedAdsForTokensQuery = /* GraphQL */ `
   query getValidatedAds($adOfferId: String, $tokenIds: [BigInt!]) {
     adOffers(where: { id: $adOfferId }) {
-      ...AdOfferFragment
+      ...AdOfferSelectedTokensFragment
     }
     adProposals(
       first: 1000
@@ -29,9 +30,9 @@ const getValidatedAdsForOfferQuery = /* GraphQL */ `
   }
 `;
 
-export async function getValidatedAds(chainId, offerId, tokenIds) {
+export async function getValidatedAds(chainId, adOfferId, tokenIds) {
   const variables = {
-    adOfferId: offerId
+    adOfferId
   };
   const query =
     tokenIds && tokenIds.length ? getValidatedAdsForTokensQuery : getValidatedAdsForOfferQuery;
@@ -52,43 +53,21 @@ export async function getValidatedAds(chainId, offerId, tokenIds) {
   }
 
   const result = {};
-
-  /**
-   * NFT Contract, Mint data
-   */
-
-  const {
-    allowList,
-    //  maxSupply,
-    prices: defaultPrices
-    // tokens
-  } = graphResult.data.adOffers[0].nftContract;
-
-  /*
-  const availableAllowlistedTokens = tokens
-    .filter((t) => {
-      const isMinted = t.mint && t.mint.blockTimestamp && t.mint.blockTimestamp > 0;
-
-      return t.setInAllowList && !isMinted;
-    })
-    .map(({ tokenId, prices: tokenPrices }) => {
-      return {
-        tokenId,
-        prices: tokenPrices && tokenPrices.length > 0 ? tokenPrices : defaultPrices
-      };
-    });
-*/
+  const { adParameters, nftContract } = graphResult.data.adOffers[0];
+  const { allowList, prices: defaultPrices } = nftContract;
 
   const getTokenMintValue = (token) => {
-    const { mint, prices: tokenPrices, setInAllowList } = token;
+    const isMinted = token?.mint?.blockTimestamp && token?.mint?.blockTimestamp > 0;
+    const isInAllowlist = allowList ? token?.setInAllowList : true;
+    const tokenCanBeMinted = !isMinted && isInAllowlist;
 
-    const isInAllowlist = allowList ? setInAllowList : true;
-
-    return mint?.blockTimestamp || !isInAllowlist
-      ? null
-      : tokenPrices && tokenPrices
-        ? tokenPrices
-        : defaultPrices;
+    return tokenCanBeMinted
+      ? token?.tokenPrices?.length
+        ? token.tokenPrices
+        : defaultPrices?.length
+          ? defaultPrices
+          : null
+      : null;
   };
 
   /**
@@ -97,23 +76,11 @@ export async function getValidatedAds(chainId, offerId, tokenIds) {
 
   graphResult.data.adProposals.forEach((ad) => {
     const { token } = ad;
-    const { tokenId, marketplaceListings, mint } = token;
+    const { tokenId } = token;
     if (!result[tokenId]) {
       result[tokenId] = {};
     }
-    result[tokenId][ad.adParameter.id] = ad.data;
-
-    if (mint?.tokenData) {
-      result[tokenId].tokenData = mint.tokenData;
-    }
-
-    result[tokenId]._buy = {
-      mint: getTokenMintValue(token),
-      secondary:
-        marketplaceListings.find(
-          (l) => l.startTime < Date.now() / 1000 && l.endTime > Date.now() / 1000
-        ) || null
-    };
+    result[tokenId][ad.adParameter.id] = { state: "CURRENT_ACCEPTED", data: ad.data };
   });
 
   /**
@@ -125,7 +92,7 @@ export async function getValidatedAds(chainId, offerId, tokenIds) {
   }
 
   if (tokenIds && tokenIds.length > 0) {
-    tokenIds.forEach((_tokenId) => {
+    for (const _tokenId of tokenIds) {
       if (!result[_tokenId]) {
         result[_tokenId] = {};
       }
@@ -134,32 +101,78 @@ export async function getValidatedAds(chainId, offerId, tokenIds) {
         (t) => t.tokenId === _tokenId
       );
 
-      if (token) {
-        const { tokenId, setInAllowList, marketplaceListings, nftContract, mint, prices } = token;
-
-        if (mint?.tokenData) {
-          result[tokenId].tokenData = mint.tokenData;
-        }
-
-        const restrictedToAllowlist = nftContract?.allowList ? !setInAllowList : false;
-
-        result[tokenId]._buy = {
-          mint:
-            mint?.blockTimestamp || restrictedToAllowlist
-              ? null
-              : prices?.length > 0
-                ? prices
-                : nftContract?.prices,
-          secondary:
-            marketplaceListings.find(
-              (l) => l.startTime < Date.now() / 1000 && l.endTime > Date.now() / 1000
-            ) || null
-        };
-      } else {
-        // mint / buy
+      const tokenData = token?.mint?.tokenData;
+      if (tokenData) {
+        result[_tokenId].tokenData = token.mint.tokenData;
       }
-    });
+
+      result[_tokenId]._buy = {
+        mint: getTokenMintValue(token),
+        secondary:
+          token?.marketplaceListings.find(
+            (l) =>
+              l.startTime < Date.now() / 1000 &&
+              l.endTime > Date.now() / 1000 &&
+              l.status === "CREATED"
+          ) || null
+      };
+
+      for (const { adParameter } of adParameters) {
+        if (!result[_tokenId][adParameter.id]) {
+          const state = result[_tokenId]._buy.mint?.length
+            ? "BUY_MINT"
+            : result[_tokenId]._buy.secondary
+              ? "BUY_MARKET"
+              : "UNAVAILABLE";
+          result[_tokenId][adParameter.id] = {
+            state,
+            data: await getDefaultAdData(
+              state,
+              chainId,
+              adOfferId,
+              _tokenId,
+              tokenData,
+              adParameter,
+              result[_tokenId]._buy
+            )
+          };
+        }
+      }
+    }
   }
 
   return result;
+}
+
+export async function getDefaultAdData(
+  state,
+  chainId,
+  adOfferId,
+  tokenId,
+  tokenData,
+  adParameter,
+  // eslint-disable-next-line no-unused-vars
+  buyInfos
+) {
+  const chainName = config[chainId]?.chainName;
+  const appURL = config[chainId]?.appURL;
+
+  const {
+    base
+    // variants
+  } = adParameter;
+
+  let data = null;
+
+  if (base === "imageURL") {
+    if (state === "BUY_MINT" || state === "BUY_MARKET") {
+      data = "https://relayer.dsponsor.com/available.webp";
+    } else if (state === "UNAVAILABLE") {
+      data = data = "https://relayer.dsponsor.com/reserved.webp";
+    }
+  } else if (base === "linkURL") {
+    return `${appURL}/offer/${chainName}/${adOfferId}/${tokenId}`;
+  }
+
+  return data;
 }
