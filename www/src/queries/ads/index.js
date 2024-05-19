@@ -171,8 +171,38 @@ export async function getDefaultAdData(
       data = data = "https://relayer.dsponsor.com/reserved.webp";
     }
   } else if (base === "linkURL") {
-    return `${appURL}/offer/${chainName}/${adOfferId}/${tokenId}`;
+    return `${appURL}/${chainName}/offer/${adOfferId}/${tokenId}`;
   }
 
   return data;
+}
+
+export async function getAdDataForToken(
+  chainId,
+  adOfferId,
+  tokenId,
+  adParameterId,
+  defaultAdParameterKey
+) {
+  const adParameterKey = adParameterId ? adParameterId : defaultAdParameterKey;
+
+  const result = await getValidatedAds(chainId, adOfferId, [tokenId]);
+
+  console.log(result);
+
+  if (!result || !result[tokenId]) {
+    return null;
+  }
+
+  let foundAdParameterKey = Object.keys(result[tokenId]).find((key) => key === adParameterKey);
+
+  if (!foundAdParameterKey) {
+    foundAdParameterKey = Object.keys(result[tokenId]).find((key) => key.includes(adParameterKey));
+  }
+
+  if (!foundAdParameterKey) {
+    return null;
+  }
+
+  return result[tokenId][foundAdParameterKey].data;
 }
