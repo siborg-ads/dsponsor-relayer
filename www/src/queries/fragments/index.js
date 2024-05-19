@@ -1,7 +1,13 @@
-export const AdOfferFragment = /* GraphQL */ `
-  fragment AdOfferFragment on AdOffer {
+export const BaseAdOfferFragment = /* GraphQL */ `
+  fragment BaseAdOfferFragment on AdOffer {
     id
+    disable
     metadataURL
+    name
+    initialCreator
+    validators
+    admins
+    creationTimestamp
     adParameters(where: { enable: true }) {
       adParameter {
         id
@@ -9,13 +15,26 @@ export const AdOfferFragment = /* GraphQL */ `
         variants
       }
     }
+  }
+`;
+
+const BaseNftContractFragment = /* GraphQL */ `
+  fragment BaseNftContractFragment on NftContract {
+    id
+    allowList
+    maxSupply
+    prices(where: { enabled: true }) {
+      currency
+      amount
+    }
+  }
+`;
+
+export const AdOfferFragment = /* GraphQL */ `
+  fragment AdOfferFragment on AdOffer {
+    ...BaseAdOfferFragment
     nftContract {
-      allowList
-      maxSupply
-      prices(where: { enabled: true }) {
-        currency
-        amount
-      }
+      ...BaseNftContractFragment
       tokens(first: 1000) {
         ...TokenFragment
       }
@@ -25,23 +44,22 @@ export const AdOfferFragment = /* GraphQL */ `
 
 export const AdOfferSelectedTokensFragment = /* GraphQL */ `
   fragment AdOfferSelectedTokensFragment on AdOffer {
-    id
-    metadataURL
-    adParameters(where: { enable: true }) {
-      adParameter {
-        id
-        base
-        variants
+    ...BaseAdOfferFragment
+    nftContract {
+      ...BaseNftContractFragment
+      tokens(where: { tokenId_in: $tokenIds }) {
+        ...TokenFragment
       }
     }
+  }
+`;
+
+export const AdOfferSelectedNftTokensFragment = /* GraphQL */ `
+  fragment AdOfferSelectedNftTokensFragment on AdOffer {
+    ...BaseAdOfferFragment
     nftContract {
-      allowList
-      maxSupply
-      prices(where: { enabled: true }) {
-        currency
-        amount
-      }
-      tokens(where: { tokenId_in: $tokenIds }) {
+      ...BaseNftContractFragment
+      tokens(where: { id_in: $tokenIds }) {
         ...TokenFragment
       }
     }
@@ -95,8 +113,11 @@ export const TokenFragment = /* GraphQL */ `
 `;
 
 const fragments = [
+  BaseAdOfferFragment,
+  BaseNftContractFragment,
   AdOfferFragment,
   AdOfferSelectedTokensFragment,
+  AdOfferSelectedNftTokensFragment,
   AdProposalFragment,
   TokenFragment
 ];

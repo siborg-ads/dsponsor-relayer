@@ -22,3 +22,26 @@ export async function getOfferTokensFromNftContract(chainId, nftContract, tokenI
 
   return graphResult.data.adOffers[0];
 }
+
+const getOfferTokensFromNftContractsQuery = /* GraphQL */ `
+  query getOfferTokensFromNftContracts($nftContracts: [String!], $tokenIds: [String!]) {
+    adOffers(where: { nftContract_in: $nftContracts }) {
+      ...AdOfferSelectedNftTokensFragment
+    }
+  }
+`;
+
+export async function getOfferTokensFromNftContracts(chainId, nftContracts, tokenIds) {
+  const variables = {
+    nftContracts,
+    tokenIds
+  };
+
+  const graphResult = await executeQuery(chainId, getOfferTokensFromNftContractsQuery, variables);
+
+  if (!graphResult || !graphResult.data || !graphResult.data.adOffers) {
+    return null;
+  }
+
+  return graphResult.data.adOffers;
+}
