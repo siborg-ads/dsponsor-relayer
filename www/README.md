@@ -131,62 +131,63 @@ Iframe Embedding
 
 ```html
 
-<table>
-    <tr>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/0/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/0/image"/>
-            </a>
-        </td>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/1/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/1/image"/>
-            </a>
-        </td>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/2/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/2/image"/>
-            </a>
-        </td>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/3/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/3/image"/>
-            </a>
-        </td>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/4/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/4/image"/>
-            </a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/5/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/5/image"/>
-            </a>
-        </td>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/6/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/6/image"/>
-            </a>
-        </td>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/7/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/7/image"/>
-            </a>
-        </td>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/8/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/8/image"/>
-            </a>
-        </td>
-        <td>
-            <a href="https://relayer.dsponsor.com/11155111/ad/3/9/link">
-                <img src="https://relayer.dsponsor.com/11155111/ad/3/9/image"/>
-            </a>
-        </td>
-    </tr>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/0/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/0/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/1/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/1/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/2/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/2/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/3/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/3/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/4/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/4/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/5/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/5/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/6/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/6/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/7/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/7/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/8/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/8/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+    <td style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/9/link">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/9/image" width="100" height="100" style="display: block;" alt="Ad Image">
+      </a>
+    </td>
+  </tr>
 </table>
+
 ```
 
 
