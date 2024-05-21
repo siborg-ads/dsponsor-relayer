@@ -14,7 +14,7 @@ Iframe Embedding
 
 ### Example
 
-<table>
+<!-- <table>
     <tr>
         <td>
             <a href="https://relayer.dsponsor.com/11155111/ad/3/0/link">
@@ -69,65 +69,124 @@ Iframe Embedding
             </a>
         </td>
     </tr>
+</table> -->
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
+  <tr>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/0/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/0/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/1/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/1/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/2/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/2/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/3/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/3/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/4/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/4/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/5/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/5/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/6/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/6/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/7/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/7/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/8/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/8/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/9/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/9/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      </a>
+    </td>
+  </tr>
 </table>
 
 ```html
-<table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
   <tr>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/0/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/0/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/0/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/0/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/1/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/1/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/1/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/1/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/2/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/2/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/2/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/2/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/3/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/3/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/3/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/3/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/4/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/4/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/4/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/4/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
   </tr>
   <tr>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/5/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/5/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/5/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/5/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/6/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/6/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/6/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/6/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/7/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/7/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/7/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/7/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/8/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/8/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/8/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/8/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
-    <td>
-      <a href="https://relayer.dsponsor.com/11155111/ad/3/9/link">
-        <img src="https://relayer.dsponsor.com/11155111/ad/3/9/image" />
+    <td width="20%" style="text-align: center; padding: 10px;">
+      <a href="https://relayer.dsponsor.com/11155111/ad/3/9/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/ad/3/9/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
   </tr>
 </table>
+
 ```
 
 ## Getting Started
