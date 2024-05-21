@@ -62,7 +62,7 @@ const Ad = ({ ad }) => {
           />
         ) : (
           <img
-            src="/available.webp"
+            src="/reserved.webp"
             alt="Ad image"
             className="aspect-square h-full w-full object-contain"
           />
