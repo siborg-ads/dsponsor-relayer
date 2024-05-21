@@ -1,6 +1,6 @@
-export default function getLastValidatedAdQuery({offerId, tokenId}) {
-    return `
-    query {
+export default function getLastValidatedAdQuery({ offerId, tokenId }) {
+  const gqlQuery = `
+      query {
          adProposals(
             where:{
                 adOffer_:{id:"${offerId}"},
@@ -37,4 +37,5 @@ export default function getLastValidatedAdQuery({offerId, tokenId}) {
         status
         }
     }`;
+  return gqlQuery;
 }

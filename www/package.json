@@ -6,11 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@dsponsor/sdk": "^5.0.2",
+    "@uniswap/v3-periphery": "^1.4.4",
     "@vercel/og": "^0.6.2",
+    "alchemy-sdk": "^3.3.1",
+    "ethers": "^6.12.1",
     "graphql": "^16.8.1",
     "next": "14.2.2",
     "react": "^18",
@@ -18,8 +22,15 @@
     "urql": "^4.0.7"
   },
   "devDependencies": {
+    "@graphql-eslint/eslint-plugin": "^3.20.1",
     "autoprefixer": "^10.0.1",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "13.2.3",
+    "eslint-config-prettier": "^9.1.0",
     "postcss": "^8",
+    "prettier": "^3.2.5",
+    "prettier-plugin-embed": "^0.4.15",
+    "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.3.0"
   }
 }

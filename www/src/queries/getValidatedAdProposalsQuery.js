@@ -1,5 +1,5 @@
-export default function getValidatedAdForOfferQuery({offerId}) {
-    return `
+export default function getValidatedAdForOfferQuery({ offerId }) {
+  return `
     query {
            adOffers(where: { id: "${parseInt(offerId)}" }) {
             metadataURL

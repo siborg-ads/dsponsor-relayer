@@ -1,5 +1,5 @@
 function formDefaultQuery(method, formedQueryParts, formedReturnParts) {
-    const query = `
+  const query = `
       query {
           ${method}(
             ${formedQueryParts}
@@ -8,7 +8,7 @@ function formDefaultQuery(method, formedQueryParts, formedReturnParts) {
           }
     }`;
 
-    return query;
+  return query;
 }
 
 export default formDefaultQuery;

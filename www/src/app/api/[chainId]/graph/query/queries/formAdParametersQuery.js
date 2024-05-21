@@ -1,5 +1,5 @@
 export default function formAdParametersQuery(formedQueryParts) {
-    const query = `
+  const query = `
     query {
       adParameters(
         ${formedQueryParts}
@@ -16,5 +16,5 @@ export default function formAdParametersQuery(formedQueryParts) {
       }
     }`;
 
-    return query;
+  return query;
 }
