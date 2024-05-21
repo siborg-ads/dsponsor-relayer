@@ -160,93 +160,123 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
 
 ```json
 {
-    "65329693524297118063646238334159138948524025175806621014596919199733788562630": {
-        "imageURL-6.4:1": {
-            "state": "CURRENT_ACCEPTED",
-            "data": "https://6f375d41f2a33f1f08f6042a65d49ec9.ipfscdn.io/ipfs/bafybeihkthq6hnez2tfogymwnktkgnpbpbvreizpclhvzywyxkc6ukqa7u/"
-        },
-        "linkURL": {
-            "state": "CURRENT_ACCEPTED",
-            "data": "https://test.fr"
-        },
-        "tokenData": "web3",
-        "_buy": {
-            "mint": null,
-            "secondary": null
-        },
-        "xCreatorHandle": {
-            "state": "UNAVAILABLE",
-            "data": null
-        },
-        "xSpaceId": {
-            "state": "UNAVAILABLE",
-            "data": null
-        }
+  "_tokenIds": [
+    "65329693524297118063646238334159138948524025175806621014596919199733788562630",
+    "101661046026135114031620108954831493212219976668510473490175828180454937635060",
+    "64873369441774726751632143071124460964591437972899336413549633584093280026386",
+    "42815755960540918129438353840082893508347041245824540425731235505437781612563"
+  ],
+  "_tokenData": [
+    "web3",
+    "twitter",
+    "staking",
+    "cryptonnews"
+  ],
+  "65329693524297118063646238334159138948524025175806621014596919199733788562630": {
+    "imageURL-6.4:1": {
+      "state": "CURRENT_ACCEPTED",
+      "data": "https://6f375d41f2a33f1f08f6042a65d49ec9.ipfscdn.io/ipfs/bafybeihkthq6hnez2tfogymwnktkgnpbpbvreizpclhvzywyxkc6ukqa7u/"
     },
-    "101661046026135114031620108954831493212219976668510473490175828180454937635060": {
-        "_buy": {
-            "mint": null,
-            "secondary": null
-        },
-        "imageURL-6.4:1": {
-            "state": "UNAVAILABLE",
-            "data": "https://relayer.dsponsor.com/reserved.webp"
-        },
-        "linkURL": {
-            "state": "UNAVAILABLE",
-            "data": "https://app.staging.dsponsor.com/sepolia/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060"
-        },
-        "xCreatorHandle": {
-            "state": "UNAVAILABLE",
-            "data": null
-        },
-        "xSpaceId": {
-            "state": "UNAVAILABLE",
-            "data": null
-        }
+    "linkURL": {
+      "state": "CURRENT_ACCEPTED",
+      "data": "https://test.fr"
     },
-    "64873369441774726751632143071124460964591437972899336413549633584093280026386": {
-        "tokenData": "staking",
-        "_buy": {
-            "mint": null,
-            "secondary": {
-                "listingType": "Auction",
-                "startTime": "1713975960",
-                "endTime": "1717863960",
-                "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
-                "buyoutPricePerToken": "10000000000",
-                "reservePricePerToken": "2500000",
-                "status": "CREATED",
-                "bids": []
-            }
-        },
-        "imageURL-6.4:1": {
-            "state": "BUY_MARKET",
-            "data": "https://relayer.dsponsor.com/available.webp"
-        },
-        "linkURL": {
-            "state": "BUY_MARKET",
-            "data": "https://app.staging.dsponsor.com/sepolia/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386"
-        },
-        "xCreatorHandle": {
-            "state": "BUY_MARKET",
-            "data": null
-        },
-        "xSpaceId": {
-            "state": "BUY_MARKET",
-            "data": null
-        }
+    "_tokenData": "web3",
+    "_buy": {
+      "link": "https://app.staging.dsponsor.com/sepolia/offer/1/65329693524297118063646238334159138948524025175806621014596919199733788562630?tokenData=web3",
+      "mint": null,
+      "secondary": null
     },
-    "_tokenIds": [
-        "65329693524297118063646238334159138948524025175806621014596919199733788562630",
-        "101661046026135114031620108954831493212219976668510473490175828180454937635060",
-        "64873369441774726751632143071124460964591437972899336413549633584093280026386"
-    ],
-    "_tokenData": [
-        "web3",
-        "twitter",
-        "staking"
-    ]
+    "xCreatorHandle": {
+      "state": "UNAVAILABLE",
+      "data": null
+    },
+    "xSpaceId": {
+      "state": "UNAVAILABLE",
+      "data": null
+    }
+  },
+  "101661046026135114031620108954831493212219976668510473490175828180454937635060": {
+    "_tokenData": "twitter",
+    "_buy": {
+      "link": "https://app.staging.dsponsor.com/sepolia/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060?tokenData=twitter",
+      "mint": null,
+      "secondary": null
+    },
+    "imageURL-6.4:1": {
+      "state": "UNAVAILABLE",
+      "data": "https://relayer.dsponsor.com/reserved.webp"
+    },
+    "linkURL": {
+      "state": "UNAVAILABLE",
+      "data": "https://app.staging.dsponsor.com/sepolia/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060?tokenData=twitter"
+    },
+    "xCreatorHandle": {
+      "state": "UNAVAILABLE",
+      "data": null
+    },
+    "xSpaceId": {
+      "state": "UNAVAILABLE",
+      "data": null
+    }
+  },
+  "64873369441774726751632143071124460964591437972899336413549633584093280026386": {
+    "_tokenData": "staking",
+    "_buy": {
+      "link": "https://app.staging.dsponsor.com/sepolia/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386?tokenData=staking",
+      "mint": null,
+      "secondary": {
+        "listingType": "Auction",
+        "startTime": "1713975960",
+        "endTime": "1717863960",
+        "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+        "buyoutPricePerToken": "10000000000",
+        "reservePricePerToken": "2500000",
+        "status": "CREATED",
+        "bids": []
+      }
+    },
+    "imageURL-6.4:1": {
+      "state": "BUY_MARKET",
+      "data": "https://relayer.dsponsor.com/available.webp"
+    },
+    "linkURL": {
+      "state": "BUY_MARKET",
+      "data": "https://app.staging.dsponsor.com/sepolia/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386?tokenData=staking"
+    },
+    "xCreatorHandle": {
+      "state": "BUY_MARKET",
+      "data": null
+    },
+    "xSpaceId": {
+      "state": "BUY_MARKET",
+      "data": null
+    }
+  },
+  "42815755960540918129438353840082893508347041245824540425731235505437781612563": {
+    "_tokenData": "cryptonnews",
+    "_buy": {
+      "link": "https://app.staging.dsponsor.com/sepolia/offer/1/42815755960540918129438353840082893508347041245824540425731235505437781612563?tokenData=cryptonnews",
+      "mint": null,
+      "secondary": null
+    },
+    "imageURL-6.4:1": {
+      "state": "UNAVAILABLE",
+      "data": "https://relayer.dsponsor.com/reserved.webp"
+    },
+    "linkURL": {
+      "state": "UNAVAILABLE",
+      "data": "https://app.staging.dsponsor.com/sepolia/offer/1/42815755960540918129438353840082893508347041245824540425731235505437781612563?tokenData=cryptonnews"
+    },
+    "xCreatorHandle": {
+      "state": "UNAVAILABLE",
+      "data": null
+    },
+    "xSpaceId": {
+      "state": "UNAVAILABLE",
+      "data": null
+    }
+  }
 }
 ```
 

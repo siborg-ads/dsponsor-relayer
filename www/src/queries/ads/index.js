@@ -1,5 +1,6 @@
 import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
+import { normalizeString, stringToUint256 } from "@/utils";
 
 export const getValidatedAdsForTokensQuery = /* GraphQL */ `
   query getValidatedAds($adOfferId: String, $tokenIds: [BigInt!]) {
@@ -30,7 +31,15 @@ const getValidatedAdsForOfferQuery = /* GraphQL */ `
   }
 `;
 
-export async function getValidatedAds(chainId, adOfferId, tokenIds) {
+export async function getValidatedAds(chainId, adOfferId, tokenIds, tokenDatas) {
+  const chainName = config[chainId]?.chainName;
+  const appURL = config[chainId]?.appURL;
+
+  if (tokenDatas && tokenDatas.length) {
+    tokenDatas = tokenDatas.map((t) => normalizeString(t));
+    tokenIds = tokenIds && tokenIds.length ? tokenIds : tokenDatas.map((t) => stringToUint256(t));
+  }
+
   const variables = {
     adOfferId
   };
@@ -92,7 +101,8 @@ export async function getValidatedAds(chainId, adOfferId, tokenIds) {
   }
 
   if (tokenIds && tokenIds.length > 0) {
-    for (const _tokenId of tokenIds) {
+    for (let i = 0; i < tokenIds.length; i++) {
+      const _tokenId = tokenIds[i];
       if (!result[_tokenId]) {
         result[_tokenId] = {};
       }
@@ -101,12 +111,21 @@ export async function getValidatedAds(chainId, adOfferId, tokenIds) {
         (t) => t.tokenId === _tokenId
       );
 
-      const tokenData = token?.mint?.tokenData;
+      const tokenData = token?.mint?.tokenData
+        ? token.mint.tokenData
+        : tokenDatas && tokenDatas.length && tokenDatas[i]
+          ? tokenDatas[i]
+          : undefined;
       if (tokenData) {
-        result[_tokenId].tokenData = token.mint.tokenData;
+        result[_tokenId]._tokenData = tokenData;
       }
 
+      let link = `${appURL}/${chainName}/offer/${adOfferId}/${_tokenId}`;
+      if (tokenData) {
+        link += `?tokenData=${tokenData}`;
+      }
       result[_tokenId]._buy = {
+        link,
         mint: getTokenMintValue(token),
         secondary:
           token?.marketplaceListings.find(
@@ -141,7 +160,7 @@ export async function getValidatedAds(chainId, adOfferId, tokenIds) {
     }
   }
 
-  return result;
+  return Object.assign({ _tokenIds: tokenIds, _tokenData: tokenDatas }, result);
 }
 
 export async function getDefaultAdData(
@@ -151,12 +170,8 @@ export async function getDefaultAdData(
   tokenId,
   tokenData,
   adParameter,
-  // eslint-disable-next-line no-unused-vars
   buyInfos
 ) {
-  const chainName = config[chainId]?.chainName;
-  const appURL = config[chainId]?.appURL;
-
   const {
     base
     // variants
@@ -168,10 +183,10 @@ export async function getDefaultAdData(
     if (state === "BUY_MINT" || state === "BUY_MARKET") {
       data = "https://relayer.dsponsor.com/available.webp";
     } else if (state === "UNAVAILABLE") {
-      data = data = "https://relayer.dsponsor.com/reserved.webp";
+      data = "https://relayer.dsponsor.com/reserved.webp";
     }
   } else if (base === "linkURL") {
-    return `${appURL}/${chainName}/offer/${adOfferId}/${tokenId}`;
+    data = buyInfos.link;
   }
 
   return data;
@@ -187,8 +202,6 @@ export async function getAdDataForToken(
   const adParameterKey = adParameterId ? adParameterId : defaultAdParameterKey;
 
   const result = await getValidatedAds(chainId, adOfferId, [tokenId]);
-
-  console.log(result);
 
   if (!result || !result[tokenId]) {
     return null;
