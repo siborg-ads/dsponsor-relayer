@@ -536,6 +536,18 @@ Purpose: Displays a grid of clickable logos, each linking to a URL. Each ad spac
 
 Use for: Web
 
+|Method|Endpoint|Parameters|
+|--|--|--|
+|`GET`|`/ClickableLogosGrid/iFrame`|`bgColor` (default: `0d102d`), `colSizes` (default: `100,100,125,175,200`), `ratio` (default: `1:1`), `previewTokenId`, `previewImage`, `previewLink`|
+
+Note: All parameters are optional. `colSizes` should provide 5 elements as this parameter indicates the width size of each ad, according to the screen widths:
+
+* `colSizes[4]`: `@media (minWidth: 1280px)`
+* `colSizes[3]`: `@media (minWidth: 1024px)`
+* `colSizes[2]`: `@media (minWidth: 768px)`
+* `colSizes[1]`: `@media (minWidth: 640px)`
+* `colSizes[0]`: `default`
+
 <details>
 
 <summary>
@@ -544,7 +556,7 @@ Example
 </summary>
 
 ```html
- <iframe src="https://relayer.dsponsor.com/11155111/iframe/10?bgColor=0d102d" height="100%" width="100%" />
+ <iframe src="https://relayer.dsponsor.com/11155111/ads/1/ClickableLogosGrid/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%" />
 ```
 
 </details>
@@ -685,13 +697,36 @@ Example
 
 #### Dynamic Banner
 
-Purpose: Displays a single clickable image, randomly selected from all validated ad spaces of an offer.  
+Purpose: Displays a single clickable image, randomly selected from all validated ad spaces of an offer.
 
 ##### Iframe
 
 Use for: Web
 
-*Not developed yet, coming soon*
+|Method|Endpoint|Parameters|
+|--|--|--|
+|`GET`|`/DynamicBanner/iFrame`|`bgColor` (default: `0d102d`), `colSizes` (default: `100,100,125,175,200`), `ratio` (default: `1:1`), `tokenIds` (default to all from the offer), `previewImage`, `previewLink`|
+
+Note: All parameters are optional. `colSizes` should provide 5 elements as this parameter indicates the width size of each ad, according to the screen widths:
+
+* `colSizes[4]`: `@media (minWidth: 1280px)`
+* `colSizes[3]`: `@media (minWidth: 1024px)`
+* `colSizes[2]`: `@media (minWidth: 768px)`
+* `colSizes[1]`: `@media (minWidth: 640px)`
+* `colSizes[0]`: `default`
+
+<details>
+
+<summary>
+Example
+
+</summary>
+
+```html
+ <iframe src="https://relayer.dsponsor.com/11155111/ads/1/DynamicBanner/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&tokenIds=1,2,3,4,5,6&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%" />
+```
+
+</details>
 
 ##### Warpcast Frame
 
