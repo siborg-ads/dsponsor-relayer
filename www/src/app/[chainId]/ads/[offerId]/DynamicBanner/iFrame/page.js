@@ -14,6 +14,9 @@ export async function generateMetadata() {
 export default async function DynamicBannerIframePage(req) {
   const { chainId, offerId } = req.params;
   const { bgColor, colSizes, ratio, previewImage, previewLink, tokenIds } = req.searchParams;
+
+  console.log("DynamicBannerIframePage", req.params, req.searchParams);
+
   let ad =
     previewImage && previewLink
       ? {
@@ -32,7 +35,7 @@ export default async function DynamicBannerIframePage(req) {
   return (
     <html>
       <head />
-      <body style={{ backgroundColor: bgColor ? bgColor : "#0d102d" }}>
+      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "#0d102d" }}>
         <AdsGrid
           ads={[ad]}
           chainId={chainId}
