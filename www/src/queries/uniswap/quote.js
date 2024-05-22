@@ -10,6 +10,10 @@ export const getEthQuote = async (chainId, tokenOutAddr, amountOut, slippagePerC
   const USDC_ADDR = config?.[chainId]?.smartContracts?.USDC?.address;
   const rpcURL = config?.[chainId]?.rpcURL;
 
+  if (tokenOutAddr === "0x0000000000000000000000000000000000000000") {
+    tokenOutAddr = config?.[chainId]?.smartContracts?.WNATIVE?.address || WETH_ADDR;
+  }
+
   if (!uniswapV3QuoterAddr || !rpcURL || !WETH_ADDR || !USDC_ADDR) {
     return null;
   }

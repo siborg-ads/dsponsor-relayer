@@ -1,13 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import React from "react";
-import Ad from "@/components/Ad";
+import config from "@/config";
 
-const AdDynamicGrid = async ({ ads, sizes }) => {
-  let colSizes = [100, 100, 125, 175, 200];
-  if (sizes && sizes.length === 5) {
-    colSizes = sizes;
-  }
-
+const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
+  colSizes = colSizes?.length === 5 ? colSizes : [100, 100, 125, 175, 200];
+  ads = ads?.length ? ads : [];
+  ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
   /*
   const classes = `
                 grid grid-flow-row-dense
@@ -39,6 +38,10 @@ const AdDynamicGrid = async ({ ads, sizes }) => {
     gridTemplateColumns: `repeat(auto-fill, minmax(${colSizes[0]}px, 1fr))`
   };
 
+  // Convert the aspect ratio to padding-top percentage
+  const [width, height] = ratio.split(":").map(Number);
+  const paddingTop = (height / width) * 100;
+
   return (
     <div className="w-screen max-w-full">
       <div
@@ -49,12 +52,33 @@ const AdDynamicGrid = async ({ ads, sizes }) => {
         style={inlinedStyles}
       >
         {ads.map((ad, index) => (
-          <Ad key={index} ad={ad} />
+          <div
+            key={index}
+            className="flex w-full min-w-[50px] max-w-[300px] items-center justify-center overflow-hidden rounded border border-blue-500 bg-[#00143e] text-black hover:border-[#9abffb] hover:bg-[#353f75]"
+          >
+            <a
+              href={
+                ad.records.linkURL ??
+                `${config[chainId].appURL}/${config[chainId].chainName}/offer/${ad.offerId}/${ad.tokenId}`
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center text-black no-underline"
+              style={{ position: "relative", width: "100%", paddingTop: `${paddingTop}%` }}
+            >
+              <img
+                src={ad.records.imageURL ?? "/reserved.webp"}
+                alt="Ad image"
+                className="absolute top-0 left-0 h-full w-full object-contain"
+                style={{ position: "absolute", top: 0, left: 0 }}
+              />
+            </a>
+          </div>
         ))}
       </div>
-      <div className="flex justify-end">
+      <div className="flex">
         <span className="pr-2 text-right text-[0.65em] text-orange-300 hover:text-orange-500">
-          <a href="https://dsponsor.com" target="_blank" rel="noreferrer">
+          <a href={config[chainId].creditsURL} target="_blank" rel="noreferrer">
             Powered by DSponsor
           </a>
         </span>
@@ -63,4 +87,4 @@ const AdDynamicGrid = async ({ ads, sizes }) => {
   );
 };
 
-export default AdDynamicGrid;
+export default AdsGrid;

@@ -181,10 +181,13 @@ export async function getDefaultAdData(
 
   if (base === "imageURL") {
     if (state === "BUY_MINT" || state === "BUY_MARKET") {
-      data = "https://relayer.dsponsor.com/available.webp";
+      data = `${config[chainId].assetsURL}/available.webp`;
     } else if (state === "UNAVAILABLE") {
-      data = "https://relayer.dsponsor.com/reserved.webp";
+      data = `${config[chainId].assetsURL}/reserved.webp`;
     }
+    // test
+    // const random = Math.floor(Math.random() * 1000);
+    // data = `https://www.placehold.it/500x${random}`;
   } else if (base === "linkURL") {
     data = buyInfos.link;
   }

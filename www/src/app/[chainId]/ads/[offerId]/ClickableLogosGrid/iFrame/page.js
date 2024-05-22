@@ -1,35 +1,19 @@
 "use server";
 import React from "react";
-import AdDynamicGrid from "@/components/AdDynamicGrid";
+import AdsGrid from "@/components/AdsGrid";
 import { getValidatedAds } from "@/queries/ads";
 
 export async function generateMetadata() {
   return {
-    title: "DSponsor iFrame",
+    title: "DSponsor iFrame - Clickable Logos Grid",
     description: "Unlock smarter monetization for your content.",
     keyword: "web3, nft, monetization, media, ads"
   };
 }
 
-export default async function IframePage(req) {
+export default async function ClickableLogosGridIframePage(req) {
   const { chainId, offerId } = req.params;
-
-  let bgColor = "#0d102d";
-  if (req?.searchParams?.bgColor) {
-    bgColor = `#${req?.searchParams?.bgColor}`;
-  }
-
-  let sizes = [];
-  if (req?.searchParams?.sizes) {
-    sizes = req?.searchParams?.sizes.split(",");
-    sizes = new Array(5).fill(0).map((_, i) => parseInt(sizes[i]) || parseInt(sizes.slice(-1)[0]));
-  }
-
-  const preview = {
-    image: (req?.searchParams?.previewImage || "").replace(/ /g, "+"),
-    link: req?.searchParams?.previewLink || "",
-    tokenId: req?.searchParams?.previewPosition
-  };
+  const { bgColor, colSizes, ratio, previewTokenId, previewImage, previewLink } = req.searchParams;
 
   const response = await getValidatedAds(chainId, offerId);
 
@@ -43,20 +27,20 @@ export default async function IframePage(req) {
 
   const tokenIds = response._tokenIds;
   const ads = tokenIds.map((tokenId) => {
-    if (preview.image && preview.link && preview.tokenId === tokenId) {
+    if (previewImage && previewLink && previewTokenId === tokenId) {
       return {
         offerId,
         tokenId,
         records: {
-          linkURL: preview.link,
-          imageURL: preview.image
+          linkURL: previewLink,
+          imageURL: previewImage
         }
       };
     } else {
       const adParameters = Object.keys(response[tokenId]);
 
-      const imageKey = response[tokenId]["imageURL-1:1"]
-        ? "imageURL-1:1"
+      const imageKey = response[tokenId][`imageURL-${ratio}`]
+        ? `imageURL-${ratio}`
         : adParameters.find((key) => key.includes("imageURL"));
       const linkKey = response[tokenId]["linkURL"]
         ? "linkURL"
@@ -76,14 +60,19 @@ export default async function IframePage(req) {
   return (
     <html>
       <head />
-      <body style={{ backgroundColor: bgColor }}>
-        <AdDynamicGrid ads={ads} sizes={sizes} />
+      <body style={{ backgroundColor: bgColor ? bgColor : "#0d102d" }}>
+        <AdsGrid
+          ads={ads}
+          chainId={chainId}
+          colSizes={colSizes?.length ? colSizes.split(",") : undefined}
+          ratio={ratio}
+        />
       </body>
     </html>
   );
 }
 
-IframePage.getLayout = function getLayout(page) {
+ClickableLogosGridIframePage.getLayout = function getLayout(page) {
   return (
     <html>
       <head />
