@@ -1,7 +1,7 @@
 "use server";
 import React from "react";
 import AdsGrid from "@/components/AdsGrid";
-import { getValidatedAds } from "@/queries/ads";
+import { getRandomImageLinkToDisplay } from "@/queries/ads";
 
 export async function generateMetadata() {
   return {
@@ -14,50 +14,19 @@ export async function generateMetadata() {
 export default async function DynamicBannerIframePage(req) {
   const { chainId, offerId } = req.params;
   const { bgColor, colSizes, ratio, previewImage, previewLink, tokenIds } = req.searchParams;
-
-  let ads =
+  let ad =
     previewImage && previewLink
-      ? [
-          {
-            offerId,
-            records: {
-              linkURL: previewLink,
-              imageURL: previewImage
-            }
+      ? {
+          offerId,
+          records: {
+            linkURL: previewLink,
+            imageURL: previewImage
           }
-        ]
-      : undefined;
-
-  if (!ads) {
-    const selectedTokenIds = tokenIds?.length ? tokenIds.split(",") : undefined;
-    const response = await getValidatedAds(chainId, offerId, selectedTokenIds);
-    if (!response || !response._tokenIds?.length) {
-      return (
-        <div>
-          <h1>Offer not found</h1>
-        </div>
-      );
-    }
-    const randomTokenId = response._tokenIds[Math.floor(Math.random() * response._tokenIds.length)];
-
-    const adParameters = Object.keys(response[randomTokenId]);
-    const imageKey = response[randomTokenId][`imageURL-${ratio}`]
-      ? `imageURL-${ratio}`
-      : adParameters.find((key) => key.includes("imageURL"));
-    const linkKey = response[randomTokenId]["linkURL"]
-      ? "linkURL"
-      : adParameters.find((key) => key.includes("linkURL"));
-
-    ads = [
-      {
-        offerId,
-        tokenId: randomTokenId,
-        records: {
-          linkURL: response[randomTokenId][linkKey].data,
-          imageURL: response[randomTokenId][imageKey].data
         }
-      }
-    ];
+      : await getRandomImageLinkToDisplay(ratio, chainId, offerId, tokenIds);
+
+  if (!ad) {
+    return <div></div>;
   }
 
   return (
@@ -65,7 +34,7 @@ export default async function DynamicBannerIframePage(req) {
       <head />
       <body style={{ backgroundColor: bgColor ? bgColor : "#0d102d" }}>
         <AdsGrid
-          ads={ads}
+          ads={[ad]}
           chainId={chainId}
           colSizes={colSizes?.length ? colSizes.split(",") : undefined}
           ratio={ratio}

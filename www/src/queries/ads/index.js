@@ -222,3 +222,80 @@ export async function getAdDataForToken(
 
   return result[tokenId][foundAdParameterKey].data;
 }
+
+export const getRandomImageLinkToDisplay = async (imageRatio, chainId, adOfferId, tokenIds) => {
+  const selectedTokenIds = tokenIds?.length ? tokenIds.split(",") : undefined;
+  const response = await getValidatedAds(chainId, adOfferId, selectedTokenIds);
+  if (!response || !response._tokenIds?.length) {
+    return null;
+  }
+
+  let eligibibleTokenIds = [];
+  let eligibleAds = {};
+
+  for (const tokenId of response._tokenIds) {
+    const adParameters = Object.keys(response[tokenId]);
+    const imageKey = response[tokenId][`imageURL-${imageRatio}`]
+      ? `imageURL-${imageRatio}`
+      : adParameters.find((key) => key.includes("imageURL"));
+    const linkKey = response[tokenId]["linkURL"]
+      ? "linkURL"
+      : adParameters.find((key) => key.includes("linkURL"));
+    if (
+      response[tokenId][imageKey] &&
+      response[tokenId][linkKey] &&
+      response[tokenId][imageKey].data &&
+      response[tokenId][linkKey].data &&
+      response[tokenId][imageKey].state === "CURRENT_ACCEPTED" &&
+      response[tokenId][linkKey].state === "CURRENT_ACCEPTED"
+    ) {
+      eligibibleTokenIds.push(tokenId);
+      eligibleAds[tokenId] = {
+        offerId: adOfferId,
+        tokenId,
+        records: {
+          linkURL: response[tokenId][linkKey].data,
+          imageURL: response[tokenId][imageKey].data
+        }
+      };
+    }
+  }
+
+  if (!Object.keys(eligibleAds).length) {
+    for (const tokenId of response._tokenIds) {
+      const adParameters = Object.keys(response[tokenId]);
+      const imageKey = response[tokenId][`imageURL-${imageRatio}`]
+        ? `imageURL-${imageRatio}`
+        : adParameters.find((key) => key.includes("imageURL"));
+      const linkKey = response[tokenId]["linkURL"]
+        ? "linkURL"
+        : adParameters.find((key) => key.includes("linkURL"));
+      if (
+        response[tokenId][imageKey] &&
+        response[tokenId][linkKey] &&
+        response[tokenId][imageKey].data &&
+        response[tokenId][linkKey].data &&
+        response[tokenId][imageKey].state.includes("BUY") &&
+        response[tokenId][linkKey].state.includes("BUY")
+      ) {
+        eligibibleTokenIds.push(tokenId);
+        eligibleAds[tokenId] = {
+          offerId: adOfferId,
+          tokenId,
+          records: {
+            linkURL: response[tokenId][linkKey].data,
+            imageURL: response[tokenId][imageKey].data
+          }
+        };
+      }
+    }
+  }
+
+  if (!Object.keys(eligibleAds).length) {
+    return null;
+  }
+
+  const randomTokenId = eligibibleTokenIds[Math.floor(Math.random() * eligibibleTokenIds.length)];
+
+  return eligibleAds[randomTokenId];
+};
