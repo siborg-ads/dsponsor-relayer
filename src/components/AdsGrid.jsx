@@ -7,6 +7,7 @@ const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
   colSizes = colSizes?.length === 5 ? colSizes : [100, 100, 125, 175, 200];
   ads = ads?.length ? ads : [];
   ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
+
   /*
   const classes = `
                 grid grid-flow-row-dense
@@ -47,7 +48,7 @@ const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
       <div
         className={`
                 grid grow
-                grid-flow-row-dense place-items-center gap-1
+                grid-flow-row-dense gap-1
                 `}
         style={inlinedStyles}
       >
@@ -76,7 +77,7 @@ const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
           </div>
         ))}
       </div>
-      <div className="flex">
+      <div className="flex mt-2">
         <span className="pr-2 text-right text-[0.65em] text-orange-300 hover:text-orange-500">
           <a href={config[chainId].creditsURL} target="_blank" rel="noreferrer">
             Powered by DSponsor

@@ -13,7 +13,6 @@ const AdLink = ({ params, searchParams }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("chainId", chainId);
       const url = await getAdDataForToken(
         chainId,
         offerId,

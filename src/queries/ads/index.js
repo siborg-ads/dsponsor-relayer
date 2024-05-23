@@ -31,15 +31,27 @@ const getValidatedAdsForOfferQuery = /* GraphQL */ `
   }
 `;
 
-export async function getValidatedAds(chainId, adOfferId, tokenIds, tokenDatas) {
+export async function getValidatedAds({
+  chainId,
+  adOfferId,
+  tokenIds,
+  tokenDatas,
+  adParameterIds
+}) {
   const chainName = config[chainId]?.chainName;
   const appURL = config[chainId]?.appURL;
 
+  /**
+   * Handle input token data
+   */
   if (tokenDatas && tokenDatas.length) {
     tokenDatas = tokenDatas.map((t) => normalizeString(t));
     tokenIds = tokenIds && tokenIds.length ? tokenIds : tokenDatas.map((t) => stringToUint256(t));
   }
 
+  /**
+   * Execute the GraphQL query
+   */
   const variables = {
     adOfferId
   };
@@ -62,25 +74,35 @@ export async function getValidatedAds(chainId, adOfferId, tokenIds, tokenDatas) 
   }
 
   const result = {};
-  const { adParameters, nftContract } = graphResult.data.adOffers[0];
+  const { nftContract, adParameters: offerAdParameters } = graphResult.data.adOffers[0];
   const { allowList, prices: defaultPrices } = nftContract;
 
-  const getTokenMintValue = (token) => {
-    const isMinted = token?.mint?.blockTimestamp && token?.mint?.blockTimestamp > 0;
-    const isInAllowlist = allowList ? token?.setInAllowList : true;
-    const tokenCanBeMinted = !isMinted && isInAllowlist;
+  /**
+   * Handle ad parameters
+   */
 
-    return tokenCanBeMinted
-      ? token?.tokenPrices?.length
-        ? token.tokenPrices
-        : defaultPrices?.length
-          ? defaultPrices
-          : null
-      : null;
-  };
+  const adParameters = adParameterIds?.length
+    ? adParameterIds
+
+        .map((adParameterId) => {
+          const base = adParameterId.split("-")[0];
+
+          let adParameter = offerAdParameters.find(
+            (a) => a?.adParameter?.id === adParameterId
+          )?.adParameter;
+
+          if (!adParameter) {
+            adParameter = offerAdParameters.find((a) => a?.adParameter?.base === base)?.adParameter;
+          }
+
+          return adParameter;
+        })
+        .filter((a) => !!a)
+    : graphResult.data.adOffers[0].adParameters.map((a) => a.adParameter);
+  adParameterIds = adParameters.map((a) => a.id);
 
   /**
-   * Provide validated ads data
+   * POPULATE: Provide validated ads data
    */
 
   graphResult.data.adProposals.forEach((ad) => {
@@ -89,11 +111,13 @@ export async function getValidatedAds(chainId, adOfferId, tokenIds, tokenDatas) 
     if (!result[tokenId]) {
       result[tokenId] = {};
     }
-    result[tokenId][ad.adParameter.id] = { state: "CURRENT_ACCEPTED", data: ad.data };
+    if (adParameterIds.includes(ad.adParameter.id)) {
+      result[tokenId][ad.adParameter.id] = { state: "CURRENT_ACCEPTED", data: ad.data };
+    }
   });
 
   /**
-   * Fulfill data for each token id
+   * POPULATE: Fulfill data for each token id
    */
 
   if (!tokenIds) {
@@ -120,13 +144,28 @@ export async function getValidatedAds(chainId, adOfferId, tokenIds, tokenDatas) 
         result[_tokenId]._tokenData = tokenData;
       }
 
+      // Provide buy infos for each token /////////////////////////////////
+
       let link = `${appURL}/${chainName}/offer/${adOfferId}/${_tokenId}`;
       if (tokenData) {
         link += `?tokenData=${tokenData}`;
       }
+
+      const isMinted = token?.mint?.blockTimestamp && token?.mint?.blockTimestamp > 0;
+      const isInAllowlist = allowList ? token?.setInAllowList : true;
+      const tokenCanBeMinted = !isMinted && isInAllowlist;
+
+      const mint = tokenCanBeMinted
+        ? token?.tokenPrices?.length
+          ? token.tokenPrices
+          : defaultPrices?.length
+            ? defaultPrices
+            : null
+        : null;
+
       result[_tokenId]._buy = {
         link,
-        mint: getTokenMintValue(token),
+        mint,
         secondary:
           token?.marketplaceListings.find(
             (l) =>
@@ -136,7 +175,9 @@ export async function getValidatedAds(chainId, adOfferId, tokenIds, tokenDatas) 
           ) || null
       };
 
-      for (const { adParameter } of adParameters) {
+      // Provide default data for each ad parameter, for each token /////////////////////////////////
+
+      for (const adParameter of adParameters) {
         if (!result[_tokenId][adParameter.id]) {
           const state = result[_tokenId]._buy.mint?.length
             ? "BUY_MINT"
@@ -160,7 +201,10 @@ export async function getValidatedAds(chainId, adOfferId, tokenIds, tokenDatas) 
     }
   }
 
-  return Object.assign({ _tokenIds: tokenIds, _tokenData: tokenDatas }, result);
+  return Object.assign(
+    { _tokenIds: tokenIds, _tokenData: tokenDatas, _adParameterIds: adParameterIds },
+    result
+  );
 }
 
 export async function getDefaultAdData(
@@ -172,10 +216,7 @@ export async function getDefaultAdData(
   adParameter,
   buyInfos
 ) {
-  const {
-    base
-    // variants
-  } = adParameter;
+  const { base } = adParameter;
 
   let data = null;
 
@@ -204,29 +245,29 @@ export async function getAdDataForToken(
 ) {
   const adParameterKey = adParameterId ? adParameterId : defaultAdParameterKey;
 
-  const result = await getValidatedAds(chainId, adOfferId, [tokenId]);
+  const result = await getValidatedAds({
+    chainId,
+    adOfferId,
+    tokenIds: [tokenId],
+    adParameterIds: [adParameterKey]
+  });
 
-  if (!result || !result[tokenId]) {
-    return null;
-  }
-
-  let foundAdParameterKey = Object.keys(result[tokenId]).find((key) => key === adParameterKey);
-
-  if (!foundAdParameterKey) {
-    foundAdParameterKey = Object.keys(result[tokenId]).find((key) => key.includes(adParameterKey));
-  }
-
-  if (!foundAdParameterKey) {
-    return null;
-  }
-
-  return result[tokenId][foundAdParameterKey].data;
+  return result[tokenId][adParameterKey].data || null;
 }
 
-export const getRandomImageLinkToDisplay = async (imageRatio, chainId, adOfferId, tokenIds) => {
-  const selectedTokenIds = tokenIds?.length ? tokenIds.split(",") : undefined;
-  const response = await getValidatedAds(chainId, adOfferId, selectedTokenIds);
-  if (!response || !response._tokenIds?.length) {
+export const getRandomAdData = async ({ chainId, adOfferId, tokenIds, adParameterIds }) => {
+  const response = await getValidatedAds({
+    chainId,
+    adOfferId,
+    tokenIds,
+    adParameterIds
+  });
+  if (
+    !response ||
+    !response._tokenIds?.length ||
+    !response._adParameterIds?.length ||
+    (adParameterIds?.length > 0 && response._adParameterIds.length !== adParameterIds.length)
+  ) {
     return null;
   }
 
@@ -234,59 +275,41 @@ export const getRandomImageLinkToDisplay = async (imageRatio, chainId, adOfferId
   let eligibleAds = {};
 
   for (const tokenId of response._tokenIds) {
-    const adParameters = Object.keys(response[tokenId]);
-    const imageKey = response[tokenId][`imageURL-${imageRatio}`]
-      ? `imageURL-${imageRatio}`
-      : adParameters.find((key) => key.includes("imageURL"));
-    const linkKey = response[tokenId]["linkURL"]
-      ? "linkURL"
-      : adParameters.find((key) => key.includes("linkURL"));
-    if (
-      response[tokenId][imageKey] &&
-      response[tokenId][linkKey] &&
-      response[tokenId][imageKey].data &&
-      response[tokenId][linkKey].data &&
-      response[tokenId][imageKey].state === "CURRENT_ACCEPTED" &&
-      response[tokenId][linkKey].state === "CURRENT_ACCEPTED"
-    ) {
+    let allAccepted = true;
+
+    for (const adParameterId of response._adParameterIds) {
+      if (
+        !response[tokenId][adParameterId] ||
+        response[tokenId][adParameterId].state !== "CURRENT_ACCEPTED"
+      ) {
+        allAccepted = false;
+        break;
+      }
+    }
+
+    if (allAccepted) {
       eligibibleTokenIds.push(tokenId);
-      eligibleAds[tokenId] = {
-        offerId: adOfferId,
-        tokenId,
-        records: {
-          linkURL: response[tokenId][linkKey].data,
-          imageURL: response[tokenId][imageKey].data
-        }
-      };
+      eligibleAds[tokenId] = response[tokenId];
     }
   }
 
   if (!Object.keys(eligibleAds).length) {
     for (const tokenId of response._tokenIds) {
-      const adParameters = Object.keys(response[tokenId]);
-      const imageKey = response[tokenId][`imageURL-${imageRatio}`]
-        ? `imageURL-${imageRatio}`
-        : adParameters.find((key) => key.includes("imageURL"));
-      const linkKey = response[tokenId]["linkURL"]
-        ? "linkURL"
-        : adParameters.find((key) => key.includes("linkURL"));
-      if (
-        response[tokenId][imageKey] &&
-        response[tokenId][linkKey] &&
-        response[tokenId][imageKey].data &&
-        response[tokenId][linkKey].data &&
-        response[tokenId][imageKey].state.includes("BUY") &&
-        response[tokenId][linkKey].state.includes("BUY")
-      ) {
+      let allAccepted = true;
+
+      for (const adParameterId of response._adParameterIds) {
+        if (
+          !response[tokenId][adParameterId] ||
+          response[tokenId][adParameterId].state.includes("BUY")
+        ) {
+          allAccepted = false;
+          break;
+        }
+      }
+
+      if (allAccepted) {
         eligibibleTokenIds.push(tokenId);
-        eligibleAds[tokenId] = {
-          offerId: adOfferId,
-          tokenId,
-          records: {
-            linkURL: response[tokenId][linkKey].data,
-            imageURL: response[tokenId][imageKey].data
-          }
-        };
+        eligibleAds[tokenId] = response[tokenId];
       }
     }
   }
@@ -297,5 +320,9 @@ export const getRandomImageLinkToDisplay = async (imageRatio, chainId, adOfferId
 
   const randomTokenId = eligibibleTokenIds[Math.floor(Math.random() * eligibibleTokenIds.length)];
 
-  return eligibleAds[randomTokenId];
+  return {
+    randomAd: eligibleAds[randomTokenId],
+    _adParameterIds: response._adParameterIds,
+    _tokenIds: response._tokenIds
+  };
 };

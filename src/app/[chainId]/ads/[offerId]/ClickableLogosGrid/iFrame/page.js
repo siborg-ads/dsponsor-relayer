@@ -13,14 +13,39 @@ export async function generateMetadata() {
 
 export default async function ClickableLogosGridIframePage(req) {
   const { chainId, offerId } = req.params;
-  const { bgColor, colSizes, ratio, previewTokenId, previewImage, previewLink } = req.searchParams;
+  const { bgColor, colSizes, previewTokenId, previewImage, previewLink } = req.searchParams;
+  let { ratio } = req.searchParams;
+  ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
 
-  const response = await getValidatedAds(chainId, offerId);
+  const response = await getValidatedAds({
+    chainId,
+    adOfferId: offerId,
+    adParameterIds: [`imageURL-${ratio}`, "linkURL"]
+  });
 
   if (!response) {
     return (
       <div>
         <h1>Offer not found</h1>
+      </div>
+    );
+  }
+
+  const adParameterIds = response._adParameterIds;
+  const [imageKey, linkKey] = adParameterIds;
+
+  if (adParameterIds?.length !== 2) {
+    return (
+      <div>
+        <h1>Invalid ad parameters</h1>
+      </div>
+    );
+  }
+
+  if (!response._tokenIds?.length) {
+    return (
+      <div>
+        <h1>No ads found</h1>
       </div>
     );
   }
@@ -37,21 +62,12 @@ export default async function ClickableLogosGridIframePage(req) {
         }
       };
     } else {
-      const adParameters = Object.keys(response[tokenId]);
-
-      const imageKey = response[tokenId][`imageURL-${ratio}`]
-        ? `imageURL-${ratio}`
-        : adParameters.find((key) => key.includes("imageURL"));
-      const linkKey = response[tokenId]["linkURL"]
-        ? "linkURL"
-        : adParameters.find((key) => key.includes("linkURL"));
-
       return {
         offerId,
         tokenId,
         records: {
-          linkURL: response[tokenId][linkKey].data,
-          imageURL: response[tokenId][imageKey].data
+          linkURL: response[tokenId][linkKey].data || null,
+          imageURL: response[tokenId][imageKey].data || null
         }
       };
     }

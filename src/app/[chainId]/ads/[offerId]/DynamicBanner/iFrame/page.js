@@ -1,7 +1,7 @@
 "use server";
 import React from "react";
 import AdsGrid from "@/components/AdsGrid";
-import { getRandomImageLinkToDisplay } from "@/queries/ads";
+import { getRandomAdData } from "@/queries/ads";
 
 export async function generateMetadata() {
   return {
@@ -13,20 +13,40 @@ export async function generateMetadata() {
 
 export default async function DynamicBannerIframePage(req) {
   const { chainId, offerId } = req.params;
-  const { bgColor, colSizes, ratio, previewImage, previewLink, tokenIds } = req.searchParams;
+  const { bgColor, colSizes, previewImage, previewLink, tokenIds } = req.searchParams;
+  let { ratio } = req.searchParams;
+  ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "5:1";
 
-  console.log("DynamicBannerIframePage", req.params, req.searchParams);
+  let ad;
 
-  let ad =
-    previewImage && previewLink
-      ? {
-          offerId,
-          records: {
-            linkURL: previewLink,
-            imageURL: previewImage
-          }
+  if (previewImage && previewLink) {
+    ad = {
+      offerId,
+      records: {
+        linkURL: previewLink,
+        imageURL: previewImage
+      }
+    };
+  } else {
+    const { randomAd, _adParameterIds } =
+      (await getRandomAdData({
+        chainId,
+        adOfferId: offerId,
+        tokenIds: tokenIds?.split(","),
+        adParameterIds: [`imageURL-${ratio}`, "linkURL"]
+      })) || {};
+
+    if (randomAd) {
+      const [imageKey, linkKey] = _adParameterIds;
+      ad = {
+        offerId,
+        records: {
+          imageURL: randomAd[imageKey].data,
+          linkURL: randomAd[linkKey].data
         }
-      : await getRandomImageLinkToDisplay(ratio, chainId, offerId, tokenIds);
+      };
+    }
+  }
 
   if (!ad) {
     return <div></div>;
