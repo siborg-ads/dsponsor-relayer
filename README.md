@@ -139,7 +139,7 @@ Purpose: Retrieve data to display on sponsors' interfaces.
 
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET` or `POST`|`/ads/[offerId]`| `tokenIds` (optionnal) or `tokenData` (optionnal)|
+|`GET` or `POST`|`/ads/[offerId]`| `tokenIds` (optionnal), `tokenData` (optionnal), `adParameterIds` (optionnal)|
 
 <details>
 
@@ -150,7 +150,7 @@ Purpose: Retrieve data to display on sponsors' interfaces.
 #### Request
 
 ```bash
-curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,staking'
+curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,staking&adParameterIds=imageURL,linkURL'
 ```
 
 #### Response
@@ -160,14 +160,16 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
   "_tokenIds": [
     "65329693524297118063646238334159138948524025175806621014596919199733788562630",
     "101661046026135114031620108954831493212219976668510473490175828180454937635060",
-    "64873369441774726751632143071124460964591437972899336413549633584093280026386",
-    "42815755960540918129438353840082893508347041245824540425731235505437781612563"
+    "64873369441774726751632143071124460964591437972899336413549633584093280026386"
   ],
   "_tokenData": [
     "web3",
     "twitter",
-    "staking",
-    "cryptonnews"
+    "staking"
+  ],
+  "_adParameterIds": [
+    "imageURL-6.4:1",
+    "linkURL"
   ],
   "65329693524297118063646238334159138948524025175806621014596919199733788562630": {
     "imageURL-6.4:1": {
@@ -183,14 +185,6 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
       "link": "https://app.staging.dsponsor.com/sepolia/offer/1/65329693524297118063646238334159138948524025175806621014596919199733788562630?tokenData=web3",
       "mint": null,
       "secondary": null
-    },
-    "xCreatorHandle": {
-      "state": "UNAVAILABLE",
-      "data": null
-    },
-    "xSpaceId": {
-      "state": "UNAVAILABLE",
-      "data": null
     }
   },
   "101661046026135114031620108954831493212219976668510473490175828180454937635060": {
@@ -207,14 +201,6 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
     "linkURL": {
       "state": "UNAVAILABLE",
       "data": "https://app.staging.dsponsor.com/sepolia/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060?tokenData=twitter"
-    },
-    "xCreatorHandle": {
-      "state": "UNAVAILABLE",
-      "data": null
-    },
-    "xSpaceId": {
-      "state": "UNAVAILABLE",
-      "data": null
     }
   },
   "64873369441774726751632143071124460964591437972899336413549633584093280026386": {
@@ -240,38 +226,6 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
     "linkURL": {
       "state": "BUY_MARKET",
       "data": "https://app.staging.dsponsor.com/sepolia/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386?tokenData=staking"
-    },
-    "xCreatorHandle": {
-      "state": "BUY_MARKET",
-      "data": null
-    },
-    "xSpaceId": {
-      "state": "BUY_MARKET",
-      "data": null
-    }
-  },
-  "42815755960540918129438353840082893508347041245824540425731235505437781612563": {
-    "_tokenData": "cryptonnews",
-    "_buy": {
-      "link": "https://app.staging.dsponsor.com/sepolia/offer/1/42815755960540918129438353840082893508347041245824540425731235505437781612563?tokenData=cryptonnews",
-      "mint": null,
-      "secondary": null
-    },
-    "imageURL-6.4:1": {
-      "state": "UNAVAILABLE",
-      "data": "https://relayer.dsponsor.com/reserved.webp"
-    },
-    "linkURL": {
-      "state": "UNAVAILABLE",
-      "data": "https://app.staging.dsponsor.com/sepolia/offer/1/42815755960540918129438353840082893508347041245824540425731235505437781612563?tokenData=cryptonnews"
-    },
-    "xCreatorHandle": {
-      "state": "UNAVAILABLE",
-      "data": null
-    },
-    "xSpaceId": {
-      "state": "UNAVAILABLE",
-      "data": null
     }
   }
 }
