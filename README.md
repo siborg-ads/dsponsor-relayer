@@ -1,24 +1,21 @@
 # DSponsor Relayer
 
-## Relayer App
-
 The Relayer App provides API endpoints and UI components for the [DSponsor ecosystem](https://dsponsor.com). It processes and transforms on-chain data indexed by the [DSponsor subgraph](https://github.com/dcast-media/dsponsor-subgraph) deployed on The Graph Network.
 
-### Development setup
+## Development setup
 
 ```bash
-cd www
 npm i # install node dependencies
 npm run dev # run next app locally
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to test.
 
-### API endpoints
+## API endpoints
 
 API base URL: `https://relayer.dsponsor.com/api/[chainId]`
 
-#### Get a sponsor's ad spaces
+### Get a sponsor's ad spaces
 
 Purpose: Retrieve tokens from DSponsor ad offers owned by a specific wallet.
 
@@ -32,13 +29,13 @@ Purpose: Retrieve tokens from DSponsor ad offers owned by a specific wallet.
  Example
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250E65d7C4CA7d39De766/tokens'
 ```
 
-##### Response
+#### Response
 
 ```json
 [
@@ -136,7 +133,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250
 
 </details>
 
-#### Ad spaces data for an offer
+### Ad spaces data for an offer
 
 Purpose: Retrieve data to display on sponsors' interfaces.
 
@@ -150,13 +147,13 @@ Purpose: Retrieve data to display on sponsors' interfaces.
  Example
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,staking'
 ```
 
-##### Response
+#### Response
 
 ```json
 {
@@ -282,7 +279,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
 
 </details>
 
-#### Graph proxy
+### Graph proxy
 
 Purpose: Relay any GraphQL request to the DSponsor subgraph and populate offer and token metadata.
 
@@ -298,7 +295,7 @@ You can use [Apollo's Sandbox](https://studio.apollographql.com/sandbox/explorer
  Example
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/graph' \
@@ -325,7 +322,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
 
 ```
 
-##### Response
+#### Response
 
 ```json
 {
@@ -404,7 +401,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
 
 </details>
 
-#### Price quotes
+### Price quotes
 
 Purpose: Retrieve USD and ETH prices for a specific token from Uniswap.
 
@@ -418,13 +415,13 @@ Purpose: Retrieve USD and ETH prices for a specific token from Uniswap.
  Example (0.00002 UNI, 0.3% slippage)
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&amount=20000000000000&slippage=0.3'
 ```
 
-##### Response
+#### Response
 
 ```json
 {
@@ -439,7 +436,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1
 
 </details>
 
-#### Token metadata
+### Token metadata
 
 Purpose: Retrieve token metadata according to the official ERC721 metadata standard.
 
@@ -453,13 +450,13 @@ Purpose: Retrieve token metadata according to the official ERC721 metadata stand
  Example
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/tokenMetadata/0x6b9e4504a91b077d2b72b5186373ead75c6cdc03/2'
 ```
 
-##### Response
+#### Response
 
 ```json
 {
@@ -482,13 +479,13 @@ curl 'https://relayer.dsponsor.com/api/11155111/tokenMetadata/0x6b9e4504a91b077d
 
 </details>
 
-### Integrations
+## Integrations
 
 App base URL: `https://relayer.dsponsor.com/[chainId]/ads/[offerId]`
 
-#### Generic
+### Generic
 
-##### Get image for a specific token
+#### Get image for a specific token
 
 Purpose: Retrieve the image for an ad offer token.
 
@@ -508,7 +505,7 @@ Purpose: Retrieve the image for an ad offer token.
 
 </details>
 
-##### Get link for a specific token
+#### Get link for a specific token
 
 Purpose: Retrieve the link for an ad offer token.
 
@@ -528,11 +525,11 @@ Purpose: Retrieve the link for an ad offer token.
 
 </details>
 
-#### Clickable Logos Grid
+### Clickable Logos Grid
 
 Purpose: Displays a grid of clickable logos, each linking to a URL. Each ad space is displayed, tied to a token from the related ad offer.
 
-##### Iframe
+#### Iframe
 
 Use for: Web
 
@@ -556,12 +553,12 @@ Example
 </summary>
 
 ```html
- <iframe src="https://relayer.dsponsor.com/11155111/ads/1/ClickableLogosGrid/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%" />
+ <iframe loading="lazy" src="https://relayer.dsponsor.com/11155111/ads/1/ClickableLogosGrid/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%" />
 ```
 
 </details>
 
-##### HTML table
+#### HTML table
 
 Use for: Newsletters, GitHub READMEs
 
@@ -571,7 +568,7 @@ Use for: Newsletters, GitHub READMEs
 Example
 </summary>
 
-###### HTML code
+##### HTML code
 
 ```html
 
@@ -634,7 +631,7 @@ Example
 
 ```
 
-###### Result
+##### Result
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
   <tr>
@@ -695,11 +692,11 @@ Example
 
 </details>
 
-#### Dynamic Banner
+### Dynamic Banner
 
 Purpose: Displays a single clickable image, randomly selected from all validated ad spaces of an offer.
 
-##### Iframe
+#### Iframe
 
 Use for: Web
 
@@ -723,12 +720,12 @@ Example
 </summary>
 
 ```html
- <iframe src="https://relayer.dsponsor.com/11155111/ads/1/DynamicBanner/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&tokenIds=1,2,3,4,5,6&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%" />
+ <iframe loading="lazy" src="https://relayer.dsponsor.com/11155111/ads/1/DynamicBanner/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&tokenIds=1,2,3,4,5,6&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%" />
 ```
 
 </details>
 
-##### Warpcast Frame
+#### Warpcast Frame
 
 Use for: a post published on Warpcast
 
