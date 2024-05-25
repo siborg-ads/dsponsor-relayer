@@ -4,12 +4,20 @@ The Relayer App provides API endpoints and UI components for the [DSponsor ecosy
 
 ## Development setup
 
+1. Create a `.env.local` file:
+
+```
+NEXT_ALCHEMY_API_KEY=<your-alchemy-api-key>
+```
+
+2. Install dependencies and run the project:
+
 ```bash
 npm i # install node dependencies
 npm run dev # run next app locally
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to test.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser to test.
 
 ## API endpoints
 

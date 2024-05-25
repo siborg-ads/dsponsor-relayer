@@ -300,7 +300,7 @@ export const getRandomAdData = async ({ chainId, adOfferId, tokenIds, adParamete
       for (const adParameterId of response._adParameterIds) {
         if (
           !response[tokenId][adParameterId] ||
-          response[tokenId][adParameterId].state.includes("BUY")
+          !response[tokenId][adParameterId].state.includes("BUY")
         ) {
           allAccepted = false;
           break;
@@ -323,6 +323,7 @@ export const getRandomAdData = async ({ chainId, adOfferId, tokenIds, adParamete
   return {
     randomAd: eligibleAds[randomTokenId],
     _adParameterIds: response._adParameterIds,
-    _tokenIds: response._tokenIds
+    _tokenIds: eligibibleTokenIds,
+    _validatedAds: response
   };
 };
