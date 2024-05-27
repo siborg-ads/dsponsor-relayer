@@ -2,11 +2,14 @@
 "use client";
 import React from "react";
 import config from "@/config";
+import { getDefaultImg } from "@/queries/ads";
 
 const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
   colSizes = colSizes?.length === 5 ? colSizes : [100, 100, 125, 175, 200];
   ads = ads?.length ? ads : [];
   ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
+
+  const defaultImg = await getDefaultImg({ type: "reserved", ratio });
 
   /*
   const classes = `
@@ -68,7 +71,7 @@ const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
               style={{ position: "relative", width: "100%", paddingTop: `${paddingTop}%` }}
             >
               <img
-                src={ad.records.imageURL ?? "/reserved.webp"}
+                src={ad.records.imageURL ?? defaultImg}
                 alt="Ad image"
                 className="absolute top-0 left-0 h-full w-full object-contain"
                 style={{ position: "absolute", top: 0, left: 0 }}

@@ -95,10 +95,17 @@ export async function getValidatedAds({
             adParameter = offerAdParameters.find((a) => a?.adParameter?.base === base)?.adParameter;
           }
 
+          if (adParameter) {
+            adParameter.originalId = adParameterId;
+          }
+
           return adParameter;
         })
         .filter((a) => !!a)
-    : graphResult.data.adOffers[0].adParameters.map((a) => a.adParameter);
+    : graphResult.data.adOffers[0].adParameters.map((a) => ({
+        originalId: a.adParameter.id,
+        ...a.adParameter
+      }));
   adParameterIds = adParameters.map((a) => a.id);
 
   /**
@@ -155,7 +162,7 @@ export async function getValidatedAds({
       const isInAllowlist = allowList ? token?.setInAllowList : true;
       const tokenCanBeMinted = !isMinted && isInAllowlist;
 
-      const mint = tokenCanBeMinted
+      let mint = tokenCanBeMinted
         ? token?.tokenPrices?.length
           ? token.tokenPrices
           : defaultPrices?.length
@@ -163,16 +170,45 @@ export async function getValidatedAds({
             : null
         : null;
 
+      if (mint) {
+        mint = mint.map((m) => {
+          const { currency, amount } = m;
+          const { address, feeBps } = config[chainId].smartContracts.DSPONSOR_ADMIN;
+          const totalAmount = BigInt(amount) + (BigInt(amount) * BigInt(feeBps)) / BigInt(10000);
+          return {
+            currency,
+            amount,
+            mintAddress: address,
+            totalAmount: totalAmount.toString()
+          };
+        });
+      }
+
+      let secondary = token?.marketplaceListings.find(
+        (l) =>
+          l.currency !== "0x0000000000000000000000000000000000000000" &&
+          l.startTime < Date.now() / 1000 &&
+          l.endTime > Date.now() / 1000 &&
+          l.status === "CREATED"
+      );
+
+      if (secondary) {
+        const { address, minimalBidBps } = config[chainId].smartContracts.DSPONSOR_MARKETPLACE;
+        const { reservePricePerToken } = secondary;
+        const minimalBidAmount =
+          BigInt(reservePricePerToken) +
+          (BigInt(reservePricePerToken) * BigInt(minimalBidBps)) / BigInt(10000);
+        secondary = {
+          ...secondary,
+          minimalBidAmount: minimalBidAmount.toString(),
+          marketplaceAddress: address
+        };
+      }
+
       result[_tokenId]._buy = {
         link,
         mint,
-        secondary:
-          token?.marketplaceListings.find(
-            (l) =>
-              l.startTime < Date.now() / 1000 &&
-              l.endTime > Date.now() / 1000 &&
-              l.status === "CREATED"
-          ) || null
+        secondary
       };
 
       // Provide default data for each ad parameter, for each token /////////////////////////////////
@@ -207,6 +243,28 @@ export async function getValidatedAds({
   );
 }
 
+export async function getDefaultImg({
+  // chainId,
+  // adOfferId,
+  // tokenId,
+  type,
+  ratio
+}) {
+  if (type === "reserved") {
+    if (ratio === "1.91:1") {
+      return `${process.env.VERCEL_URL ?? "http://localhost:3000"}/reserved-1.91-1.png`;
+    } else {
+      return `${process.env.VERCEL_URL ?? "http://localhost:3000"}/reserved-1-1.png`;
+    }
+  } else if (type === "available") {
+    if (ratio === "1.91:1") {
+      return `${process.env.VERCEL_URL ?? "http://localhost:3000"}/available-1.91-1.png`;
+    } else {
+      return `${process.env.VERCEL_URL ?? "http://localhost:3000"}/available-1-1.png`;
+    }
+  }
+}
+
 export async function getDefaultAdData(
   state,
   chainId,
@@ -216,15 +274,16 @@ export async function getDefaultAdData(
   adParameter,
   buyInfos
 ) {
-  const { base } = adParameter;
-
   let data = null;
+
+  const { base, originalId } = adParameter;
+  const [, ratio] = originalId.split("-");
 
   if (base === "imageURL") {
     if (state === "BUY_MINT" || state === "BUY_MARKET") {
-      data = `${config[chainId].assetsURL}/available.webp`;
+      data = await getDefaultImg({ type: "available", ratio });
     } else if (state === "UNAVAILABLE") {
-      data = `${config[chainId].assetsURL}/reserved.webp`;
+      data = await getDefaultImg({ type: "reserved", ratio });
     }
     // test
     // const random = Math.floor(Math.random() * 1000);
@@ -243,7 +302,7 @@ export async function getAdDataForToken(
   adParameterId,
   defaultAdParameterKey
 ) {
-  const adParameterKey = adParameterId ? adParameterId : defaultAdParameterKey;
+  let adParameterKey = adParameterId ? adParameterId : defaultAdParameterKey;
 
   const result = await getValidatedAds({
     chainId,
@@ -251,6 +310,9 @@ export async function getAdDataForToken(
     tokenIds: [tokenId],
     adParameterIds: [adParameterKey]
   });
+
+  const { _adParameterIds } = result;
+  adParameterKey = _adParameterIds[0];
 
   return result[tokenId][adParameterKey].data || null;
 }
@@ -324,6 +386,7 @@ export const getRandomAdData = async ({ chainId, adOfferId, tokenIds, adParamete
     randomAd: eligibleAds[randomTokenId],
     _adParameterIds: response._adParameterIds,
     _tokenIds: eligibibleTokenIds,
+    _randomTokenId: randomTokenId,
     _validatedAds: response
   };
 };

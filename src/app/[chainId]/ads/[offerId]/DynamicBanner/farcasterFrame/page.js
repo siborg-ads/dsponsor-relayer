@@ -1,28 +1,26 @@
-import { fetchMetadata } from "frames.js/next";
+import { getFrameMetadata } from "frog/next";
 
 export async function generateMetadata({ params, searchParams }) {
   const { chainId, offerId } = params;
-  const { tokenIds } = searchParams;
+  const { tokenIds, ratio } = searchParams;
 
-  let queryParams = "";
+  let queryParams = `?time=${Date.now()}`;
 
   if (tokenIds) {
-    queryParams += `tokenIds=${tokenIds}`;
+    queryParams += `&tokenIds=${tokenIds}`;
   }
 
-  if (queryParams) {
-    queryParams = `?${queryParams}`;
+  if (ratio) {
+    queryParams += `&ratio=${ratio}`;
   }
+
+  let url = process.env.VERCEL_URL || "http://localhost:3000";
+  url = `${url}/api/${chainId}/ads/${offerId}/frames${queryParams}`;
+  const frameMetadata = await getFrameMetadata(url);
 
   return {
     title: "DSponsor Frame",
-
-    other: await fetchMetadata(
-      new URL(
-        `/api/${chainId}/ads/${offerId}/frames${queryParams}`,
-        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
-      )
-    )
+    other: frameMetadata
   };
 }
 

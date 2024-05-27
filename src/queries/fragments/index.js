@@ -83,6 +83,7 @@ export const TokenFragment = /* GraphQL */ `
     tokenId
     setInAllowList
     marketplaceListings(where: { status: CREATED }) {
+      id
       listingType
       startTime
       endTime
