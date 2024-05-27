@@ -556,7 +556,7 @@ Example
 </summary>
 
 ```html
- <iframe src="https://relayer.dsponsor.com/11155111/ads/1/ClickableLogosGrid/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%" />
+ <iframe src="https://relayer.dsponsor.com/11155111/ads/1/ClickableLogosGrid/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%"></iframe>
 ```
 
 </details>
@@ -723,7 +723,7 @@ Example
 </summary>
 
 ```html
- <iframe src="https://relayer.dsponsor.com/11155111/ads/1/DynamicBanner/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&tokenIds=1,2,3,4,5,6&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%" />
+ <iframe src="https://relayer.dsponsor.com/11155111/ads/1/DynamicBanner/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&tokenIds=1,2,3,4,5,6&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%"></iframe>
 ```
 
 </details>
