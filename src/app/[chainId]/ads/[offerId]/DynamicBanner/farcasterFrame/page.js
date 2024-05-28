@@ -2,12 +2,20 @@ import { getFrameMetadata } from "frog/next";
 
 export async function generateMetadata({ params, searchParams }) {
   const { chainId, offerId } = params;
-  const { tokenIds, ratio } = searchParams;
+  const { tokenIds, tokenDatas, ratio, tokenDataInput } = searchParams;
 
   let queryParams = `?time=${Date.now()}`;
 
   if (tokenIds) {
     queryParams += `&tokenIds=${tokenIds}`;
+  }
+
+  if (tokenDatas) {
+    queryParams += `&tokenDatas=${tokenDatas}`;
+  }
+
+  if (tokenDataInput) {
+    queryParams += `&tokenDataInput=${tokenDataInput}`;
   }
 
   if (ratio) {

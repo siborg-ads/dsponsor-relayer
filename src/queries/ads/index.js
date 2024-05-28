@@ -290,13 +290,21 @@ export async function getAdDataForToken(
   return result[tokenId][adParameterKey].data || null;
 }
 
-export const getRandomAdData = async ({ chainId, adOfferId, tokenIds, adParameterIds }) => {
+export const getRandomAdData = async ({
+  chainId,
+  adOfferId,
+  tokenIds,
+  tokenDatas,
+  adParameterIds
+}) => {
   const response = await getValidatedAds({
     chainId,
     adOfferId,
     tokenIds,
+    tokenDatas,
     adParameterIds
   });
+
   if (
     !response ||
     !response._tokenIds?.length ||
@@ -349,14 +357,13 @@ export const getRandomAdData = async ({ chainId, adOfferId, tokenIds, adParamete
     }
   }
 
-  if (!Object.keys(eligibleAds).length) {
-    return null;
+  let randomTokenId;
+  if (Object.keys(eligibleAds).length > 0) {
+    randomTokenId = eligibibleTokenIds[Math.floor(Math.random() * eligibibleTokenIds.length)];
   }
 
-  const randomTokenId = eligibibleTokenIds[Math.floor(Math.random() * eligibibleTokenIds.length)];
-
   return {
-    randomAd: eligibleAds[randomTokenId],
+    randomAd: randomTokenId !== undefined ? eligibleAds[randomTokenId] : undefined,
     _adParameterIds: response._adParameterIds,
     _tokenIds: eligibibleTokenIds,
     _randomTokenId: randomTokenId,

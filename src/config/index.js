@@ -6,7 +6,7 @@ const config = {
     chainName: "sepolia",
     network: Network.ETH_SEPOLIA,
     subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest",
-    appURL: "https://app.staging.dsponsor.com",
+    appURL: "https://app.dsponsor.com",
     assetsURL: "https://relayer.dsponsor.com",
     creditsURL: "https://dsponsor.com",
     explorerURL: "https://sepolia.etherscan.io",

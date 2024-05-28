@@ -7,7 +7,7 @@ import DSponsorAdminABI from "@/config/abis/DSponsorAdmin.js";
 import DSponsorMarketplaceABI from "@/config/abis/DSponsorMarketplace.js";
 import { getRandomAdData, getValidatedAds } from "@/queries/ads";
 import { getEthQuote } from "@/queries/uniswap/quote";
-import { Button, Frog } from "frog";
+import { Button, Frog, TextInput } from "frog";
 import { handle } from "frog/next";
 import { createSystem } from "frog/ui";
 
@@ -26,9 +26,18 @@ const app = new Frog({
 
 app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
   const { offerId, chainId } = c.req.param();
+  const { inputText, buttonValue } = c;
 
-  let { ratio, tokenIds } = c.req.query();
+  let { ratio, tokenIds, tokenDatas, tokenDataInput } = c.req.query();
   ratio = ratio === "1:1" ? "1:1" : "1.91:1";
+
+  tokenIds = tokenIds && tokenIds.length > 0 ? tokenIds.split(",") : undefined;
+  tokenDatas =
+    tokenDatas && tokenDatas.length > 0
+      ? tokenDatas.split(",")
+      : inputText && inputText.length > 0
+        ? [inputText]
+        : undefined;
 
   const {
     randomAd,
@@ -41,12 +50,9 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
       chainId,
       adOfferId: offerId,
       tokenIds,
+      tokenDatas,
       adParameterIds: [`imageURL-${ratio}`, "linkURL"]
     })) || {};
-
-  if (_adParameterIds?.length !== 2) {
-    return null;
-  }
 
   const [imageURL, linkURL] = _adParameterIds;
   ratio =
@@ -56,6 +62,19 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
 
   let image;
   const intents = [];
+
+  if (tokenDataInput || buttonValue == "tokenDataInput") {
+    intents.push(<TextInput placeholder={tokenDataInput ? tokenDataInput : "..."} />);
+    intents.push(<Button action={`/api/${chainId}/ads/${offerId}/frames`}>Lookup</Button>);
+  }
+
+  if (inputText) {
+    intents.push(
+      <Button value="tokenDataInput" action={`/api/${chainId}/ads/${offerId}/frames`}>
+        ⬅️ Back
+      </Button>
+    );
+  }
 
   const mintTokenId = Object.keys(_validatedAds).find((tokenId) => {
     return _validatedAds[tokenId]?._buy?.mint?.length > 0;
@@ -101,6 +120,12 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
     intents.push(<Button.Link href={randomAd[linkURL].data}>{text}</Button.Link>);
   }
 
+  if (!image && intents.length === 0 && _validatedAds._tokenIds.length > 0) {
+    const tokenId = _validatedAds._tokenIds[0];
+    image = _validatedAds[tokenId][imageURL].data;
+    intents.push(<Button.Link href={_validatedAds[tokenId][linkURL].data}>Details</Button.Link>);
+  }
+
   let contentType;
   try {
     const imageResponse = await fetch(image, {
@@ -108,7 +133,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
     });
     contentType = imageResponse.headers.get("Content-Type");
   } catch (error) {
-    console.log("error fetching image", error);
+    // console.log("error fetching image", error)
   }
 
   if (contentType && ["image/jpeg", "image/png", "image/gif", "image/bmp"].includes(contentType)) {
@@ -117,18 +142,26 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
         <Image src={image} alt="frameImg" objectFit="contain" width="100%" height="100%" />
       </Box>
     );
-  } else if (contentType && contentType.includes("image/")) {
-    // keep img url as it is
-  } else {
+  }
+
+  if (!image) {
     image = (
       <Box grow alignVertical="center" backgroundColor="background" padding="32">
         <VStack gap="4">
           <Heading>DSponsor Ad Space</Heading>
           <Text color="text200" size="20">
-            Buy ad space ownership or checkout current sponsor details 👇
+            (No ad space image information to provide)
           </Text>
         </VStack>
       </Box>
+    );
+    ratio = "1.91:1";
+  }
+  if (intents.length === 0) {
+    intents.push(
+      <Button.Link href={`${config[chainId].appURL}/${chainId}/offer/${offerId}`}>
+        Offer details
+      </Button.Link>
     );
   }
 
@@ -182,73 +215,82 @@ app.transaction("/api/:chainId/ads/:offerId/frames/:tokenId/txdata/:action", asy
   const { mint, secondary } = validatedAds[tokenId]._buy || {};
 
   if (action === actions.MINT && mint.length > 0) {
-    const { currency, totalAmount } = mint[0];
+    const { currency, mintPriceStructure } = mint[0] || {};
+    const { totalAmount } = mintPriceStructure || {};
 
-    const quote = await getEthQuote(chainId, currency, totalAmount /* , slippagePerCent = 0.3 */);
+    if (currency && totalAmount) {
+      const quote = await getEthQuote(chainId, currency, totalAmount /* , slippagePerCent = 0.3 */);
 
-    const { amountInEthWithSlippage: value } = quote;
+      const { amountInEthWithSlippage: value } = quote;
 
-    const mintParams = {
-      tokenId,
-      to: frameData.address,
-      currency,
-      tokenData: "",
-      offerId,
-      adParameters: [],
-      adDatas: []
-    };
+      const mintParams = {
+        tokenId,
+        to: frameData.address,
+        currency,
+        tokenData: "",
+        offerId,
+        adParameters: [],
+        adDatas: []
+      };
 
-    return c.contract({
-      abi: DSponsorAdminABI,
-      chainId: `eip155:${chainId}`,
-      functionName: "mintAndSubmit",
-      args: [mintParams],
-      to: config[chainId].smartContracts.DSPONSOR_ADMIN.address,
-      value
-    });
+      return c.contract({
+        abi: DSponsorAdminABI,
+        chainId: `eip155:${chainId}`,
+        functionName: "mintAndSubmit",
+        args: [mintParams],
+        to: config[chainId].smartContracts.DSPONSOR_ADMIN.address,
+        value
+      });
+    }
   } else if (action === actions.BUY && secondary) {
-    const { id: listingId, buyoutPricePerToken, currency } = secondary;
+    const { id: listingId, currency, buyoutPricePerToken } = secondary || {};
 
-    const { amountInEthWithSlippage: value } = await getEthQuote(
-      chainId,
-      currency,
-      buyoutPricePerToken /* , slippagePerCent = 0.3 */
-    );
+    if (listingId && currency && buyoutPricePerToken) {
+      const { amountInEthWithSlippage: value } = await getEthQuote(
+        chainId,
+        currency,
+        buyoutPricePerToken /* , slippagePerCent = 0.3 */
+      );
 
-    const buyParams = {
-      listingId,
-      buyFor: frameData.address,
-      quantity: 1,
-      currency,
-      totalPrice: buyoutPricePerToken,
-      referralInformation: ""
-    };
+      const buyParams = {
+        listingId,
+        buyFor: frameData.address,
+        quantity: 1,
+        currency,
+        totalPrice: buyoutPricePerToken,
+        referralInformation: ""
+      };
 
-    return c.contract({
-      abi: DSponsorMarketplaceABI,
-      chainId: `eip155:${chainId}`,
-      functionName: "buy",
-      args: [buyParams],
-      to: config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address,
-      value
-    });
+      return c.contract({
+        abi: DSponsorMarketplaceABI,
+        chainId: `eip155:${chainId}`,
+        functionName: "buy",
+        args: [buyParams],
+        to: config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address,
+        value
+      });
+    }
   } else if (action === actions.BID && secondary) {
-    const { id: listingId, minimalBidAmount, currency } = secondary;
-    const { amountInEthWithSlippage: value } = await getEthQuote(
-      chainId,
-      currency,
-      minimalBidAmount /* , slippagePerCent = 0.3 */
-    );
-    const args = [listingId, minimalBidAmount, ""];
+    const { id: listingId, currency, bidPriceStructure } = secondary || {};
+    const { totalMinimalBidAmount } = bidPriceStructure || {};
 
-    return c.contract({
-      abi: DSponsorMarketplaceABI,
-      chainId: `eip155:${chainId}`,
-      functionName: "bid",
-      args,
-      to: config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address,
-      value
-    });
+    if (listingId && currency && totalMinimalBidAmount) {
+      const { amountInEthWithSlippage: value } = await getEthQuote(
+        chainId,
+        currency,
+        totalMinimalBidAmount /* , slippagePerCent = 0.3 */
+      );
+      const args = [listingId, totalMinimalBidAmount, ""];
+
+      return c.contract({
+        abi: DSponsorMarketplaceABI,
+        chainId: `eip155:${chainId}`,
+        functionName: "bid",
+        args,
+        to: config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address,
+        value
+      });
+    }
   }
 });
 
