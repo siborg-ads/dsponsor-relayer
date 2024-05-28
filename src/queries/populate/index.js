@@ -1,4 +1,96 @@
+import config from "@/config";
 import { isObject } from "@/utils";
+
+async function populateMarketplaceListing(chainId, listing) {
+  if (listing) {
+    const { address, feeBps, minimalBidBps, previousBidAmountBps } =
+      config[chainId].smartContracts.DSPONSOR_MARKETPLACE || {};
+    const { reservePricePerToken, buyoutPricePerToken, bids } = listing || {};
+
+    if (minimalBidBps && reservePricePerToken && buyoutPricePerToken && bids) {
+      const { totalBidAmount: previousBid } = bids[0] || {};
+
+      const currentBid = previousBid ? BigInt(previousBid) : BigInt(reservePricePerToken);
+      const totalMinimalBidAmount =
+        currentBid + (currentBid * BigInt(minimalBidBps)) / BigInt("10000");
+
+      const previousBidFeeAmount = previousBid
+        ? (BigInt(totalMinimalBidAmount) * BigInt(previousBidAmountBps)) / BigInt("10000")
+        : BigInt("0");
+
+      const minimalNextBidAmount = BigInt(totalMinimalBidAmount) - previousBidFeeAmount;
+      const protocolFeeBidAmount =
+        (BigInt(minimalNextBidAmount) * BigInt(feeBps)) / BigInt("10000");
+
+      // todo : royaltiesBidAmount =  get royalties fron nft contract
+      const royaltiesBidAmount = BigInt("0");
+
+      const listerBidAmount =
+        totalMinimalBidAmount - previousBidFeeAmount - royaltiesBidAmount - protocolFeeBidAmount;
+
+      ////////////////////////////
+
+      const protocolFeeBuyAmount = (BigInt(buyoutPricePerToken) * BigInt(feeBps)) / BigInt("10000");
+      // todo : royaltiesBuyAmount = get royalties fron nft contract
+      const royaltiesBuyAmount = BigInt("0");
+      const listerBuyAmount =
+        BigInt(buyoutPricePerToken) - royaltiesBuyAmount - protocolFeeBuyAmount;
+
+      listing = {
+        ...listing,
+        bidPriceStructure: {
+          protocolFeeBps: BigInt(feeBps).toString(),
+          minimalBidBps: BigInt(minimalBidBps).toString(),
+          previousBidAmountBps: BigInt(previousBidAmountBps).toString(),
+          ///
+
+          minimalNextBidAmount: minimalNextBidAmount.toString(),
+          previousBidFeeAmount: previousBidFeeAmount.toString(),
+          listerBidAmount: listerBidAmount.toString(),
+          royaltiesBidAmount: royaltiesBidAmount.toString(),
+          protocolFeeBidAmount: protocolFeeBidAmount.toString(),
+          totalMinimalBidAmount: totalMinimalBidAmount.toString(),
+          ///
+          marketplaceAddress: address
+        },
+        buyPriceStructure: {
+          protocolFeeBps: BigInt(feeBps).toString(),
+          ///
+          listerBuyAmount: listerBuyAmount.toString(),
+          royaltiesBuyAmount: royaltiesBuyAmount.toString(),
+          protocolFeeBuyAmount: protocolFeeBuyAmount.toString(),
+          totalBuyAmount: buyoutPricePerToken,
+          ///
+          marketplaceAddress: address
+        }
+      };
+    }
+  }
+  return listing;
+}
+
+async function populateMintPrice(chainId, price) {
+  if (price) {
+    const { currency, amount } = price || {};
+    const { address, feeBps } = config[chainId].smartContracts.DSPONSOR_ADMIN || {};
+    if (amount && currency && feeBps) {
+      const protocolFeeAmount = (BigInt(amount) * BigInt(feeBps)) / BigInt(10000);
+      const totalAmount = BigInt(amount) + protocolFeeAmount;
+      price = {
+        ...price,
+        mintPriceStructure: {
+          protocolFeeBps: BigInt(feeBps).toString(),
+          //
+          creatorAmount: amount,
+          protocolFeeAmount: protocolFeeAmount.toString(),
+          totalAmount: totalAmount.toString(),
+          minterAddress: address
+        }
+      };
+    }
+  }
+  return price;
+}
 
 async function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
   let res = null;
@@ -91,7 +183,7 @@ async function populateAdOffer(adOffer) {
   }
 }
 
-export async function populateSubgraphResult(queryResult) {
+export async function populateSubgraphResult(chainId, queryResult) {
   // Recursive function to traverse the object
   async function traverse(current) {
     if (isObject(current.adOffer)) {
@@ -99,6 +191,15 @@ export async function populateSubgraphResult(queryResult) {
     }
     if (isObject(current.token)) {
       await populateTokens(current.token);
+    }
+    if (isObject(current.price)) {
+      current.price = await populateMintPrice(chainId, current.price);
+    }
+    if (isObject(current.marketplaceListing)) {
+      current.marketplaceListing = await populateMarketplaceListing(
+        chainId,
+        current.marketplaceListing
+      );
     }
 
     if (Array.isArray(current.adOffers)) {
@@ -109,6 +210,19 @@ export async function populateSubgraphResult(queryResult) {
     if (Array.isArray(current.tokens)) {
       for (let key in current.tokens) {
         await populateTokens(current.tokens[key]);
+      }
+    }
+    if (Array.isArray(current.prices)) {
+      for (let key in current.prices) {
+        current.prices[key] = await populateMintPrice(chainId, current.prices[key]);
+      }
+    }
+    if (Array.isArray(current.marketplaceListings)) {
+      for (let key in current.marketplaceListings) {
+        current.marketplaceListings[key] = await populateMarketplaceListing(
+          chainId,
+          current.marketplaceListings[key]
+        );
       }
     }
 

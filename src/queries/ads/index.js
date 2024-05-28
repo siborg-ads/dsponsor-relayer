@@ -170,20 +170,6 @@ export async function getValidatedAds({
             : null
         : null;
 
-      if (mint) {
-        mint = mint.map((m) => {
-          const { currency, amount } = m;
-          const { address, feeBps } = config[chainId].smartContracts.DSPONSOR_ADMIN;
-          const totalAmount = BigInt(amount) + (BigInt(amount) * BigInt(feeBps)) / BigInt(10000);
-          return {
-            currency,
-            amount,
-            mintAddress: address,
-            totalAmount: totalAmount.toString()
-          };
-        });
-      }
-
       let secondary = token?.marketplaceListings.find(
         (l) =>
           l.currency !== "0x0000000000000000000000000000000000000000" &&
@@ -191,19 +177,6 @@ export async function getValidatedAds({
           l.endTime > Date.now() / 1000 &&
           l.status === "CREATED"
       );
-
-      if (secondary) {
-        const { address, minimalBidBps } = config[chainId].smartContracts.DSPONSOR_MARKETPLACE;
-        const { reservePricePerToken } = secondary;
-        const minimalBidAmount =
-          BigInt(reservePricePerToken) +
-          (BigInt(reservePricePerToken) * BigInt(minimalBidBps)) / BigInt(10000);
-        secondary = {
-          ...secondary,
-          minimalBidAmount: minimalBidAmount.toString(),
-          marketplaceAddress: address
-        };
-      }
 
       result[_tokenId]._buy = {
         link,

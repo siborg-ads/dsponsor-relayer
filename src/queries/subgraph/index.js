@@ -36,7 +36,7 @@ export async function executeQuery(chainId, query, variables, options) {
   const result = await request.json();
 
   // if (options?.populate && result?.data) {
-  await populateSubgraphResult(result);
+  await populateSubgraphResult(chainId, result);
   // }
 
   return result;

@@ -92,6 +92,7 @@ export const TokenFragment = /* GraphQL */ `
       reservePricePerToken
       status
       bids(orderBy: totalBidAmount, orderDirection: desc, first: 1) {
+        bidder
         totalBidAmount
       }
     }

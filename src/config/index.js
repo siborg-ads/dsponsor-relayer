@@ -19,7 +19,8 @@ const config = {
       DSPONSOR_MARKETPLACE: {
         address: "0xac03b675fa9644279b92f060bf542eed54f75599",
         feeBps: "400",
-        minimalBidBps: "1000"
+        minimalBidBps: "1000",
+        previousBidAmountBps: "500"
       },
       WNATIVE: {
         address: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
