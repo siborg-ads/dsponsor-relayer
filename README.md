@@ -97,43 +97,187 @@ curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250
       "prices": [],
       "tokens": [
         {
-          "tokenId": "110771216890900307486995680796878979552050216338441285842533727414245120540081",
+          "tokenId": "109209750437790945652155443835624055978955232477308362696330723152483678880972",
           "setInAllowList": false,
-          "marketplaceListings": [
-            {
-              "listingType": "Direct",
-              "startTime": "1713630360",
-              "endTime": "1714062360",
-              "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
-              "buyoutPricePerToken": "45500000",
-              "reservePricePerToken": "45500000",
-              "status": "CREATED",
-              "bids": []
-            }
-          ],
+          "marketplaceListings": [],
           "nftContract": {
             "allowList": false,
             "prices": []
           },
           "mint": {
-            "tokenData": "airdrop",
-            "blockTimestamp": "1713371592"
+            "tokenData": "lol",
+            "blockTimestamp": "1715710404"
           },
           "prices": [],
           "metadata": {
-            "name": "#airdrop - Tokenized Ad Space",
-            "description": "Tokenized advertisement spaces link to the ticker 'airdrop' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'airdrop'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Aairdrop",
+            "name": "#lol - Tokenized Ad Space",
+            "description": "Tokenized advertisement spaces link to the ticker 'lol' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'lol'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Alol",
+            "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+            "external_link": "",
+            "valid_from": "2024-05-01T00:00:00Z",
+            "valid_to": "2024-10-31T23:59:59Z",
+            "categories": [
+              "Community",
+              "NFT",
+              "Crypto"
+            ],
+            "token_metadata": {
+              "name": "#{tokenData} - Tokenized Ad Space",
+              "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+              "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+              "external_url": "",
+              "attributes": [
+                {
+                  "trait_type": "Search Query",
+                  "value": "{tokenData}"
+                }
+              ]
+            },
             "external_url": "",
             "attributes": [
               {
                 "trait_type": "Search Query",
-                "value": "airdrop"
+                "value": "lol"
+              }
+            ]
+          }
+        },
+        {
+          "tokenId": "65329693524297118063646238334159138948524025175806621014596919199733788562630",
+          "setInAllowList": false,
+          "marketplaceListings": [],
+          "nftContract": {
+            "allowList": false,
+            "prices": []
+          },
+          "mint": {
+            "tokenData": "web3",
+            "blockTimestamp": "1713371652"
+          },
+          "prices": [],
+          "metadata": {
+            "name": "#web3 - Tokenized Ad Space",
+            "description": "Tokenized advertisement spaces link to the ticker 'web3' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'web3'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Aweb3",
+            "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+            "external_link": "",
+            "valid_from": "2024-05-01T00:00:00Z",
+            "valid_to": "2024-10-31T23:59:59Z",
+            "categories": [
+              "Community",
+              "NFT",
+              "Crypto"
+            ],
+            "token_metadata": {
+              "name": "#{tokenData} - Tokenized Ad Space",
+              "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+              "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+              "external_url": "",
+              "attributes": [
+                {
+                  "trait_type": "Search Query",
+                  "value": "{tokenData}"
+                }
+              ]
+            },
+            "external_url": "",
+            "attributes": [
+              {
+                "trait_type": "Search Query",
+                "value": "web3"
+              }
+            ]
+          }
+        },
+        {
+          "tokenId": "70622639689279718371527342103894932928233838121221666359043189029713682937432",
+          "setInAllowList": false,
+          "marketplaceListings": [],
+          "nftContract": {
+            "allowList": false,
+            "prices": []
+          },
+          "mint": {
+            "tokenData": "test",
+            "blockTimestamp": "1714762092"
+          },
+          "prices": [],
+          "metadata": {
+            "name": "#test - Tokenized Ad Space",
+            "description": "Tokenized advertisement spaces link to the ticker 'test' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'test'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Atest",
+            "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+            "external_link": "",
+            "valid_from": "2024-05-01T00:00:00Z",
+            "valid_to": "2024-10-31T23:59:59Z",
+            "categories": [
+              "Community",
+              "NFT",
+              "Crypto"
+            ],
+            "token_metadata": {
+              "name": "#{tokenData} - Tokenized Ad Space",
+              "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+              "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+              "external_url": "",
+              "attributes": [
+                {
+                  "trait_type": "Search Query",
+                  "value": "{tokenData}"
+                }
+              ]
+            },
+            "external_url": "",
+            "attributes": [
+              {
+                "trait_type": "Search Query",
+                "value": "test"
               }
             ]
           }
         }
       ]
+    },
+    "metadata": {
+      "creator": {
+        "name": "SiBorg",
+        "description": "SiBorg application empowers podcasters by leveraging SocialFi.",
+        "image": "https://bafkreidonqrmvzm4544yv7lqeggp3t34r72glwszbh3qafjqmegvzvgiry.ipfs.nftstorage.link/",
+        "external_link": "https://siborg.io",
+        "categories": [
+          "dApp",
+          "social",
+          "media",
+          "education"
+        ]
+      },
+      "offer": {
+        "name": "Tokenized ad spaces in SiBorg App",
+        "description": "Tokenized advertisement spaces, each token is linked to a search term.\n\nBuying an ad space from the collection give you the exclusive right to submit an ad.\nSiBorg team still has the power to validate or reject ad assets. You are free to change the ad proposal at anytime and free to resell it on the open market.",
+        "image": "https://bafkreif4dihekhhd24itluilol4qab6zxhwlokkinbpnkqaprzf6jenqne.ipfs.nftstorage.link/",
+        "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+        "external_link": "",
+        "valid_from": "2024-05-01T00:00:00Z",
+        "valid_to": "2024-10-31T23:59:59Z",
+        "categories": [
+          "Community",
+          "NFT",
+          "Crypto"
+        ],
+        "token_metadata": {
+          "name": "#{tokenData} - Tokenized Ad Space",
+          "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+          "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+          "external_url": "",
+          "attributes": [
+            {
+              "trait_type": "Search Query",
+              "value": "{tokenData}"
+            }
+          ]
+        }
+      }
     }
   }
 ]

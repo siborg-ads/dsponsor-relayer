@@ -98,7 +98,16 @@ async function populateMintPrice(chainId, price) {
 }
 
 async function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
-  let res = null;
+  const res = {
+    name: "Untitled token",
+    description: "No description for this token",
+    image: "https://via.placeholder.com/500x500?text=Unknown%20token"
+  };
+
+  if (typeof offerMetadata === "object" && offerMetadata !== null) {
+    Object.assign(res, offerMetadata);
+  }
+
   if (
     tokenData &&
     tokenMetadata &&
@@ -107,29 +116,13 @@ async function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
     tokenMetadata.image
   ) {
     try {
-      res = JSON.parse(JSON.stringify(tokenMetadata).replace(/\{tokenData\}/g, tokenData));
+      const fetchTokenData = JSON.parse(
+        JSON.stringify(tokenMetadata).replace(/\{tokenData\}/g, tokenData)
+      );
+      Object.assign(res, fetchTokenData);
     } catch (e) {
       console.error(`Error with token metadata ${tokenMetadata}`, e);
     }
-    if (!res) {
-      if (tokenMetadata) {
-        res = tokenMetadata;
-      }
-    }
-  }
-
-  if (!res) {
-    if (offerMetadata.name && offerMetadata.description && offerMetadata.image) {
-      res = offerMetadata;
-    }
-  }
-
-  if (!res) {
-    res = {
-      name: "Untitled token",
-      description: "No description for this token",
-      image: "https://via.placeholder.com/500x500?text=Unknown%20token"
-    };
   }
 
   return res;
