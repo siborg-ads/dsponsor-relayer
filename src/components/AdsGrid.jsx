@@ -9,7 +9,7 @@ const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
   ads = ads?.length ? ads : [];
   ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
 
-  const defaultImg = await getDefaultImg({ type: "reserved", ratio });
+  const defaultImg = await getDefaultImg({ chainId, type: "reserved", ratio });
 
   /*
   const classes = `

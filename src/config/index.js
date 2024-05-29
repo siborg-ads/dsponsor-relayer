@@ -5,12 +5,14 @@ const config = {
   11155111: {
     chainName: "sepolia",
     network: Network.ETH_SEPOLIA,
-    subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest",
+
     appURL: "https://app.dsponsor.com",
-    assetsURL: "https://relayer.dsponsor.com",
     creditsURL: "https://dsponsor.com",
     explorerURL: "https://sepolia.etherscan.io",
+    relayerURL: process.env.DEV ? process.env.DEV : "https://relayer.dsponsor.com",
     rpcURL: "https://ethereum-sepolia-rpc.publicnode.com",
+    subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest",
+
     smartContracts: {
       DSPONSOR_ADMIN: {
         address: "0xE442802706F3603d58F34418Eac50C78C7B4E8b3",

@@ -217,23 +217,25 @@ export async function getValidatedAds({
 }
 
 export async function getDefaultImg({
-  // chainId,
+  chainId,
   // adOfferId,
   // tokenId,
   type,
   ratio
 }) {
+  const baseURL = config[chainId].relayerURL;
+
   if (type === "reserved") {
     if (ratio === "1.91:1") {
-      return `${process.env.VERCEL_URL ?? "http://localhost:3000"}/reserved-1.91-1.png`;
+      return `${baseURL}/reserved-1.91-1.png`;
     } else {
-      return `${process.env.VERCEL_URL ?? "http://localhost:3000"}/reserved-1-1.png`;
+      return `${baseURL}/reserved-1-1.png`;
     }
   } else if (type === "available") {
     if (ratio === "1.91:1") {
-      return `${process.env.VERCEL_URL ?? "http://localhost:3000"}/available-1.91-1.png`;
+      return `${baseURL}/available-1.91-1.png`;
     } else {
-      return `${process.env.VERCEL_URL ?? "http://localhost:3000"}/available-1-1.png`;
+      return `${baseURL}/available-1-1.png`;
     }
   }
 }
@@ -254,9 +256,9 @@ export async function getDefaultAdData(
 
   if (base === "imageURL") {
     if (state === "BUY_MINT" || state === "BUY_MARKET") {
-      data = await getDefaultImg({ type: "available", ratio });
+      data = await getDefaultImg({ chainId, type: "available", ratio });
     } else if (state === "UNAVAILABLE") {
-      data = await getDefaultImg({ type: "reserved", ratio });
+      data = await getDefaultImg({ chainId, type: "reserved", ratio });
     }
     // test
     // const random = Math.floor(Math.random() * 1000);
