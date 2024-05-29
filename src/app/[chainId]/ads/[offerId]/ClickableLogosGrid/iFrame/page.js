@@ -1,4 +1,3 @@
-"use server";
 import React from "react";
 import AdsGrid from "@/components/AdsGrid";
 import { getValidatedAds } from "@/queries/ads";
@@ -96,3 +95,5 @@ ClickableLogosGridIframePage.getLayout = function getLayout(page) {
     </html>
   );
 };
+
+export const dynamic = "force-dynamic";

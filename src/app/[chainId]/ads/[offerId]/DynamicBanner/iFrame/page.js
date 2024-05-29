@@ -1,4 +1,3 @@
-"use server";
 import React from "react";
 import AdsGrid from "@/components/AdsGrid";
 import { getRandomAdData } from "@/queries/ads";
@@ -75,3 +74,5 @@ DynamicBannerIframePage.getLayout = function getLayout(page) {
     </html>
   );
 };
+
+export const dynamic = "force-dynamic";

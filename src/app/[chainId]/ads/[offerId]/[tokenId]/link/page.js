@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { getAdDataForToken } from "@/queries/ads";
 
@@ -33,3 +31,5 @@ const AdLink = ({ params, searchParams }) => {
   window.location.href = url;
 };
 export default AdLink;
+
+export const dynamic = "force-dynamic";
