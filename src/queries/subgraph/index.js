@@ -2,7 +2,12 @@ import config from "@/config";
 import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
 
-export async function executeQuery(chainId, query, variables, options) {
+export async function executeQuery(
+  chainId,
+  query,
+  variables
+  //  , options
+) {
   const url = config ? config[chainId]?.subgraphURL : null;
 
   if (!url) {
@@ -20,16 +25,19 @@ export async function executeQuery(chainId, query, variables, options) {
       "Content-Type": "application/json"
       //  "Authorization": "Bearer " + process.env.SUBGRAPH_API_KEY
     },
+    cache: "no-store",
     body: JSON.stringify({ query, variables })
   };
 
+  /*
   if (options?.next) {
     requestInit.next = options.next;
   }
-
+ 
   if (options?.cache) {
     requestInit.cache = options.cache;
   }
+  */
 
   const request = await fetch(url, requestInit);
 

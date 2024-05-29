@@ -211,7 +211,11 @@ export async function getValidatedAds({
   }
 
   return Object.assign(
-    { _tokenIds: tokenIds, _tokenData: tokenDatas, _adParameterIds: adParameterIds },
+    {
+      _tokenIds: tokenIds,
+      _tokenData: tokenDatas,
+      _adParameterIds: adParameterIds
+    },
     result
   );
 }
