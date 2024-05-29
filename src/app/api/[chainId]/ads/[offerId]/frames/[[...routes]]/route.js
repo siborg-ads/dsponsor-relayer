@@ -296,3 +296,5 @@ app.transaction("/api/:chainId/ads/:offerId/frames/:tokenId/txdata/:action", asy
 
 export const GET = handle(app);
 export const POST = handle(app);
+
+export const dynamic = "force-dynamic";
