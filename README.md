@@ -1,24 +1,29 @@
 # DSponsor Relayer
 
-## Relayer App
-
 The Relayer App provides API endpoints and UI components for the [DSponsor ecosystem](https://dsponsor.com). It processes and transforms on-chain data indexed by the [DSponsor subgraph](https://github.com/dcast-media/dsponsor-subgraph) deployed on The Graph Network.
 
-### Development setup
+## Development setup
+
+1. Create a `.env.local` file:
+
+```
+NEXT_ALCHEMY_API_KEY=<your-alchemy-api-key>
+```
+
+2. Install dependencies and run the project:
 
 ```bash
-cd www
 npm i # install node dependencies
 npm run dev # run next app locally
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to test.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser to test.
 
-### API endpoints
+## API endpoints
 
 API base URL: `https://relayer.dsponsor.com/api/[chainId]`
 
-#### Get a sponsor's ad spaces
+### Get a sponsor's ad spaces
 
 Purpose: Retrieve tokens from DSponsor ad offers owned by a specific wallet.
 
@@ -32,13 +37,13 @@ Purpose: Retrieve tokens from DSponsor ad offers owned by a specific wallet.
  Example
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250E65d7C4CA7d39De766/tokens'
 ```
 
-##### Response
+#### Response
 
 ```json
 [
@@ -92,43 +97,187 @@ curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250
       "prices": [],
       "tokens": [
         {
-          "tokenId": "110771216890900307486995680796878979552050216338441285842533727414245120540081",
+          "tokenId": "109209750437790945652155443835624055978955232477308362696330723152483678880972",
           "setInAllowList": false,
-          "marketplaceListings": [
-            {
-              "listingType": "Direct",
-              "startTime": "1713630360",
-              "endTime": "1714062360",
-              "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
-              "buyoutPricePerToken": "45500000",
-              "reservePricePerToken": "45500000",
-              "status": "CREATED",
-              "bids": []
-            }
-          ],
+          "marketplaceListings": [],
           "nftContract": {
             "allowList": false,
             "prices": []
           },
           "mint": {
-            "tokenData": "airdrop",
-            "blockTimestamp": "1713371592"
+            "tokenData": "lol",
+            "blockTimestamp": "1715710404"
           },
           "prices": [],
           "metadata": {
-            "name": "#airdrop - Tokenized Ad Space",
-            "description": "Tokenized advertisement spaces link to the ticker 'airdrop' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'airdrop'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Aairdrop",
+            "name": "#lol - Tokenized Ad Space",
+            "description": "Tokenized advertisement spaces link to the ticker 'lol' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'lol'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Alol",
+            "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+            "external_link": "",
+            "valid_from": "2024-05-01T00:00:00Z",
+            "valid_to": "2024-10-31T23:59:59Z",
+            "categories": [
+              "Community",
+              "NFT",
+              "Crypto"
+            ],
+            "token_metadata": {
+              "name": "#{tokenData} - Tokenized Ad Space",
+              "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+              "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+              "external_url": "",
+              "attributes": [
+                {
+                  "trait_type": "Search Query",
+                  "value": "{tokenData}"
+                }
+              ]
+            },
             "external_url": "",
             "attributes": [
               {
                 "trait_type": "Search Query",
-                "value": "airdrop"
+                "value": "lol"
+              }
+            ]
+          }
+        },
+        {
+          "tokenId": "65329693524297118063646238334159138948524025175806621014596919199733788562630",
+          "setInAllowList": false,
+          "marketplaceListings": [],
+          "nftContract": {
+            "allowList": false,
+            "prices": []
+          },
+          "mint": {
+            "tokenData": "web3",
+            "blockTimestamp": "1713371652"
+          },
+          "prices": [],
+          "metadata": {
+            "name": "#web3 - Tokenized Ad Space",
+            "description": "Tokenized advertisement spaces link to the ticker 'web3' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'web3'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Aweb3",
+            "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+            "external_link": "",
+            "valid_from": "2024-05-01T00:00:00Z",
+            "valid_to": "2024-10-31T23:59:59Z",
+            "categories": [
+              "Community",
+              "NFT",
+              "Crypto"
+            ],
+            "token_metadata": {
+              "name": "#{tokenData} - Tokenized Ad Space",
+              "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+              "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+              "external_url": "",
+              "attributes": [
+                {
+                  "trait_type": "Search Query",
+                  "value": "{tokenData}"
+                }
+              ]
+            },
+            "external_url": "",
+            "attributes": [
+              {
+                "trait_type": "Search Query",
+                "value": "web3"
+              }
+            ]
+          }
+        },
+        {
+          "tokenId": "70622639689279718371527342103894932928233838121221666359043189029713682937432",
+          "setInAllowList": false,
+          "marketplaceListings": [],
+          "nftContract": {
+            "allowList": false,
+            "prices": []
+          },
+          "mint": {
+            "tokenData": "test",
+            "blockTimestamp": "1714762092"
+          },
+          "prices": [],
+          "metadata": {
+            "name": "#test - Tokenized Ad Space",
+            "description": "Tokenized advertisement spaces link to the ticker 'test' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'test'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Atest",
+            "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+            "external_link": "",
+            "valid_from": "2024-05-01T00:00:00Z",
+            "valid_to": "2024-10-31T23:59:59Z",
+            "categories": [
+              "Community",
+              "NFT",
+              "Crypto"
+            ],
+            "token_metadata": {
+              "name": "#{tokenData} - Tokenized Ad Space",
+              "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+              "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+              "external_url": "",
+              "attributes": [
+                {
+                  "trait_type": "Search Query",
+                  "value": "{tokenData}"
+                }
+              ]
+            },
+            "external_url": "",
+            "attributes": [
+              {
+                "trait_type": "Search Query",
+                "value": "test"
               }
             ]
           }
         }
       ]
+    },
+    "metadata": {
+      "creator": {
+        "name": "SiBorg",
+        "description": "SiBorg application empowers podcasters by leveraging SocialFi.",
+        "image": "https://bafkreidonqrmvzm4544yv7lqeggp3t34r72glwszbh3qafjqmegvzvgiry.ipfs.nftstorage.link/",
+        "external_link": "https://siborg.io",
+        "categories": [
+          "dApp",
+          "social",
+          "media",
+          "education"
+        ]
+      },
+      "offer": {
+        "name": "Tokenized ad spaces in SiBorg App",
+        "description": "Tokenized advertisement spaces, each token is linked to a search term.\n\nBuying an ad space from the collection give you the exclusive right to submit an ad.\nSiBorg team still has the power to validate or reject ad assets. You are free to change the ad proposal at anytime and free to resell it on the open market.",
+        "image": "https://bafkreif4dihekhhd24itluilol4qab6zxhwlokkinbpnkqaprzf6jenqne.ipfs.nftstorage.link/",
+        "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+        "external_link": "",
+        "valid_from": "2024-05-01T00:00:00Z",
+        "valid_to": "2024-10-31T23:59:59Z",
+        "categories": [
+          "Community",
+          "NFT",
+          "Crypto"
+        ],
+        "token_metadata": {
+          "name": "#{tokenData} - Tokenized Ad Space",
+          "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+          "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+          "external_url": "",
+          "attributes": [
+            {
+              "trait_type": "Search Query",
+              "value": "{tokenData}"
+            }
+          ]
+        }
+      }
     }
   }
 ]
@@ -136,13 +285,13 @@ curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250
 
 </details>
 
-#### Ad spaces data for an offer
+### Ad spaces data for an offer
 
 Purpose: Retrieve data to display on sponsors' interfaces.
 
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET` or `POST`|`/ads/[offerId]`| `tokenIds` (optionnal) or `tokenData` (optionnal)|
+|`GET` or `POST`|`/ads/[offerId]`| `tokenIds` (optionnal), `tokenData` (optionnal), `adParameterIds` (optionnal)|
 
 <details>
 
@@ -150,27 +299,29 @@ Purpose: Retrieve data to display on sponsors' interfaces.
  Example
 </summary>
 
-##### Request
+#### Request
 
 ```bash
-curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,staking'
+curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,staking&adParameterIds=imageURL,linkURL'
 ```
 
-##### Response
+#### Response
 
 ```json
 {
   "_tokenIds": [
     "65329693524297118063646238334159138948524025175806621014596919199733788562630",
     "101661046026135114031620108954831493212219976668510473490175828180454937635060",
-    "64873369441774726751632143071124460964591437972899336413549633584093280026386",
-    "42815755960540918129438353840082893508347041245824540425731235505437781612563"
+    "64873369441774726751632143071124460964591437972899336413549633584093280026386"
   ],
   "_tokenData": [
     "web3",
     "twitter",
-    "staking",
-    "cryptonnews"
+    "staking"
+  ],
+  "_adParameterIds": [
+    "imageURL-6.4:1",
+    "linkURL"
   ],
   "65329693524297118063646238334159138948524025175806621014596919199733788562630": {
     "imageURL-6.4:1": {
@@ -186,14 +337,6 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
       "link": "https://app.staging.dsponsor.com/sepolia/offer/1/65329693524297118063646238334159138948524025175806621014596919199733788562630?tokenData=web3",
       "mint": null,
       "secondary": null
-    },
-    "xCreatorHandle": {
-      "state": "UNAVAILABLE",
-      "data": null
-    },
-    "xSpaceId": {
-      "state": "UNAVAILABLE",
-      "data": null
     }
   },
   "101661046026135114031620108954831493212219976668510473490175828180454937635060": {
@@ -210,14 +353,6 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
     "linkURL": {
       "state": "UNAVAILABLE",
       "data": "https://app.staging.dsponsor.com/sepolia/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060?tokenData=twitter"
-    },
-    "xCreatorHandle": {
-      "state": "UNAVAILABLE",
-      "data": null
-    },
-    "xSpaceId": {
-      "state": "UNAVAILABLE",
-      "data": null
     }
   },
   "64873369441774726751632143071124460964591437972899336413549633584093280026386": {
@@ -243,38 +378,6 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
     "linkURL": {
       "state": "BUY_MARKET",
       "data": "https://app.staging.dsponsor.com/sepolia/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386?tokenData=staking"
-    },
-    "xCreatorHandle": {
-      "state": "BUY_MARKET",
-      "data": null
-    },
-    "xSpaceId": {
-      "state": "BUY_MARKET",
-      "data": null
-    }
-  },
-  "42815755960540918129438353840082893508347041245824540425731235505437781612563": {
-    "_tokenData": "cryptonnews",
-    "_buy": {
-      "link": "https://app.staging.dsponsor.com/sepolia/offer/1/42815755960540918129438353840082893508347041245824540425731235505437781612563?tokenData=cryptonnews",
-      "mint": null,
-      "secondary": null
-    },
-    "imageURL-6.4:1": {
-      "state": "UNAVAILABLE",
-      "data": "https://relayer.dsponsor.com/reserved.webp"
-    },
-    "linkURL": {
-      "state": "UNAVAILABLE",
-      "data": "https://app.staging.dsponsor.com/sepolia/offer/1/42815755960540918129438353840082893508347041245824540425731235505437781612563?tokenData=cryptonnews"
-    },
-    "xCreatorHandle": {
-      "state": "UNAVAILABLE",
-      "data": null
-    },
-    "xSpaceId": {
-      "state": "UNAVAILABLE",
-      "data": null
     }
   }
 }
@@ -282,7 +385,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
 
 </details>
 
-#### Graph proxy
+### Graph proxy
 
 Purpose: Relay any GraphQL request to the DSponsor subgraph and populate offer and token metadata.
 
@@ -298,7 +401,7 @@ You can use [Apollo's Sandbox](https://studio.apollographql.com/sandbox/explorer
  Example
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/graph' \
@@ -325,7 +428,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
 
 ```
 
-##### Response
+#### Response
 
 ```json
 {
@@ -404,7 +507,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
 
 </details>
 
-#### Price quotes
+### Price quotes
 
 Purpose: Retrieve USD and ETH prices for a specific token from Uniswap.
 
@@ -418,13 +521,13 @@ Purpose: Retrieve USD and ETH prices for a specific token from Uniswap.
  Example (0.00002 UNI, 0.3% slippage)
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&amount=20000000000000&slippage=0.3'
 ```
 
-##### Response
+#### Response
 
 ```json
 {
@@ -439,7 +542,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1
 
 </details>
 
-#### Token metadata
+### Token metadata
 
 Purpose: Retrieve token metadata according to the official ERC721 metadata standard.
 
@@ -453,13 +556,13 @@ Purpose: Retrieve token metadata according to the official ERC721 metadata stand
  Example
 </summary>
 
-##### Request
+#### Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/tokenMetadata/0x6b9e4504a91b077d2b72b5186373ead75c6cdc03/2'
 ```
 
-##### Response
+#### Response
 
 ```json
 {
@@ -482,13 +585,13 @@ curl 'https://relayer.dsponsor.com/api/11155111/tokenMetadata/0x6b9e4504a91b077d
 
 </details>
 
-### Integrations
+## Integrations
 
 App base URL: `https://relayer.dsponsor.com/[chainId]/ads/[offerId]`
 
-#### Generic
+### Generic
 
-##### Get image for a specific token
+#### Get image for a specific token
 
 Purpose: Retrieve the image for an ad offer token.
 
@@ -508,7 +611,7 @@ Purpose: Retrieve the image for an ad offer token.
 
 </details>
 
-##### Get link for a specific token
+#### Get link for a specific token
 
 Purpose: Retrieve the link for an ad offer token.
 
@@ -528,11 +631,11 @@ Purpose: Retrieve the link for an ad offer token.
 
 </details>
 
-#### Clickable Logos Grid
+### Clickable Logos Grid
 
 Purpose: Displays a grid of clickable logos, each linking to a URL. Each ad space is displayed, tied to a token from the related ad offer.
 
-##### Iframe
+#### Iframe
 
 Use for: Web
 
@@ -556,12 +659,12 @@ Example
 </summary>
 
 ```html
- <iframe src="https://relayer.dsponsor.com/11155111/ads/1/ClickableLogosGrid/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%"></iframe>
+ <iframe loading="lazy" src="https://relayer.dsponsor.com/11155111/ads/1/ClickableLogosGrid/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%"></iframe>
 ```
 
 </details>
 
-##### HTML table
+#### HTML table
 
 Use for: Newsletters, GitHub READMEs
 
@@ -571,7 +674,7 @@ Use for: Newsletters, GitHub READMEs
 Example
 </summary>
 
-###### HTML code
+##### HTML code
 
 ```html
 
@@ -634,7 +737,7 @@ Example
 
 ```
 
-###### Result
+##### Result
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
   <tr>
@@ -695,11 +798,11 @@ Example
 
 </details>
 
-#### Dynamic Banner
+### Dynamic Banner
 
 Purpose: Displays a single clickable image, randomly selected from all validated ad spaces of an offer.
 
-##### Iframe
+#### Iframe
 
 Use for: Web
 
@@ -723,12 +826,12 @@ Example
 </summary>
 
 ```html
- <iframe src="https://relayer.dsponsor.com/11155111/ads/1/DynamicBanner/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&tokenIds=1,2,3,4,5,6&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%"></iframe>
+ <iframe loading="lazy" src="https://relayer.dsponsor.com/11155111/ads/1/DynamicBanner/iFrame?bgColor=0d102d&colSizes=300,300,300,300,300&ratio=1:1&tokenIds=1,2,3,4,5,6&previewImage=https://relayer.dsponsor.com/available.webp&previewLink=https://google.fr" height="100%" width="100%"></iframe>
 ```
 
 </details>
 
-##### Warpcast Frame
+#### Warpcast Frame
 
 Use for: a post published on Warpcast
 
