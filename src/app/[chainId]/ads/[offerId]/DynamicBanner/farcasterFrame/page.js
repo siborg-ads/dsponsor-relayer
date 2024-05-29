@@ -1,4 +1,5 @@
 import { getFrameMetadata } from "frog/next";
+import { config } from "process";
 
 export async function generateMetadata({ params, searchParams }) {
   const { chainId, offerId } = params;
@@ -22,7 +23,7 @@ export async function generateMetadata({ params, searchParams }) {
     queryParams += `&ratio=${ratio}`;
   }
 
-  let url = process.env.VERCEL_URL || "http://localhost:3000";
+  let url = config[chainId].relayerURL;
   url = `${url}/api/${chainId}/ads/${offerId}/frames${queryParams}`;
   const frameMetadata = await getFrameMetadata(url);
 
