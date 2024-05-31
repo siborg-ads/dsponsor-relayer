@@ -26,7 +26,7 @@ export async function GET(request, context) {
     headers.set("Content-Type", "image/*");
     return new NextResponse(blob, { status: 200, statusText: "OK", headers });
   } catch (e) {
-    console.error("Error fetching image", e);
+    console.error("Error fetching image", imgUrl);
     return new Response("Error fetching image", {
       status: 500
     });

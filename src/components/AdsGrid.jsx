@@ -10,8 +10,8 @@ const AdsGrid = ({ ads, chainId, ratio }) => {
   const defaultImg = getDefaultImg({ chainId, type: "reserved", ratio });
   const gridContainerRef = useRef(null);
   const [containerSize, setContainerSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
+    width: 0,
+    height: 0
   });
   useEffect(() => {
     const handleResize = () => {

@@ -51,7 +51,7 @@ export const getEthQuote = async (chainId, tokenOutAddr, amountOut, slippagePerC
     amountInEthWithSlippage =
       (amountInEth * BigInt(slippage.toString())) / BigInt(slippageMul.toString());
   } catch (e) {
-    console.error("Quote error", e);
+    console.error("Quote error", chainId, tokenOutAddr, amountOut, slippagePerCent);
   }
 
   return {
