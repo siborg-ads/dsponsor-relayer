@@ -1,5 +1,119 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
+import React, { useState, useEffect, useRef } from "react";
+import config from "@/config";
+import { getDefaultImg } from "@/queries/ads";
+const AdsGrid = ({ ads, chainId, ratio }) => {
+  ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
+  ads = ads?.length ? ads : [];
+
+  const defaultImg = getDefaultImg({ chainId, type: "reserved", ratio });
+  const gridContainerRef = useRef(null);
+  const [containerSize, setContainerSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+  useEffect(() => {
+    const handleResize = () => {
+      if (gridContainerRef.current) {
+        setContainerSize({
+          width: gridContainerRef.current.clientWidth,
+          height: gridContainerRef.current.clientHeight
+        });
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Call at initial render too
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  const calculateLayout = () => {
+    const [widthRatio, heightRatio] = ratio.split(":").map(Number);
+    // Calculating the ideal number of columns based on aspect ratio and container width
+    let columnWidth = Math.sqrt(
+      (containerSize.width * containerSize.height) / ads.length / (widthRatio / heightRatio)
+    );
+    let numColumns = Math.max(1, Math.floor(containerSize.width / columnWidth));
+
+    let numRows = Math.ceil(ads.length / numColumns);
+    let rowHeight = columnWidth * (heightRatio / widthRatio);
+    while (rowHeight * numRows + rowHeight < containerSize.height) {
+      numColumns -= 1;
+      numRows = Math.ceil(ads.length / numColumns);
+      columnWidth = containerSize.width / numColumns;
+      rowHeight = columnWidth * (heightRatio / widthRatio);
+    }
+    if (rowHeight * numRows > containerSize.height) {
+      numRows -= 1;
+      numColumns += 1;
+      columnWidth = containerSize.width / numColumns;
+      rowHeight = columnWidth * (heightRatio / widthRatio);
+    }
+
+    return { numColumns, rowHeight, columnWidth };
+  };
+  const { numColumns, rowHeight, columnWidth } = calculateLayout();
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        boxSizing: "border-box",
+        justifyContent: "center"
+      }}
+    >
+      <div ref={gridContainerRef} className="w-screen h-screen">
+        <div
+          className="grid grid-flow-row-dense place-items-center gap-1"
+          style={{
+            gridTemplateColumns: `repeat(${numColumns}, calc(${columnWidth}px - 4px))`,
+            gridAutoRows: `calc(${rowHeight}px - 4px)`,
+            overflow: "hidden",
+            justifyContent: "center"
+          }}
+        >
+          {ads.map((ad, index) => (
+            <div
+              key={index}
+              className="relative overflow-hidden rounded border border-blue-500 bg-[#00143e] text-black hover:border-[#9abffb] hover:bg-[#353f75]"
+              style={{ width: `100%`, height: `100%` }}
+            >
+              <a
+                href={
+                  ad.records.linkURL ??
+                  `${config[chainId].appURL}/${config[chainId].chainName}/offer/${ad.offerId}/${ad.tokenId}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute inset-0 flex items-center justify-center no-underline"
+              >
+                <img
+                  src={ad.records.imageURL ?? defaultImg}
+                  alt="Ad image"
+                  className="h-full w-full object-contain"
+                />
+              </a>
+            </div>
+          ))}
+        </div>
+        <div className="flex mt-2">
+          <span className="pr-2 text-right text-[0.65em] text-orange-300 hover:text-orange-500">
+            <a href={config[chainId].creditsURL} target="_blank" rel="noreferrer">
+              Powered by DSponsor
+            </a>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+export default AdsGrid;
+
+/* 
+"use client";
 import React from "react";
 import config from "@/config";
 import { getDefaultImg } from "@/queries/ads";
@@ -11,17 +125,17 @@ const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
 
   const defaultImg = await getDefaultImg({ chainId, type: "reserved", ratio });
 
-  /*
-  const classes = `
-                grid grid-flow-row-dense
-                gap-1 grow place-items-center
-                grid-cols-[repeat(auto-fill,minmax(${colSizes[0]}px,1fr))]
-                sm:grid-cols-[repeat(auto-fill,minmax(${colSizes[1]}px,1fr))]
-                md:grid-cols-[repeat(auto-fill,minmax(${colSizes[2]}px,1fr))]
-                lg:grid-cols-[repeat(auto-fill,minmax(${colSizes[3]}px,1fr))]
-                xl:grid-cols-[repeat(auto-fill,minmax(${colSizes[4]}px,1fr))]
-                `;
-*/
+ 
+  // const classes = `
+  //              grid grid-flow-row-dense
+  //              gap-1 grow place-items-center
+  //              grid-cols-[repeat(auto-fill,minmax(${colSizes[0]}px,1fr))]
+  //              sm:grid-cols-[repeat(auto-fill,minmax(${colSizes[1]}px,1fr))]
+  //              md:grid-cols-[repeat(auto-fill,minmax(${colSizes[2]}px,1fr))]
+  //              lg:grid-cols-[repeat(auto-fill,minmax(${colSizes[3]}px,1fr))]
+  //              xl:grid-cols-[repeat(auto-fill,minmax(${colSizes[4]}px,1fr))]
+  //              `;
+
 
   // We would have loved using above classes
   // But tailwindcss does not support programmatic dynamic arbitrary value
@@ -92,3 +206,4 @@ const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
 };
 
 export default AdsGrid;
+*/
