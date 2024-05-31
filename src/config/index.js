@@ -37,7 +37,7 @@ const config = {
         decimals: 18
       },
       UNISWAP_QUOTER: {
-        address: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6" // "0xC5290058841028F1614F3A6F0F5816cAd0df5E27"
+        address: "0xC5290058841028F1614F3A6F0F5816cAd0df5E27"
       }
     }
   },
