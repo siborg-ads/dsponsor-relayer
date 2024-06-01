@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import config from "@/config";
@@ -10,8 +11,8 @@ const AdsGrid = ({ ads, chainId, ratio }) => {
   const defaultImg = getDefaultImg({ chainId, type: "reserved", ratio });
   const gridContainerRef = useRef(null);
   const [containerSize, setContainerSize] = useState({
-    width: 0,
-    height: 0
+    width: window.innerWidth || 0,
+    height: window.innerHeight || 0
   });
   useEffect(() => {
     const handleResize = () => {
@@ -30,25 +31,44 @@ const AdsGrid = ({ ads, chainId, ratio }) => {
   }, []);
   const calculateLayout = () => {
     const [widthRatio, heightRatio] = ratio.split(":").map(Number);
+
+    const padding = 30; // Added padding for clear layout margins
+    const effectiveHeight = containerSize.height - padding;
     // Calculating the ideal number of columns based on aspect ratio and container width
     let columnWidth = Math.sqrt(
-      (containerSize.width * containerSize.height) / ads.length / (widthRatio / heightRatio)
+      (containerSize.width * effectiveHeight) / ads.length / (widthRatio / heightRatio)
     );
     let numColumns = Math.max(1, Math.floor(containerSize.width / columnWidth));
-
     let numRows = Math.ceil(ads.length / numColumns);
     let rowHeight = columnWidth * (heightRatio / widthRatio);
-    while (rowHeight * numRows + rowHeight < containerSize.height) {
-      numColumns -= 1;
-      numRows = Math.ceil(ads.length / numColumns);
-      columnWidth = containerSize.width / numColumns;
-      rowHeight = columnWidth * (heightRatio / widthRatio);
-    }
-    if (rowHeight * numRows > containerSize.height) {
-      numRows -= 1;
-      numColumns += 1;
-      columnWidth = containerSize.width / numColumns;
-      rowHeight = columnWidth * (heightRatio / widthRatio);
+
+    // case 1 ad
+    if (ads.length === 1) {
+      // Calculate dimensions based on the aspect ratio and the maximum size that can fit
+      const maxPossibleWidth = containerSize.width;
+      const maxPossibleHeight = containerSize.width * (heightRatio / widthRatio);
+      numColumns = 1;
+      if (maxPossibleHeight <= effectiveHeight) {
+        columnWidth = maxPossibleWidth;
+        rowHeight = maxPossibleHeight;
+      } else {
+        rowHeight = effectiveHeight;
+        columnWidth = effectiveHeight * (widthRatio / heightRatio);
+      }
+      // case multi ads
+    } else {
+      while (rowHeight * numRows + rowHeight < effectiveHeight && numColumns > 1) {
+        numColumns -= 1;
+        numRows = Math.ceil(ads.length / numColumns);
+        columnWidth = containerSize.width / numColumns;
+        rowHeight = columnWidth * (heightRatio / widthRatio);
+      }
+      while (rowHeight * numRows > effectiveHeight && numRows > 1) {
+        numColumns = Math.min(ads.length, numColumns + 1);
+        numRows = Math.ceil(ads.length / numColumns);
+        columnWidth = containerSize.width / numColumns;
+        rowHeight = columnWidth * (heightRatio / widthRatio);
+      }
     }
 
     return { numColumns, rowHeight, columnWidth };
@@ -99,7 +119,7 @@ const AdsGrid = ({ ads, chainId, ratio }) => {
             </div>
           ))}
         </div>
-        <div className="flex mt-2">
+        <div className="flex justify-end mt-2">
           <span className="pr-2 text-right text-[0.65em] text-orange-300 hover:text-orange-500">
             <a href={config[chainId].creditsURL} target="_blank" rel="noreferrer">
               Powered by DSponsor
