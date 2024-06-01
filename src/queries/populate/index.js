@@ -15,7 +15,10 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
       minimalBidBps,
       previousBidAmountBps
     } = config[chainId].smartContracts.DSPONSOR_MARKETPLACE || {};
-    const { reservePricePerToken, buyoutPricePerToken, bids, currency } = listing || {};
+    const { reservePricePerToken, buyoutPricePerToken, bids, currency, token } = listing || {};
+
+    nftContract = token?.nftContract?.royalty ? token.nftContract : nftContract;
+
     const { royalty } = nftContract || {};
     let { bps: royaltyBps } = royalty || {};
 

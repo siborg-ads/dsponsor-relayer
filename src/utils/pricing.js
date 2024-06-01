@@ -53,8 +53,22 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
       if (formattedNb < 0.001 && formattedNb > 0) {
         const [, precision] = formatted.split(".");
         const precisionSplit = precision.split("");
-        const firstNonZeroIndex = precisionSplit.findIndex((x) => x !== "0");
-        res[`${key}`] = `0.0${toSubscript(firstNonZeroIndex)}${precisionSplit[firstNonZeroIndex]}`;
+        let firstNonZeroIndex = precisionSplit.findIndex((x) => x !== "0");
+        let nonZeroNb = Number(precisionSplit[firstNonZeroIndex]);
+        const nextNonZeroNb = nonZeroNb ? Number(precisionSplit[firstNonZeroIndex + 1]) : 0;
+        let lastNumber;
+
+        if (nonZeroNb === 9 && nextNonZeroNb > 5) {
+          firstNonZeroIndex -= 1;
+          lastNumber = 1;
+        } else {
+          lastNumber =
+            nextNonZeroNb > 5
+              ? Number(precisionSplit[firstNonZeroIndex]) + 1
+              : Number(precisionSplit[firstNonZeroIndex]);
+        }
+
+        res[`${key}`] = `0.0${toSubscript(firstNonZeroIndex)}${lastNumber}`;
       } else if (formattedNb >= 0.001 && formattedNb < 0.1) {
         res[`${key}`] = numeral(formatted).format("0.[000]");
       } else if (formattedNb >= 0.1 && formattedNb < 1000) {
@@ -87,9 +101,17 @@ const subscriptMap = {
 };
 
 function toSubscript(num) {
-  return num
-    .toString()
-    .split("")
-    .map((char) => subscriptMap[char] || char)
-    .join("");
+  if (num.toString().length === 1) {
+    if (num === 2) {
+      return "0"; // "0.000996666" should become "0.001"
+    } else {
+      return subscriptMap[num];
+    }
+  } else {
+    return num
+      .toString()
+      .split("")
+      .map((char) => subscriptMap[char] || char)
+      .join("");
+  }
 }
