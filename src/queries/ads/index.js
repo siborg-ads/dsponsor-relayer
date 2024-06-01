@@ -181,7 +181,7 @@ export async function getValidatedAds({
       result[_tokenId]._buy = {
         link,
         mint,
-        secondary
+        secondary: secondary ? secondary : null
       };
 
       // Provide default data for each ad parameter, for each token /////////////////////////////////

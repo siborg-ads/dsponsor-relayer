@@ -23,11 +23,19 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
     let { bps: royaltyBps } = royalty || {};
 
     let { quantity } = listing;
-    if (!quantity) quantity = "1";
 
-    if (!royaltyBps) royaltyBps = "0";
+    // if (!quantity) quantity = "1";
+    // if (!royaltyBps) royaltyBps = "0";
 
-    if (minimalBidBps && reservePricePerToken && buyoutPricePerToken && bids) {
+    if (
+      minimalBidBps &&
+      reservePricePerToken &&
+      buyoutPricePerToken &&
+      bids &&
+      currency &&
+      royaltyBps &&
+      quantity
+    ) {
       let { totalBidAmount: previousBidAmount } = bids[0] || {};
       previousBidAmount = previousBidAmount ? previousBidAmount : "0";
       const previousPricePerToken = previousBidAmount
