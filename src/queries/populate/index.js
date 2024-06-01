@@ -56,10 +56,10 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
         BigInt(buyoutPricePerToken) - royaltiesBuyAmount - protocolFeeBuyAmount;
 
       const buyPriceStructure = {
+        buyoutPricePerToken,
         listerBuyAmount: listerBuyAmount.toString(),
         royaltiesBuyAmount: royaltiesBuyAmount.toString(),
-        protocolFeeBuyAmount: protocolFeeBuyAmount.toString(),
-        buyoutPricePerToken
+        protocolFeeBuyAmount: protocolFeeBuyAmount.toString()
       };
 
       const { decimals, symbol } = (await getDecimalsAndSymbol(chainId, currency)) || {};
@@ -91,7 +91,6 @@ async function populateMintPrice(chainId, price) {
       const totalAmount = BigInt(amount) + protocolFeeAmount;
 
       const mintPriceStructure = {
-        protocolFeeBps: BigInt(feeBps).toString(),
         //
         creatorAmount: amount,
         protocolFeeAmount: protocolFeeAmount.toString(),
@@ -105,6 +104,7 @@ async function populateMintPrice(chainId, price) {
         currencySymbol: symbol,
         currencyDecimals: decimals.toString(),
         minterAddress: address,
+        protocolFeeBps: BigInt(feeBps).toString(),
         mintPriceStructure,
         mintPriceStructureFormatted: priceFormattedForAllValuesObject(decimals, mintPriceStructure)
       };

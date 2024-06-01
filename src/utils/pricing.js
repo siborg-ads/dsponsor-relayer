@@ -1,3 +1,4 @@
+import * as numeral from "numeral";
 import config from "@/config";
 import { ethers, formatUnits } from "ethers";
 import ERC20 from "@uniswap/v3-periphery/artifacts/contracts/interfaces/IERC20Metadata.sol/IERC20Metadata.json";
@@ -44,7 +45,26 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
   const objKeys = Object.keys(obj);
 
   for (const key of objKeys) {
-    res[key] = formatUnits(obj[key], decimals);
+    let formatted = formatUnits(obj[key], decimals);
+    res[key] = formatted;
+
+    try {
+      let formattedNb = numeral(formatted).value();
+      if (formattedNb < 0.001 && formattedNb > 0) {
+        const [, precision] = formatted.split(".");
+        const precisionSplit = precision.split("");
+        const firstNonZeroIndex = precisionSplit.findIndex((x) => x !== "0");
+        res[`${key}`] = `0.0${toSubscript(firstNonZeroIndex)}${precisionSplit[firstNonZeroIndex]}`;
+      } else if (formattedNb >= 0.001 && formattedNb < 0.1) {
+        res[`${key}`] = numeral(formatted).format("0.[000]");
+      } else if (formattedNb >= 0.1 && formattedNb < 1000) {
+        res[`${key}`] = numeral(formatted).format("0.[00]");
+      } else {
+        res[`${key}`] = numeral(formatted).format("0.[0]a").toLocaleUpperCase();
+      }
+    } catch (e) {
+      console.error("error formatting ", formatted, e);
+    }
   }
   return res;
 };
@@ -52,3 +72,24 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
 export const priceFormatted = (decimals, amount) => {
   return formatUnits(amount, decimals);
 };
+
+const subscriptMap = {
+  0: "₀",
+  1: "₁",
+  2: "₂",
+  3: "₃",
+  4: "₄",
+  5: "₅",
+  6: "₆",
+  7: "₇",
+  8: "₈",
+  9: "₉"
+};
+
+function toSubscript(num) {
+  return num
+    .toString()
+    .split("")
+    .map((char) => subscriptMap[char] || char)
+    .join("");
+}
