@@ -9,7 +9,9 @@ const config = {
     appURL: "https://app.dsponsor.com",
     creditsURL: "https://dsponsor.com",
     explorerURL: "https://sepolia.basescan.org/",
-    relayerURL: process.env.DEV ? process.env.DEV : "https://relayer.dsponsor.com",
+    relayerURL: process.env.NEXT_DEV_URL
+      ? process.env.NEXT_DEV_URL
+      : "https://relayer.dsponsor.com",
     rpcURL: "https://sepolia.base.org",
     subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-base-sepolia/version/latest",
 
@@ -58,7 +60,9 @@ const config = {
     appURL: "https://app.dsponsor.com",
     creditsURL: "https://dsponsor.com",
     explorerURL: "https://sepolia.etherscan.io",
-    relayerURL: process.env.DEV ? process.env.DEV : "https://relayer.dsponsor.com",
+    relayerURL: process.env.NEXT_DEV_URL
+      ? process.env.NEXT_DEV_URL
+      : "https://relayer.dsponsor.com",
     rpcURL: "https://ethereum-sepolia-rpc.publicnode.com",
     subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest",
 

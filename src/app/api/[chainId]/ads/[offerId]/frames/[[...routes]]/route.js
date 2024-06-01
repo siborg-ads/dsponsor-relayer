@@ -28,7 +28,10 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
   const { offerId, chainId } = c.req.param();
   const { inputText, buttonValue } = c;
 
-  let { ratio, tokenIds, tokenDatas, tokenDataInput } = c.req.query();
+  let { items, ratio, tokenIds, tokenDataInput, tokenDatas } = c.req.query();
+
+  items = items && items.length > 0 ? items.split(",") : ["sale", "sponsor"];
+
   ratio = ratio === "1:1" ? "1:1" : "1.91:1";
 
   tokenIds = tokenIds && tokenIds.length > 0 ? tokenIds.split(",") : undefined;
@@ -63,11 +66,6 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
   let image;
   const intents = [];
 
-  if (tokenDataInput || buttonValue == "tokenDataInput") {
-    intents.push(<TextInput placeholder={tokenDataInput ? tokenDataInput : "..."} />);
-    intents.push(<Button action={`/api/${chainId}/ads/${offerId}/frames`}>Lookup</Button>);
-  }
-
   if (inputText) {
     intents.push(
       <Button value="tokenDataInput" action={`/api/${chainId}/ads/${offerId}/frames`}>
@@ -76,48 +74,65 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
     );
   }
 
-  const mintTokenId = Object.keys(_validatedAds).find((tokenId) => {
-    return _validatedAds[tokenId]?._buy?.mint?.length > 0;
-  });
-
-  if (mintTokenId) {
-    image = _validatedAds[mintTokenId][imageURL].data;
-    const action = actions.MINT;
-
-    intents.push(
-      <Button.Transaction
-        action={`/api/${chainId}/ads/${offerId}/frames/${mintTokenId}/txres`}
-        target={`/api/${chainId}/ads/${offerId}/frames/${mintTokenId}/txdata/${action}`}
-      >
-        {action}
-      </Button.Transaction>
-    );
+  if (tokenDataInput || buttonValue == "tokenDataInput") {
+    intents.push(<TextInput placeholder={tokenDataInput ? tokenDataInput : "..."} />);
+    intents.push(<Button action={`/api/${chainId}/ads/${offerId}/frames`}>Lookup</Button>);
   }
 
-  const secondaryTokenId = Object.keys(_validatedAds).find((tokenId) => {
-    return !!_validatedAds[tokenId]?._buy?.secondary;
-  });
+  if (items.includes("sale")) {
+    const mintTokenId = Object.keys(_validatedAds).find((tokenId) => {
+      return _validatedAds[tokenId]?._buy?.mint?.length > 0;
+    });
 
-  if (secondaryTokenId) {
-    const { listingType } = _validatedAds[secondaryTokenId]._buy.secondary;
+    if (mintTokenId) {
+      image = _validatedAds[mintTokenId][imageURL].data;
+      const action = actions.MINT;
 
-    const action = listingType === "Direct" ? actions.BUY : actions.BID;
+      intents.push(
+        <Button.Transaction
+          action={`/api/${chainId}/ads/${offerId}/frames/${mintTokenId}/txres`}
+          target={`/api/${chainId}/ads/${offerId}/frames/${mintTokenId}/txdata/${action}`}
+        >
+          {action}
+        </Button.Transaction>
+      );
+      intents.push(
+        <Button.Link href={_validatedAds[mintTokenId][linkURL].data}>Details</Button.Link>
+      );
+    } else {
+      const secondaryTokenId = Object.keys(_validatedAds).find((tokenId) => {
+        return !!_validatedAds[tokenId]?._buy?.secondary;
+      });
 
-    image = _validatedAds[secondaryTokenId][imageURL].data;
-    intents.push(
-      <Button.Transaction
-        action={`/api/${chainId}/ads/${offerId}/frames`}
-        target={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txdata/${action}`}
-      >
-        {action}
-      </Button.Transaction>
-    );
+      if (secondaryTokenId) {
+        const { listingType } = _validatedAds[secondaryTokenId]._buy.secondary;
+
+        const action = listingType === "Direct" ? actions.BUY : actions.BID;
+
+        image = _validatedAds[secondaryTokenId][imageURL].data;
+        intents.push(
+          <Button.Transaction
+            action={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txres`}
+            target={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txdata/${action}`}
+          >
+            {action}
+          </Button.Transaction>
+        );
+        intents.push(
+          <Button.Link href={_validatedAds[secondaryTokenId][linkURL].data}>Details</Button.Link>
+        );
+      }
+    }
   }
 
-  if (randomAd && _tokenIds.length > 0) {
+  if (
+    items.includes("sponsor") &&
+    randomAd &&
+    _tokenIds.length > 0 &&
+    randomAd[linkURL].state === "CURRENT_ACCEPTED"
+  ) {
     image = randomAd[imageURL].data;
-    const text = randomAd[linkURL].state === "CURRENT_ACCEPTED" ? "Visit" : "Details";
-    intents.push(<Button.Link href={randomAd[linkURL].data}>{text}</Button.Link>);
+    intents.push(<Button.Link href={randomAd[linkURL].data}>Visit</Button.Link>);
   }
 
   if (!image && intents.length === 0 && _validatedAds._tokenIds.length > 0) {
@@ -133,7 +148,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
     });
     contentType = imageResponse.headers.get("Content-Type");
   } catch (error) {
-    // console.log("error fetching image", error)
+    console.error("error fetching image", image);
   }
 
   if (contentType && ["image/jpeg", "image/png", "image/gif", "image/bmp"].includes(contentType)) {
@@ -181,8 +196,8 @@ app.frame("/api/:chainId/ads/:offerId/frames/:tokenId/txres", async (c) => {
       <Box grow alignVertical="center" backgroundColor="background" padding="32">
         <VStack gap="4">
           <Heading size="48">Transaction submitted 🎉</Heading>
-          <Text color="text200" size="32">
-            Verify your tx or Manage your ad 👇
+          <Text color="text200" size="24">
+            Verify your tx or check it on the app 👇
           </Text>
         </VStack>
       </Box>
@@ -192,7 +207,7 @@ app.frame("/api/:chainId/ads/:offerId/frames/:tokenId/txres", async (c) => {
         Transaction
       </Button.Link>,
       <Button.Link href={`${config[chainId].appURL}/${chainId}/offer/${offerId}/${tokenId}`}>
-        Manage
+        App
       </Button.Link>
     ]
   });
@@ -272,15 +287,15 @@ app.transaction("/api/:chainId/ads/:offerId/frames/:tokenId/txdata/:action", asy
     }
   } else if (action === actions.BID && secondary) {
     const { id: listingId, currency, bidPriceStructure } = secondary || {};
-    const { totalMinimalBidAmount } = bidPriceStructure || {};
+    const { minimalBidPerToken } = bidPriceStructure || {};
 
-    if (listingId && currency && totalMinimalBidAmount) {
+    if (listingId && currency && minimalBidPerToken) {
       const { amountInEthWithSlippage: value } = await getEthQuote(
         chainId,
         currency,
-        totalMinimalBidAmount /* , slippagePerCent = 0.3 */
+        minimalBidPerToken /* , slippagePerCent = 0.3 */
       );
-      const args = [listingId, totalMinimalBidAmount, ""];
+      const args = [listingId, minimalBidPerToken, frameData.address, "frame"];
 
       return c.contract({
         abi: DSponsorMarketplaceABI,
