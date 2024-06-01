@@ -23,6 +23,10 @@ const BaseNftContractFragment = /* GraphQL */ `
     id
     allowList
     maxSupply
+    royalty {
+      bps
+      receiver
+    }
     prices(where: { enabled: true }) {
       currency
       amount
@@ -84,6 +88,7 @@ export const TokenFragment = /* GraphQL */ `
     setInAllowList
     marketplaceListings(where: { status: CREATED }) {
       id
+      quantity
       listingType
       startTime
       endTime
@@ -97,11 +102,7 @@ export const TokenFragment = /* GraphQL */ `
       }
     }
     nftContract {
-      allowList
-      prices(where: { enabled: true }) {
-        currency
-        amount
-      }
+      ...BaseNftContractFragment
     }
     mint {
       tokenData

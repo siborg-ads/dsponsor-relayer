@@ -24,20 +24,28 @@ const config = {
         minimalBidBps: "1000",
         previousBidAmountBps: "500"
       },
+      UNISWAP_QUOTER: {
+        address: "0xC5290058841028F1614F3A6F0F5816cAd0df5E27"
+      },
+      NATIVE: {
+        address: "0x0000000000000000000000000000000000000000",
+        decimals: 18,
+        symbol: "ETH"
+      },
       WNATIVE: {
         address: "0x4200000000000000000000000000000000000006",
-        decimals: 18
+        decimals: 18,
+        symbol: "WETH"
       },
       USDC: {
         address: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-        decimals: 6
+        decimals: 6,
+        symbol: "USDC"
       },
       WETH: {
         address: "0x4200000000000000000000000000000000000006",
-        decimals: 18
-      },
-      UNISWAP_QUOTER: {
-        address: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6" // "0xC5290058841028F1614F3A6F0F5816cAd0df5E27"
+        decimals: 18,
+        symbol: "WETH"
       }
     }
   },
@@ -56,29 +64,37 @@ const config = {
 
     smartContracts: {
       DSPONSOR_ADMIN: {
-        address: "0xE442802706F3603d58F34418Eac50C78C7B4E8b3",
+        address: "0x22554D70702C60A5fa30297908005B6cE19eEf51",
         feeBps: "400"
       },
       DSPONSOR_MARKETPLACE: {
-        address: "0xac03b675fa9644279b92f060bf542eed54f75599",
+        address: "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
         feeBps: "400",
         minimalBidBps: "1000",
         previousBidAmountBps: "500"
       },
+      UNISWAP_QUOTER: {
+        address: "0xEd1f6473345F45b75F8179591dd5bA1888cf2FB3"
+      },
+      NATIVE: {
+        address: "0x0000000000000000000000000000000000000000",
+        decimals: 18,
+        symbol: "ETH"
+      },
       WNATIVE: {
         address: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
-        decimals: 18
+        decimals: 18,
+        symbol: "WETH"
       },
       USDC: {
         address: "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
-        decimals: 6
+        decimals: 6,
+        symbol: "USDC"
       },
       WETH: {
         address: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
-        decimals: 18
-      },
-      UNISWAP_QUOTER: {
-        address: "0xEd1f6473345F45b75F8179591dd5bA1888cf2FB3"
+        decimals: 18,
+        symbol: "WETH"
       }
     }
   }
