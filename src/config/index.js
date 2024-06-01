@@ -64,11 +64,11 @@ const config = {
 
     smartContracts: {
       DSPONSOR_ADMIN: {
-        address: "0xE442802706F3603d58F34418Eac50C78C7B4E8b3",
+        address: "0x22554D70702C60A5fa30297908005B6cE19eEf51",
         feeBps: "400"
       },
       DSPONSOR_MARKETPLACE: {
-        address: "0xac03b675fa9644279b92f060bf542eed54f75599",
+        address: "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
         feeBps: "400",
         minimalBidBps: "1000",
         previousBidAmountBps: "500"

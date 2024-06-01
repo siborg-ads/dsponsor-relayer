@@ -33,6 +33,9 @@ export default async function ClickableLogosGridIframePage(req) {
   const adParameterIds = response._adParameterIds;
   const [imageKey, linkKey] = adParameterIds;
 
+  // const imageKeyParts = imageKey.split("-");
+  // ratio = imageKeyParts.length === 2 ? imageKeyParts[1] : ratio;
+
   if (adParameterIds?.length !== 2) {
     return (
       <div>
