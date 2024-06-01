@@ -22,6 +22,7 @@ const abi = [
   },
   { inputs: [], name: "AuctionAlreadyStarted", type: "error" },
   { inputs: [], name: "AuctionStillActive", type: "error" },
+  { inputs: [], name: "CannotBeZeroAddress", type: "error" },
   { inputs: [], name: "CannotSendValueFromSender", type: "error" },
   { inputs: [], name: "ExternalCallError", type: "error" },
   { inputs: [], name: "FailedInnerCall", type: "error" },
@@ -66,6 +67,7 @@ const abi = [
     type: "error"
   },
   { inputs: [], name: "ReentrancyGuardReentrantCall", type: "error" },
+  { inputs: [], name: "RefundExceedsBid", type: "error" },
   {
     inputs: [{ internalType: "address", name: "token", type: "address" }],
     name: "SafeERC20FailedOperation",
@@ -110,12 +112,7 @@ const abi = [
       { indexed: false, internalType: "uint256", name: "feeAmount", type: "uint256" },
       { indexed: false, internalType: "address", name: "enabler", type: "address" },
       { indexed: false, internalType: "address", name: "spender", type: "address" },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "additionalInformation",
-        type: "string"
-      }
+      { indexed: false, internalType: "string", name: "additionalInformation", type: "string" }
     ],
     name: "CallWithProtocolFee",
     type: "event"
@@ -156,11 +153,7 @@ const abi = [
           { internalType: "address", name: "currency", type: "address" },
           { internalType: "uint256", name: "reservePricePerToken", type: "uint256" },
           { internalType: "uint256", name: "buyoutPricePerToken", type: "uint256" },
-          {
-            internalType: "enum IDSponsorMarketplace.TokenType",
-            name: "tokenType",
-            type: "uint8"
-          },
+          { internalType: "enum IDSponsorMarketplace.TokenType", name: "tokenType", type: "uint8" },
           {
             internalType: "enum IDSponsorMarketplace.TransferType",
             name: "transferType",
@@ -195,7 +188,22 @@ const abi = [
     anonymous: false,
     inputs: [
       { indexed: true, internalType: "uint256", name: "listingId", type: "uint256" },
-      { indexed: true, internalType: "address", name: "listingCreator", type: "address" }
+      { indexed: true, internalType: "address", name: "listingCreator", type: "address" },
+      {
+        components: [
+          { internalType: "uint256", name: "quantityToList", type: "uint256" },
+          { internalType: "uint256", name: "reservePricePerToken", type: "uint256" },
+          { internalType: "uint256", name: "buyoutPricePerToken", type: "uint256" },
+          { internalType: "address", name: "currencyToAccept", type: "address" },
+          { internalType: "uint256", name: "startTime", type: "uint256" },
+          { internalType: "uint256", name: "secondsUntilEndTime", type: "uint256" },
+          { internalType: "uint64", name: "rentalExpirationTimestamp", type: "uint64" }
+        ],
+        indexed: false,
+        internalType: "struct IDSponsorMarketplace.ListingUpdateParameters",
+        name: "params",
+        type: "tuple"
+      }
     ],
     name: "ListingUpdated",
     type: "event"
@@ -204,9 +212,11 @@ const abi = [
     anonymous: false,
     inputs: [
       { indexed: true, internalType: "uint256", name: "listingId", type: "uint256" },
-      { indexed: true, internalType: "address", name: "bidder", type: "address" },
       { indexed: false, internalType: "uint256", name: "quantityWanted", type: "uint256" },
-      { indexed: false, internalType: "uint256", name: "totalBidAmount", type: "uint256" },
+      { indexed: true, internalType: "address", name: "newBidder", type: "address" },
+      { indexed: false, internalType: "uint256", name: "newPricePerToken", type: "uint256" },
+      { indexed: false, internalType: "address", name: "previousBidder", type: "address" },
+      { indexed: false, internalType: "uint256", name: "refundBonus", type: "uint256" },
       { indexed: false, internalType: "address", name: "currency", type: "address" }
     ],
     name: "NewBid",
@@ -228,11 +238,7 @@ const abi = [
           { internalType: "address", name: "offeror", type: "address" },
           { internalType: "address", name: "assetContract", type: "address" },
           { internalType: "address", name: "currency", type: "address" },
-          {
-            internalType: "enum IDSponsorMarketplace.TokenType",
-            name: "tokenType",
-            type: "uint8"
-          },
+          { internalType: "enum IDSponsorMarketplace.TokenType", name: "tokenType", type: "uint8" },
           {
             internalType: "enum IDSponsorMarketplace.TransferType",
             name: "transferType",
@@ -275,7 +281,28 @@ const abi = [
   },
   {
     inputs: [],
+    name: "ADDITIONNAL_REFUND_PREVIOUS_BIDDER_BPS",
+    outputs: [{ internalType: "uint64", name: "", type: "uint64" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "AUCTION_ENDTIME_BUFFER",
+    outputs: [{ internalType: "uint128", name: "", type: "uint128" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
     name: "MAX_BPS",
+    outputs: [{ internalType: "uint64", name: "", type: "uint64" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "MIN_AUCTION_INCREASE_BPS",
     outputs: [{ internalType: "uint64", name: "", type: "uint64" }],
     stateMutability: "view",
     type: "function"
@@ -291,18 +318,12 @@ const abi = [
     inputs: [
       { internalType: "uint256", name: "_listingId", type: "uint256" },
       { internalType: "uint256", name: "_pricePerToken", type: "uint256" },
+      { internalType: "address", name: "_bidder", type: "address" },
       { internalType: "string", name: "_referralAdditionalInformation", type: "string" }
     ],
     name: "bid",
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
-    inputs: [],
-    name: "bidBufferBps",
-    outputs: [{ internalType: "uint128", name: "", type: "uint128" }],
-    stateMutability: "view",
+    stateMutability: "payable",
     type: "function"
   },
   {
@@ -313,12 +334,11 @@ const abi = [
           { internalType: "address", name: "buyFor", type: "address" },
           { internalType: "uint256", name: "quantity", type: "uint256" },
           { internalType: "address", name: "currency", type: "address" },
-          { internalType: "uint256", name: "totalPrice", type: "uint256" },
           { internalType: "string", name: "referralAdditionalInformation", type: "string" }
         ],
-        internalType: "struct IDSponsorMarketplace.BuyParams[]",
-        name: "_buyParams",
-        type: "tuple[]"
+        internalType: "struct IDSponsorMarketplace.BuyParams",
+        name: "buyParams",
+        type: "tuple"
       }
     ],
     name: "buy",
@@ -423,22 +443,14 @@ const abi = [
       { internalType: "address", name: "currency", type: "address" },
       { internalType: "uint256", name: "reservePricePerToken", type: "uint256" },
       { internalType: "uint256", name: "buyoutPricePerToken", type: "uint256" },
-      {
-        internalType: "enum IDSponsorMarketplace.TokenType",
-        name: "tokenType",
-        type: "uint8"
-      },
+      { internalType: "enum IDSponsorMarketplace.TokenType", name: "tokenType", type: "uint8" },
       {
         internalType: "enum IDSponsorMarketplace.TransferType",
         name: "transferType",
         type: "uint8"
       },
       { internalType: "uint64", name: "rentalExpirationTimestamp", type: "uint64" },
-      {
-        internalType: "enum IDSponsorMarketplace.ListingType",
-        name: "listingType",
-        type: "uint8"
-      }
+      { internalType: "enum IDSponsorMarketplace.ListingType", name: "listingType", type: "uint8" }
     ],
     stateMutability: "view",
     type: "function"
@@ -483,11 +495,7 @@ const abi = [
       { internalType: "address", name: "offeror", type: "address" },
       { internalType: "address", name: "assetContract", type: "address" },
       { internalType: "address", name: "currency", type: "address" },
-      {
-        internalType: "enum IDSponsorMarketplace.TokenType",
-        name: "tokenType",
-        type: "uint8"
-      },
+      { internalType: "enum IDSponsorMarketplace.TokenType", name: "tokenType", type: "uint8" },
       {
         internalType: "enum IDSponsorMarketplace.TransferType",
         name: "transferType",
@@ -570,13 +578,6 @@ const abi = [
     inputs: [],
     name: "swapRouter",
     outputs: [{ internalType: "contract UniV3SwapRouter", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function"
-  },
-  {
-    inputs: [],
-    name: "timeBuffer",
-    outputs: [{ internalType: "uint128", name: "", type: "uint128" }],
     stateMutability: "view",
     type: "function"
   },

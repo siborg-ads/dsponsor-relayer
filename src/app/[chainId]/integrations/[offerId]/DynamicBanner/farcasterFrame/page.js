@@ -1,26 +1,30 @@
 import { getFrameMetadata } from "frog/next";
-import { config } from "process";
+import config from "@/config";
 
 export async function generateMetadata({ params, searchParams }) {
   const { chainId, offerId } = params;
-  const { tokenIds, tokenDatas, ratio, tokenDataInput } = searchParams;
+  const { items, ratio, tokenIds, tokenDataInput, tokenDatas } = searchParams;
 
   let queryParams = `?time=${Date.now()}`;
 
-  if (tokenIds) {
-    queryParams += `&tokenIds=${tokenIds}`;
+  if (items) {
+    queryParams += `&items=${items}`;
   }
 
-  if (tokenDatas) {
-    queryParams += `&tokenDatas=${tokenDatas}`;
+  if (ratio) {
+    queryParams += `&ratio=${ratio}`;
+  }
+
+  if (tokenIds) {
+    queryParams += `&tokenIds=${tokenIds}`;
   }
 
   if (tokenDataInput) {
     queryParams += `&tokenDataInput=${tokenDataInput}`;
   }
 
-  if (ratio) {
-    queryParams += `&ratio=${ratio}`;
+  if (tokenDatas) {
+    queryParams += `&tokenDatas=${tokenDatas}`;
   }
 
   let url = config[chainId].relayerURL;
