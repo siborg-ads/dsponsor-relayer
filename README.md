@@ -86,7 +86,7 @@ Example
 </summary>
 
 ```html
- <iframe sandbox loading="lazy" src="https://relayer.dsponsor.com/84532/integrations/2/ClickableLogosGrid/iFrame?bgColor=ebe9e8&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/reserved.webp&previewLink=https://google.fr" height="100%" width="100%"></iframe>
+ <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation" loading="lazy" src="https://relayer.dsponsor.com/84532/integrations/2/ClickableLogosGrid/iFrame?bgColor=ebe9e8&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/reserved.webp&previewLink=https://google.fr" style="width:100%; height:100%; overflow:hidden; border: none;"></iframe>
 ```
 
 </details>
@@ -245,7 +245,7 @@ Example
 </summary>
 
 ```html
- <iframe sandbox loading="lazy" src="https://relayer.dsponsor.com/84532/integrations/2/DynamicBanner/iFrame?bgColor=0d102d&ratio=5:1&tokenIds=1,2,3,4,5,6" height="100%" width="100%"></iframe>
+ <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation" loading="lazy" src="https://relayer.dsponsor.com/84532/integrations/2/DynamicBanner/iFrame?bgColor=0d102d&ratio=5:1&tokenIds=1,2,3,4,5,6" style="width:100%; height:100%; overflow:hidden; border: none;"></iframe>
 ```
 
 </details>
