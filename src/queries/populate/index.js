@@ -34,7 +34,8 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
       bids &&
       currency &&
       royaltyBps &&
-      quantity
+      quantity &&
+      quantity != "0"
     ) {
       let { totalBidAmount: previousBidAmount } = bids[0] || {};
       previousBidAmount = previousBidAmount ? previousBidAmount : "0";
