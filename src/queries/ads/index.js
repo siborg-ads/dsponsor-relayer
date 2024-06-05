@@ -38,7 +38,7 @@ export async function getValidatedAds({
   tokenDatas,
   adParameterIds
 }) {
-  const chainName = config[chainId]?.chainName;
+  // const chainName = config[chainId]?.chainName;
   const appURL = config[chainId]?.appURL;
 
   /**
@@ -153,7 +153,7 @@ export async function getValidatedAds({
 
       // Provide buy infos for each token /////////////////////////////////
 
-      let link = `${appURL}/${chainName}/offer/${adOfferId}/${_tokenId}`;
+      let link = `${appURL}/${chainId}/offer/${adOfferId}/${_tokenId}`;
       if (tokenData) {
         link += `?tokenData=${tokenData}`;
       }

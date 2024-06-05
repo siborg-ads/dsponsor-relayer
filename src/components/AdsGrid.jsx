@@ -104,7 +104,7 @@ const AdsGrid = ({ ads, chainId, ratio }) => {
               <a
                 href={
                   ad.records.linkURL ??
-                  `${config[chainId].appURL}/${config[chainId].chainName}/offer/${ad.offerId}/${ad.tokenId}`
+                  `${config[chainId].appURL}/${chainId}/offer/${ad.offerId}/${ad.tokenId}`
                 }
                 target="_blank"
                 rel="noopener noreferrer"
@@ -197,7 +197,7 @@ const AdsGrid = async ({ ads, chainId, colSizes, ratio }) => {
             <a
               href={
                 ad.records.linkURL ??
-                `${config[chainId].appURL}/${config[chainId].chainName}/offer/${ad.offerId}/${ad.tokenId}`
+                `${config[chainId].appURL}/${chainId}/offer/${ad.offerId}/${ad.tokenId}`
               }
               target="_blank"
               rel="noopener noreferrer"
