@@ -92,16 +92,16 @@ export const AdProposalFragment = /* GraphQL */ `
   }
 `;
 
-export const NewBidFragment = /* GraphQL */ `
-  fragment NewBidFragment on NewBid {
-    blockTimestamp
+export const MarketplaceBidFragment = /* GraphQL */ `
+  fragment MarketplaceBidFragment on MarketplaceBid {
+    creationTxHash
+    creationTimestamp
+    bidder
+    totalBidAmount # current bid / new price per token * quantity
+    paidBidAmount # how much bidder paid
+    refundBonus # reward (outbid case)
     currency
-    quantityWanted
-    newPricePerToken
-    refundBonus
-    newBidder
-    previousBidder
-    listingId
+    status
   }
 `;
 
@@ -111,21 +111,7 @@ export const RevenueTransactionFragment = /* GraphQL */ `
     blockTimestamp
 
     marketplaceBids {
-      currency
-      totalBidAmount
-      bidder
-      amountSentToCreator
-      creatorRecipient
-      amountSentToProtocol
-      amountSentToSeller
-      sellerRecipient
-      listing {
-        token {
-          nftContract {
-            id
-          }
-        }
-      }
+      ...MarketplaceBidFragment
     }
     marketplaceDirectBuys {
       totalPricePaid
@@ -191,8 +177,7 @@ export const TokenFragment = /* GraphQL */ `
       reservePricePerToken
       status
       bids(orderBy: totalBidAmount, orderDirection: desc, first: 1) {
-        bidder
-        totalBidAmount
+        ...MarketplaceBidFragment
       }
     }
     nftContract {
@@ -217,7 +202,7 @@ const fragments = [
   AdOfferSelectedTokensFragment,
   AdOfferSelectedNftTokensFragment,
   AdProposalFragment,
-  NewBidFragment,
+  MarketplaceBidFragment,
   RevenueTransactionFragment,
   TokenFragment
 ];

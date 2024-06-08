@@ -110,13 +110,25 @@ export async function GET(request, context) {
     })
   );
 
+  const lastBidderEns = lastBid.bidderAddr
+    ? await provider.lookupAddress(lastBid.bidderAddr)
+    : null;
+  const lastBidderDisplayAddr = lastBidderEns
+    ? lastBidderEns
+    : lastBid.bidderAddr.slice(0, 6) + "..." + lastBid.bidderAddr.slice(-4);
+
   return new Response(
     JSON.stringify(
       {
         lastUpdate: new Date().toJSON(),
         ...priceFormattedForAllValuesObject(6, { totalSpentUSDCAmount, totalBidRefundUSDCAmount }),
         nbHolders,
-        lastBid: { ...lastBid, date: new Date(lastBid.blockTimestamp * 1000) },
+        lastBid: {
+          ...lastBid,
+          lastBidderDisplayAddr,
+          lastBidderEns,
+          date: new Date(lastBid.blockTimestamp * 1000)
+        },
         rankings: resultArray
       },
       null,

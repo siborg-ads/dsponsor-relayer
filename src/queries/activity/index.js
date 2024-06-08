@@ -49,12 +49,30 @@ export async function getHolders(chainId, nftContractAddresses) {
 export async function getSpendings(chainId) {
   const getSpendingsQuery = /* GraphQL */ `
     query getSpendings($fromTimestamp: BigInt, $toTimestamp: BigInt) {
-      newBids(
-        orderBy: blockTimestamp
+      marketplaceBids(
+        orderBy: creationTimestamp
         orderDirection: asc
-        where: { blockTimestamp_gte: $fromTimestamp, blockTimestamp_lte: $toTimestamp }
+        where: { creationTimestamp_gte: $fromTimestamp, creationTimestamp_lte: $toTimestamp }
       ) {
-        ...NewBidFragment
+        ...MarketplaceBidFragment
+        amountSentToCreator
+        creatorRecipient
+        amountSentToProtocol
+        amountSentToSeller
+        sellerRecipient
+        listing {
+          token {
+            tokenId
+            nftContract {
+              id
+              adOffers {
+                id
+                name
+                metadataURL
+              }
+            }
+          }
+        }
       }
       revenueTransactions(
         where: { blockTimestamp_gte: $fromTimestamp, blockTimestamp_lte: $toTimestamp }
@@ -128,40 +146,31 @@ export async function getSpendings(chainId) {
   });
 
   for (const {
-    blockTimestamp,
-    currency,
-    quantityWanted,
-    newPricePerToken,
+    creationTimestamp,
+    bidder,
+    paidBidAmount,
     refundBonus,
-    newBidder,
-    previousBidder,
-    listingId
-  } of graphResult.data.newBids) {
-    if (blockTimestamp > lastBid.blockTimestamp) {
-      lastBid.blockTimestamp = blockTimestamp;
-      lastBid.bidderAddr = newBidder;
-      lastBid.listingId = listingId;
+    currency,
+    listing
+  } of graphResult.data.marketplaceBids) {
+    if (creationTimestamp > lastBid.blockTimestamp) {
+      lastBid.blockTimestamp = creationTimestamp;
+      lastBid.bidderAddr = bidder;
+      lastBid.listing = listing;
     }
 
-    setupResult(newBidder, currency);
-    setupResult(previousBidder, currency);
+    setupResult(bidder, currency);
 
-    const spent = BigInt(quantityWanted) * (BigInt(newPricePerToken) + BigInt(refundBonus));
-    result[newBidder]["currenciesAmounts"][currency].bidSpent += spent;
-    result[newBidder]["currenciesAmounts"][currency].totalSpent += spent;
-    result[newBidder].nbBids += 1;
+    const spent = BigInt(paidBidAmount) - BigInt(refundBonus);
+    result[bidder]["currenciesAmounts"][currency].bidSpent += spent;
+    result[bidder]["currenciesAmounts"][currency].totalSpent += spent;
+    result[bidder].nbBids += 1;
 
-    /**
-     * @fix - this should be implemented differently
-     */
-    result[previousBidder]["currenciesAmounts"][currency].bidSpent -=
-      BigInt("20") * BigInt(refundBonus);
-    result[previousBidder]["currenciesAmounts"][currency].totalSpent -=
-      BigInt("20") * BigInt(refundBonus);
-
-    result[previousBidder]["currenciesAmounts"][currency].bidRefundReceived += BigInt(refundBonus);
-    result[previousBidder]["currenciesAmounts"][currency].totalReceived += BigInt(refundBonus);
-    result[previousBidder].nbRefunds += 1;
+    if (refundBonus > BigInt("0")) {
+      result[bidder]["currenciesAmounts"][currency].bidRefundReceived += BigInt(refundBonus);
+      result[bidder]["currenciesAmounts"][currency].totalReceived += BigInt(refundBonus);
+      result[bidder].nbRefunds += 1;
+    }
   }
 
   /* @todo
