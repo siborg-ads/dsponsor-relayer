@@ -1,6 +1,13 @@
 import { Network } from "alchemy-sdk";
 
 const config = {
+  // ethereum (for ENS)
+  1: {
+    chainName: "ethereum",
+    network: Network.ETH,
+    rpcURL: "https://ethereum-rpc.publicnode.com"
+  },
+
   // base-sepolia
   84532: {
     chainName: "base-sepolia",

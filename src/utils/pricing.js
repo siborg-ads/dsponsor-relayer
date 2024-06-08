@@ -1,7 +1,7 @@
 import * as numeral from "numeral";
 import config from "@/config";
 import { getEthQuote } from "@/queries/uniswap/quote";
-import { ethers, formatUnits, parseUnits } from "ethers";
+import { ethers, formatUnits, getAddress, parseUnits } from "ethers";
 import ERC20 from "@uniswap/v3-periphery/artifacts/contracts/interfaces/IERC20Metadata.sol/IERC20Metadata.json";
 
 const memoize = {};
@@ -22,7 +22,7 @@ export const getCurrencyInfos = async (chainId, currency) => {
     const { smartContracts } = config[chainId] || {};
     const smartContractKeys = Object.keys(smartContracts);
     const currencyKey = smartContractKeys.find(
-      (s) => smartContracts[s].address.toLowerCase() === currency.toLowerCase()
+      (s) => getAddress(smartContracts[s].address) === getAddress(currency)
     );
 
     if (currencyKey) {

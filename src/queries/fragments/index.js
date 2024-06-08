@@ -34,6 +34,16 @@ const BaseNftContractFragment = /* GraphQL */ `
   }
 `;
 
+const BaseProtocolFeesFragment = /* GraphQL */ `
+  fragment BaseProtocolFeesFragment on CallWithProtocolFee {
+    currency
+    fee
+    enabler
+    spender
+    referralAddresses
+  }
+`;
+
 export const AdOfferFragment = /* GraphQL */ `
   fragment AdOfferFragment on AdOffer {
     ...BaseAdOfferFragment
@@ -82,6 +92,90 @@ export const AdProposalFragment = /* GraphQL */ `
   }
 `;
 
+export const NewBidFragment = /* GraphQL */ `
+  fragment NewBidFragment on NewBid {
+    blockTimestamp
+    currency
+    quantityWanted
+    newPricePerToken
+    refundBonus
+    newBidder
+    previousBidder
+    listingId
+  }
+`;
+
+export const RevenueTransactionFragment = /* GraphQL */ `
+  fragment RevenueTransactionFragment on RevenueTransaction {
+    id
+    blockTimestamp
+
+    marketplaceBids {
+      currency
+      totalBidAmount
+      bidder
+      amountSentToCreator
+      creatorRecipient
+      amountSentToProtocol
+      amountSentToSeller
+      sellerRecipient
+      listing {
+        token {
+          nftContract {
+            id
+          }
+        }
+      }
+    }
+    marketplaceDirectBuys {
+      totalPricePaid
+      buyer
+      amountSentToCreator
+      creatorRecipient
+      amountSentToProtocol
+      amountSentToSeller
+      sellerRecipient
+      listing {
+        currency
+        token {
+          nftContract {
+            id
+          }
+        }
+      }
+    }
+    marketplaceOffers {
+      currency
+      totalPrice
+      offeror
+      amountSentToCreator
+      creatorRecipient
+      amountSentToProtocol
+      amountSentToSeller
+      sellerRecipient
+      token {
+        nftContract {
+          id
+        }
+      }
+    }
+    mints {
+      currency
+      amount
+      to
+      amountSentToProtocol
+      token {
+        nftContract {
+          id
+        }
+      }
+    }
+    protocolFees {
+      ...BaseProtocolFeesFragment
+    }
+  }
+`;
+
 export const TokenFragment = /* GraphQL */ `
   fragment TokenFragment on Token {
     tokenId
@@ -118,10 +212,13 @@ export const TokenFragment = /* GraphQL */ `
 const fragments = [
   BaseAdOfferFragment,
   BaseNftContractFragment,
+  BaseProtocolFeesFragment,
   AdOfferFragment,
   AdOfferSelectedTokensFragment,
   AdOfferSelectedNftTokensFragment,
   AdProposalFragment,
+  NewBidFragment,
+  RevenueTransactionFragment,
   TokenFragment
 ];
 

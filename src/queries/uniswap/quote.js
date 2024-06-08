@@ -1,5 +1,5 @@
 import config from "@/config";
-import { ethers } from "ethers";
+import { ethers, getAddress } from "ethers";
 import Quoter from "@uniswap/v3-periphery/artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json";
 
 const { formatUnits } = ethers;
@@ -27,7 +27,7 @@ export const getEthQuote = async (chainId, tokenOutAddr, amountOut, slippagePerC
     const quoterContract = new ethers.Contract(uniswapV3QuoterAddr, Quoter.abi, signer);
 
     [amountInEth] =
-      tokenOutAddr.toLowerCase() === WETH_ADDR.toLowerCase() ||
+      getAddress(tokenOutAddr) === getAddress(WETH_ADDR) ||
       tokenOutAddr === "0x0000000000000000000000000000000000000000"
         ? [BigInt(amountOut.toString())]
         : await quoterContract.quoteExactOutputSingle.staticCall({
