@@ -1,43 +1,78 @@
 import * as numeral from "numeral";
 import config from "@/config";
-import { ethers, formatUnits } from "ethers";
+import { getEthQuote } from "@/queries/uniswap/quote";
+import { ethers, formatUnits, parseUnits } from "ethers";
 import ERC20 from "@uniswap/v3-periphery/artifacts/contracts/interfaces/IERC20Metadata.sol/IERC20Metadata.json";
 
 const memoize = {};
 
-export const getDecimalsAndSymbol = async (chainId, currency) => {
-  let decimals, symbol;
+export const getCurrencyInfos = async (chainId, currency) => {
+  let decimals = memoize[currency]?.decimals || undefined;
+  let symbol = memoize[currency]?.symbol || undefined;
 
-  if (memoize[currency]) {
+  if (
+    memoize[currency] &&
+    memoize[currency].lastFetchTimestamp &&
+    memoize[currency].lastFetchTimestamp > Date.now() - 1000 * 60 * 5 // 5 minutes
+  ) {
     return memoize[currency];
   }
 
-  const { smartContracts } = config[chainId] || {};
-  const smartContractKeys = Object.keys(smartContracts);
-  const currencyKey = smartContractKeys.find(
-    (s) => smartContracts[s].address.toLowerCase() === currency.toLowerCase()
-  );
+  if (!decimals || !symbol) {
+    const { smartContracts } = config[chainId] || {};
+    const smartContractKeys = Object.keys(smartContracts);
+    const currencyKey = smartContractKeys.find(
+      (s) => smartContracts[s].address.toLowerCase() === currency.toLowerCase()
+    );
 
-  if (currencyKey) {
-    decimals = smartContracts[currencyKey].decimals;
-    symbol = smartContracts[currencyKey].symbol;
-  } else {
-    try {
-      const rpcURL = config?.[chainId]?.rpcURL;
-      const provider = new ethers.JsonRpcProvider(rpcURL);
-      const signer = ethers.Wallet.createRandom().connect(provider);
-      const ERC20Contract = new ethers.Contract(currency, ERC20.abi, signer);
+    if (currencyKey) {
+      decimals = smartContracts[currencyKey].decimals;
+      symbol = smartContracts[currencyKey].symbol;
+    } else {
+      try {
+        const rpcURL = config?.[chainId]?.rpcURL;
+        const provider = new ethers.JsonRpcProvider(rpcURL);
+        const signer = ethers.Wallet.createRandom().connect(provider);
+        const ERC20Contract = new ethers.Contract(currency, ERC20.abi, signer);
 
-      decimals = await ERC20Contract.decimals.call();
-      symbol = await ERC20Contract.symbol();
-    } catch (e) {
-      console.error("Error getting decimals and symbol", chainId, currency);
-      decimals = BigInt("18");
-      symbol = "";
+        decimals = await ERC20Contract.decimals.call();
+        symbol = await ERC20Contract.symbol();
+      } catch (e) {
+        console.error("Error getting decimals and symbol", chainId, currency);
+        decimals = BigInt("18");
+        symbol = "";
+      }
     }
   }
-  memoize[currency] = { decimals, symbol };
-  return { decimals, symbol };
+
+  const unit = parseInt(decimals.toString());
+
+  const { amountUSDC, amountUSDCFormatted } = await getEthQuote(
+    chainId,
+    currency,
+    parseUnits("1", unit).toString(), //   "1000000",
+    0.3
+  );
+
+  memoize[currency] = {
+    decimals,
+    symbol,
+    priceUSDC: amountUSDC.toString(),
+    priceUSDCFormatted: amountUSDCFormatted,
+    lastFetchTimestamp: Date.now()
+  };
+  return memoize[currency];
+};
+
+export const priceUsdcFormattedForAllValuesObject = async (chainId, obj, currency) => {
+  const { decimals, priceUSDC } = await getCurrencyInfos(chainId, currency);
+
+  const res = {};
+  for (const key of Object.keys(obj)) {
+    res[key] = (BigInt(priceUSDC) * BigInt(obj[key])) / parseUnits("1", decimals);
+  }
+
+  return priceFormattedForAllValuesObject(6, res);
 };
 
 export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {

@@ -1,10 +1,11 @@
 import config from "@/config";
 import {
   computeBidAmounts,
-  getDecimalsAndSymbol,
+  getCurrencyInfos,
   getMinimalBidPerToken,
   isObject,
-  priceFormattedForAllValuesObject
+  priceFormattedForAllValuesObject,
+  priceUsdcFormattedForAllValuesObject
 } from "@/utils";
 
 async function populateMarketplaceListing(chainId, listing, nftContract) {
@@ -74,20 +75,46 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
         protocolFeeBuyAmount: protocolFeeBuyAmount.toString()
       };
 
-      const { decimals, symbol } = (await getDecimalsAndSymbol(chainId, currency)) || {};
+      const { decimals, symbol, priceUSDC, priceUSDCFormatted } =
+        (await getCurrencyInfos(chainId, currency)) || {};
+
+      const buyPriceStructureFormatted = priceFormattedForAllValuesObject(
+        decimals,
+        buyPriceStructure
+      );
+      const bidPriceStructureFormatted = priceFormattedForAllValuesObject(
+        decimals,
+        bidPriceStructure
+      );
+
+      const bidPriceStructureUsdcFormatted = await priceUsdcFormattedForAllValuesObject(
+        chainId,
+        bidPriceStructure,
+        currency
+      );
+
+      const buyPriceStructureUsdcFormatted = await priceUsdcFormattedForAllValuesObject(
+        chainId,
+        buyPriceStructure,
+        currency
+      );
 
       listing = {
         ...listing,
         currencySymbol: symbol,
         currencyDecimals: decimals.toString(),
+        currencyPriceUSDC: priceUSDC,
+        currencyPriceUSDCFormatted: priceUSDCFormatted,
         marketplaceAddress: address,
         protocolFeeBps: BigInt(protocolFeeBps).toString(),
         minimalBidBps: BigInt(minimalBidBps).toString(),
         previousBidAmountBps: BigInt(previousBidAmountBps).toString(),
         bidPriceStructure,
-        bidPriceStructureFormatted: priceFormattedForAllValuesObject(decimals, bidPriceStructure),
+        bidPriceStructureFormatted,
+        bidPriceStructureUsdcFormatted,
         buyPriceStructure,
-        buyPriceStructureFormatted: priceFormattedForAllValuesObject(decimals, buyPriceStructure)
+        buyPriceStructureFormatted,
+        buyPriceStructureUsdcFormatted
       };
     }
   }
@@ -109,16 +136,31 @@ async function populateMintPrice(chainId, price) {
         totalAmount: totalAmount.toString()
       };
 
-      const { decimals, symbol } = (await getDecimalsAndSymbol(chainId, currency)) || {};
+      const { decimals, symbol, priceUSDC, priceUSDCFormatted } =
+        (await getCurrencyInfos(chainId, currency)) || {};
+
+      const mintPriceStructureFormatted = priceFormattedForAllValuesObject(
+        decimals,
+        mintPriceStructure
+      );
+
+      const mintPriceStructureUsdcFormatted = await priceUsdcFormattedForAllValuesObject(
+        chainId,
+        mintPriceStructure,
+        currency
+      );
 
       price = {
         ...price,
         currencySymbol: symbol,
         currencyDecimals: decimals.toString(),
+        currencyPriceUSDC: priceUSDC,
+        currencyPriceUSDCFormatted: priceUSDCFormatted,
         minterAddress: address,
         protocolFeeBps: BigInt(feeBps).toString(),
         mintPriceStructure,
-        mintPriceStructureFormatted: priceFormattedForAllValuesObject(decimals, mintPriceStructure)
+        mintPriceStructureFormatted,
+        mintPriceStructureUsdcFormatted
       };
     }
   }

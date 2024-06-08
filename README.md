@@ -309,260 +309,283 @@ curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250
 
 ```json
 [
-    {
-        "id": "1",
-        "disable": false,
-        "metadataURL": "https://bafkreicmn6gia3cplyt7tu56sfue6cpw5dm2dnwuz2zkj4dhqrg5bzwuua.ipfs.nftstorage.link/",
-        "name": "Tokenized ad spaces in SiBorg App",
-        "initialCreator": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766",
-        "validators": null,
-        "admins": [
-            "0x9a7fac267228f536a8f250e65d7c4ca7d39de766"
-        ],
-        "creationTimestamp": "1717173216",
-        "adParameters": [
+  {
+    "id": "1",
+    "disable": false,
+    "metadataURL": "https://bafkreicmn6gia3cplyt7tu56sfue6cpw5dm2dnwuz2zkj4dhqrg5bzwuua.ipfs.nftstorage.link/",
+    "name": "Tokenized ad spaces in SiBorg App",
+    "initialCreator": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766",
+    "validators": null,
+    "admins": ["0x9a7fac267228f536a8f250e65d7c4ca7d39de766"],
+    "creationTimestamp": "1717173216",
+    "adParameters": [
+      {
+        "adParameter": {
+          "id": "imageURL-5:1",
+          "base": "imageURL",
+          "variants": ["5:1"]
+        }
+      },
+      {
+        "adParameter": {
+          "id": "linkURL",
+          "base": "linkURL",
+          "variants": []
+        }
+      },
+      {
+        "adParameter": {
+          "id": "xCreatorHandle",
+          "base": "xCreatorHandle",
+          "variants": []
+        }
+      },
+      {
+        "adParameter": {
+          "id": "xSpaceId",
+          "base": "xSpaceId",
+          "variants": []
+        }
+      }
+    ],
+    "nftContract": {
+      "id": "0x51a533e5fbc542b0df00c352d8a8a65fff1727ac",
+      "allowList": false,
+      "maxSupply": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+      "royalty": {
+        "bps": "690",
+        "receiver": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766"
+      },
+      "prices": [
+        {
+          "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+          "amount": "30000000",
+          "currencySymbol": "USDC",
+          "currencyDecimals": "6",
+          "currencyPriceUSDC": "1000000",
+          "currencyPriceUSDCFormatted": "1.0",
+          "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
+          "protocolFeeBps": "400",
+          "mintPriceStructure": {
+            "creatorAmount": "30000000",
+            "protocolFeeAmount": "1200000",
+            "totalAmount": "31200000"
+          },
+          "mintPriceStructureFormatted": {
+            "creatorAmount": "30",
+            "protocolFeeAmount": "1.2",
+            "totalAmount": "31.2"
+          },
+          "mintPriceStructureUsdcFormatted": {
+            "creatorAmount": "30",
+            "protocolFeeAmount": "1.2",
+            "totalAmount": "31.2"
+          }
+        }
+      ],
+      "tokens": [
+        {
+          "tokenId": "90616754875103578559897293644305665530305783446554677063919912809091389674723",
+          "setInAllowList": false,
+          "marketplaceListings": [
             {
-                "adParameter": {
-                    "id": "imageURL-5:1",
-                    "base": "imageURL",
-                    "variants": [
-                        "5:1"
-                    ]
-                }
-            },
-            {
-                "adParameter": {
-                    "id": "linkURL",
-                    "base": "linkURL",
-                    "variants": []
-                }
-            },
-            {
-                "adParameter": {
-                    "id": "xCreatorHandle",
-                    "base": "xCreatorHandle",
-                    "variants": []
-                }
-            },
-            {
-                "adParameter": {
-                    "id": "xSpaceId",
-                    "base": "xSpaceId",
-                    "variants": []
-                }
+              "id": "14",
+              "quantity": "1",
+              "listingType": "Direct",
+              "startTime": "1717182744",
+              "endTime": "1718478744",
+              "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+              "buyoutPricePerToken": "1000000",
+              "reservePricePerToken": "1000000",
+              "status": "CREATED",
+              "bids": [],
+              "currencySymbol": "USDC",
+              "currencyDecimals": "6",
+              "currencyPriceUSDC": "1000000",
+              "currencyPriceUSDCFormatted": "1.0",
+              "marketplaceAddress": "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
+              "protocolFeeBps": "400",
+              "minimalBidBps": "1000",
+              "previousBidAmountBps": "500",
+              "bidPriceStructure": {
+                "previousBidAmount": "0",
+                "previousPricePerToken": "0",
+                "minimalBidPerToken": "1000000",
+                "minimalBuyoutPerToken": "1000000",
+                "newBidPerToken": "1000000",
+                "totalBidAmount": "1000000",
+                "refundBonusPerToken": "0",
+                "refundBonusAmount": "0",
+                "refundAmountToPreviousBidder": "0",
+                "newPricePerToken": "1000000",
+                "newAmount": "1000000",
+                "newRefundBonusPerToken": "50000",
+                "newRefundBonusAmount": "50000",
+                "protocolFeeAmount": "40000",
+                "royaltyAmount": "69000",
+                "listerAmount": "891000"
+              },
+              "bidPriceStructureFormatted": {
+                "previousBidAmount": "0",
+                "previousPricePerToken": "0",
+                "minimalBidPerToken": "1",
+                "minimalBuyoutPerToken": "1",
+                "newBidPerToken": "1",
+                "totalBidAmount": "1",
+                "refundBonusPerToken": "0",
+                "refundBonusAmount": "0",
+                "refundAmountToPreviousBidder": "0",
+                "newPricePerToken": "1",
+                "newAmount": "1",
+                "newRefundBonusPerToken": "0.05",
+                "newRefundBonusAmount": "0.05",
+                "protocolFeeAmount": "0.04",
+                "royaltyAmount": "0.069",
+                "listerAmount": "0.89"
+              },
+              "bidPriceStructureUsdcFormatted": {
+                "previousBidAmount": "0",
+                "previousPricePerToken": "0",
+                "minimalBidPerToken": "1",
+                "minimalBuyoutPerToken": "1",
+                "newBidPerToken": "1",
+                "totalBidAmount": "1",
+                "refundBonusPerToken": "0",
+                "refundBonusAmount": "0",
+                "refundAmountToPreviousBidder": "0",
+                "newPricePerToken": "1",
+                "newAmount": "1",
+                "newRefundBonusPerToken": "0.05",
+                "newRefundBonusAmount": "0.05",
+                "protocolFeeAmount": "0.04",
+                "royaltyAmount": "0.069",
+                "listerAmount": "0.89"
+              },
+              "buyPriceStructure": {
+                "buyoutPricePerToken": "1000000",
+                "listerBuyAmount": "891000",
+                "royaltiesBuyAmount": "69000",
+                "protocolFeeBuyAmount": "40000"
+              },
+              "buyPriceStructureFormatted": {
+                "buyoutPricePerToken": "1",
+                "listerBuyAmount": "0.89",
+                "royaltiesBuyAmount": "0.069",
+                "protocolFeeBuyAmount": "0.04"
+              },
+              "buyPriceStructureUsdcFormatted": {
+                "buyoutPricePerToken": "1",
+                "listerBuyAmount": "0.89",
+                "royaltiesBuyAmount": "0.069",
+                "protocolFeeBuyAmount": "0.04"
+              }
             }
-        ],
-        "nftContract": {
+          ],
+          "nftContract": {
             "id": "0x51a533e5fbc542b0df00c352d8a8a65fff1727ac",
             "allowList": false,
             "maxSupply": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
             "royalty": {
-                "bps": "690",
-                "receiver": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766"
+              "bps": "690",
+              "receiver": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766"
             },
             "prices": [
-                {
-                    "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
-                    "amount": "30000000",
-                    "currencySymbol": "USDC",
-                    "currencyDecimals": "6",
-                    "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
-                    "protocolFeeBps": "400",
-                    "mintPriceStructure": {
-                        "creatorAmount": "30000000",
-                        "protocolFeeAmount": "1200000",
-                        "totalAmount": "31200000"
-                    },
-                    "mintPriceStructureFormatted": {
-                        "creatorAmount": "30",
-                        "protocolFeeAmount": "1.2",
-                        "totalAmount": "31.2"
-                    }
+              {
+                "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                "amount": "30000000",
+                "currencySymbol": "USDC",
+                "currencyDecimals": "6",
+                "currencyPriceUSDC": "1000000",
+                "currencyPriceUSDCFormatted": "1.0",
+                "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
+                "protocolFeeBps": "400",
+                "mintPriceStructure": {
+                  "creatorAmount": "30000000",
+                  "protocolFeeAmount": "1200000",
+                  "totalAmount": "31200000"
+                },
+                "mintPriceStructureFormatted": {
+                  "creatorAmount": "30",
+                  "protocolFeeAmount": "1.2",
+                  "totalAmount": "31.2"
+                },
+                "mintPriceStructureUsdcFormatted": {
+                  "creatorAmount": "30",
+                  "protocolFeeAmount": "1.2",
+                  "totalAmount": "31.2"
                 }
-            ],
-            "tokens": [
-                {
-                    "tokenId": "109438364007015322736766724051813704643042782151430130119908516857056060615695",
-                    "setInAllowList": false,
-                    "marketplaceListings": [
-                        {
-                            "id": "24",
-                            "quantity": "1",
-                            "listingType": "Direct",
-                            "startTime": "1718391408",
-                            "endTime": "1722279408",
-                            "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
-                            "buyoutPricePerToken": "5000",
-                            "reservePricePerToken": "5000",
-                            "status": "CREATED",
-                            "bids": [],
-                            "currencySymbol": "USDC",
-                            "currencyDecimals": "6",
-                            "marketplaceAddress": "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
-                            "protocolFeeBps": "400",
-                            "minimalBidBps": "1000",
-                            "previousBidAmountBps": "500",
-                            "bidPriceStructure": {
-                                "previousBidAmount": "0",
-                                "previousPricePerToken": "0",
-                                "minimalBidPerToken": "5000",
-                                "minimalBuyoutPerToken": "5000",
-                                "newBidPerToken": "5000",
-                                "totalBidAmount": "5000",
-                                "refundBonusPerToken": "0",
-                                "refundBonusAmount": "0",
-                                "refundAmountToPreviousBidder": "0",
-                                "newPricePerToken": "5000",
-                                "newAmount": "5000",
-                                "newRefundBonusPerToken": "250",
-                                "newRefundBonusAmount": "250",
-                                "protocolFeeAmount": "200",
-                                "royaltyAmount": "345",
-                                "listerAmount": "4455"
-                            },
-                            "bidPriceStructureFormatted": {
-                                "previousBidAmount": "0",
-                                "previousPricePerToken": "0",
-                                "minimalBidPerToken": "0.005",
-                                "minimalBuyoutPerToken": "0.005",
-                                "newBidPerToken": "0.005",
-                                "totalBidAmount": "0.005",
-                                "refundBonusPerToken": "0",
-                                "refundBonusAmount": "0",
-                                "refundAmountToPreviousBidder": "0",
-                                "newPricePerToken": "0.005",
-                                "newAmount": "0.005",
-                                "newRefundBonusPerToken": "0.0₃2",
-                                "newRefundBonusAmount": "0.0₃2",
-                                "protocolFeeAmount": "0.0₃2",
-                                "royaltyAmount": "0.0₃3",
-                                "listerAmount": "0.004"
-                            },
-                            "buyPriceStructure": {
-                                "buyoutPricePerToken": "5000",
-                                "listerBuyAmount": "4455",
-                                "royaltiesBuyAmount": "345",
-                                "protocolFeeBuyAmount": "200"
-                            },
-                            "buyPriceStructureFormatted": {
-                                "buyoutPricePerToken": "0.005",
-                                "listerBuyAmount": "0.004",
-                                "royaltiesBuyAmount": "0.0₃3",
-                                "protocolFeeBuyAmount": "0.0₃2"
-                            }
-                        }
-                    ],
-                    "nftContract": {
-                        "id": "0x51a533e5fbc542b0df00c352d8a8a65fff1727ac",
-                        "allowList": false,
-                        "maxSupply": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
-                        "royalty": {
-                            "bps": "690",
-                            "receiver": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766"
-                        },
-                        "prices": [
-                            {
-                                "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
-                                "amount": "30000000",
-                                "currencySymbol": "USDC",
-                                "currencyDecimals": "6",
-                                "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
-                                "protocolFeeBps": "400",
-                                "mintPriceStructure": {
-                                    "creatorAmount": "30000000",
-                                    "protocolFeeAmount": "1200000",
-                                    "totalAmount": "31200000"
-                                },
-                                "mintPriceStructureFormatted": {
-                                    "creatorAmount": "30",
-                                    "protocolFeeAmount": "1.2",
-                                    "totalAmount": "31.2"
-                                }
-                            }
-                        ]
-                    },
-                    "mint": {
-                        "tokenData": "base",
-                        "blockTimestamp": "1717183452"
-                    },
-                    "prices": [],
-                    "metadata": {
-                        "name": "#base - Tokenized Ad Space",
-                        "description": "Tokenized advertisement spaces link to the ticker 'base' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'base'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                        "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Abase",
-                        "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
-                        "external_link": "",
-                        "valid_from": "2024-05-01T00:00:00Z",
-                        "valid_to": "2024-10-31T23:59:59Z",
-                        "categories": [
-                            "Community",
-                            "NFT",
-                            "Crypto"
-                        ],
-                        "token_metadata": {
-                            "name": "#{tokenData} - Tokenized Ad Space",
-                            "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
-                            "external_url": "",
-                            "attributes": [
-                                {
-                                    "trait_type": "Search Query",
-                                    "value": "{tokenData}"
-                                }
-                            ]
-                        },
-                        "external_url": "",
-                        "attributes": [
-                            {
-                                "trait_type": "Search Query",
-                                "value": "base"
-                            }
-                        ]
-                    }
-                }
+              }
             ]
-        },
-        "metadata": {
-            "creator": {
-                "name": "SiBorg",
-                "description": "SiBorg application empowers podcasters by leveraging SocialFi.",
-                "image": "https://bafkreidonqrmvzm4544yv7lqeggp3t34r72glwszbh3qafjqmegvzvgiry.ipfs.nftstorage.link/",
-                "external_link": "https://siborg.io",
-                "categories": [
-                    "dApp",
-                    "social",
-                    "media",
-                    "education"
-                ]
-            },
-            "offer": {
-                "name": "Tokenized ad spaces in SiBorg App",
-                "description": "Tokenized advertisement spaces, each token is linked to a search term.\n\nBuying an ad space from the collection give you the exclusive right to submit an ad.\nSiBorg team still has the power to validate or reject ad assets. You are free to change the ad proposal at anytime and free to resell it on the open market.",
-                "image": "https://bafkreif4dihekhhd24itluilol4qab6zxhwlokkinbpnkqaprzf6jenqne.ipfs.nftstorage.link/",
-                "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
-                "external_link": "",
-                "valid_from": "2024-05-01T00:00:00Z",
-                "valid_to": "2024-10-31T23:59:59Z",
-                "categories": [
-                    "Community",
-                    "NFT",
-                    "Crypto"
-                ],
-                "token_metadata": {
-                    "name": "#{tokenData} - Tokenized Ad Space",
-                    "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                    "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
-                    "external_url": "",
-                    "attributes": [
-                        {
-                            "trait_type": "Search Query",
-                            "value": "{tokenData}"
-                        }
-                    ]
+          },
+          "mint": {
+            "tokenData": "lens",
+            "blockTimestamp": "1717182636"
+          },
+          "prices": [],
+          "metadata": {
+            "name": "#lens - Tokenized Ad Space",
+            "description": "Tokenized advertisement spaces link to the ticker 'lens' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'lens'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+            "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Alens",
+            "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+            "external_link": "",
+            "valid_from": "2024-05-01T00:00:00Z",
+            "valid_to": "2024-10-31T23:59:59Z",
+            "categories": ["Community", "NFT", "Crypto"],
+            "token_metadata": {
+              "name": "#{tokenData} - Tokenized Ad Space",
+              "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+              "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+              "external_url": "",
+              "attributes": [
+                {
+                  "trait_type": "Search Query",
+                  "value": "{tokenData}"
                 }
-            }
+              ]
+            },
+            "external_url": "",
+            "attributes": [
+              {
+                "trait_type": "Search Query",
+                "value": "lens"
+              }
+            ]
+          }
         }
+      ]
+    },
+    "metadata": {
+      "creator": {
+        "name": "SiBorg",
+        "description": "SiBorg application empowers podcasters by leveraging SocialFi.",
+        "image": "https://bafkreidonqrmvzm4544yv7lqeggp3t34r72glwszbh3qafjqmegvzvgiry.ipfs.nftstorage.link/",
+        "external_link": "https://siborg.io",
+        "categories": ["dApp", "social", "media", "education"]
+      },
+      "offer": {
+        "name": "Tokenized ad spaces in SiBorg App",
+        "description": "Tokenized advertisement spaces, each token is linked to a search term.\n\nBuying an ad space from the collection give you the exclusive right to submit an ad.\nSiBorg team still has the power to validate or reject ad assets. You are free to change the ad proposal at anytime and free to resell it on the open market.",
+        "image": "https://bafkreif4dihekhhd24itluilol4qab6zxhwlokkinbpnkqaprzf6jenqne.ipfs.nftstorage.link/",
+        "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+        "external_link": "",
+        "valid_from": "2024-05-01T00:00:00Z",
+        "valid_to": "2024-10-31T23:59:59Z",
+        "categories": ["Community", "NFT", "Crypto"],
+        "token_metadata": {
+          "name": "#{tokenData} - Tokenized Ad Space",
+          "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+          "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+          "external_url": "",
+          "attributes": [
+            {
+              "trait_type": "Search Query",
+              "value": "{tokenData}"
+            }
+          ]
+        }
+      }
     }
+  }
 ]
 ```
 
@@ -592,152 +615,185 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
 
 ```json
 {
-    "_tokenIds": [
-        "65329693524297118063646238334159138948524025175806621014596919199733788562630",
-        "101661046026135114031620108954831493212219976668510473490175828180454937635060",
-        "64873369441774726751632143071124460964591437972899336413549633584093280026386"
-    ],
-    "_tokenData": [
-        "web3",
-        "twitter",
-        "staking"
-    ],
-    "_adParameterIds": [
-        "imageURL-5:1",
-        "linkURL"
-    ],
-    "65329693524297118063646238334159138948524025175806621014596919199733788562630": {
-        "_tokenData": "web3",
-        "_buy": {
-            "link": "https://app.dsponsor.com/sepolia/offer/1/65329693524297118063646238334159138948524025175806621014596919199733788562630?tokenData=web3",
-            "mint": null,
-            "secondary": {
-                "id": "19",
-                "quantity": "1",
-                "listingType": "Direct",
-                "startTime": "1717183164",
-                "endTime": "1719861564",
-                "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-                "buyoutPricePerToken": "400000000000",
-                "reservePricePerToken": "400000000000",
-                "status": "CREATED",
-                "bids": [],
-                "currencySymbol": "WETH",
-                "currencyDecimals": "18",
-                "marketplaceAddress": "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
-                "protocolFeeBps": "400",
-                "minimalBidBps": "1000",
-                "previousBidAmountBps": "500",
-                "bidPriceStructure": {
-                    "previousBidAmount": "0",
-                    "previousPricePerToken": "0",
-                    "minimalBidPerToken": "400000000000",
-                    "minimalBuyoutPerToken": "400000000000",
-                    "newBidPerToken": "400000000000",
-                    "totalBidAmount": "400000000000",
-                    "refundBonusPerToken": "0",
-                    "refundBonusAmount": "0",
-                    "refundAmountToPreviousBidder": "0",
-                    "newPricePerToken": "400000000000",
-                    "newAmount": "400000000000",
-                    "newRefundBonusPerToken": "20000000000",
-                    "newRefundBonusAmount": "20000000000",
-                    "protocolFeeAmount": "16000000000",
-                    "royaltyAmount": "27600000000",
-                    "listerAmount": "356400000000"
-                },
-                "bidPriceStructureFormatted": {
-                    "previousBidAmount": "0",
-                    "previousPricePerToken": "0",
-                    "minimalBidPerToken": "0.0₆4",
-                    "minimalBuyoutPerToken": "0.0₆4",
-                    "newBidPerToken": "0.0₆4",
-                    "totalBidAmount": "0.0₆4",
-                    "refundBonusPerToken": "0",
-                    "refundBonusAmount": "0",
-                    "refundAmountToPreviousBidder": "0",
-                    "newPricePerToken": "0.0₆4",
-                    "newAmount": "0.0₆4",
-                    "newRefundBonusPerToken": "0.0₇2",
-                    "newRefundBonusAmount": "0.0₇2",
-                    "protocolFeeAmount": "0.0₇2",
-                    "royaltyAmount": "0.0₇3",
-                    "listerAmount": "0.0₆3"
-                },
-                "buyPriceStructure": {
-                    "buyoutPricePerToken": "400000000000",
-                    "listerBuyAmount": "356400000000",
-                    "royaltiesBuyAmount": "27600000000",
-                    "protocolFeeBuyAmount": "16000000000"
-                },
-                "buyPriceStructureFormatted": {
-                    "buyoutPricePerToken": "0.0₆4",
-                    "listerBuyAmount": "0.0₆3",
-                    "royaltiesBuyAmount": "0.0₇3",
-                    "protocolFeeBuyAmount": "0.0₇2"
-                }
-            }
+  "_tokenIds": [
+    "65329693524297118063646238334159138948524025175806621014596919199733788562630",
+    "101661046026135114031620108954831493212219976668510473490175828180454937635060",
+    "64873369441774726751632143071124460964591437972899336413549633584093280026386"
+  ],
+  "_tokenData": [
+    "web3",
+    "twitter",
+    "staking"
+  ],
+  "_adParameterIds": [
+    "imageURL-5:1",
+    "linkURL"
+  ],
+  "65329693524297118063646238334159138948524025175806621014596919199733788562630": {
+    "_tokenData": "web3",
+    "_buy": {
+      "link": "https://app.dsponsor.com/11155111/offer/1/65329693524297118063646238334159138948524025175806621014596919199733788562630?tokenData=web3",
+      "mint": null,
+      "secondary": {
+        "id": "19",
+        "quantity": "1",
+        "listingType": "Direct",
+        "startTime": "1717183164",
+        "endTime": "1719861564",
+        "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+        "buyoutPricePerToken": "400000000000",
+        "reservePricePerToken": "400000000000",
+        "status": "CREATED",
+        "bids": [],
+        "currencySymbol": "WETH",
+        "currencyDecimals": "18",
+        "currencyPriceUSDC": "717709127322",
+        "currencyPriceUSDCFormatted": "717709.127322",
+        "marketplaceAddress": "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
+        "protocolFeeBps": "400",
+        "minimalBidBps": "1000",
+        "previousBidAmountBps": "500",
+        "bidPriceStructure": {
+          "previousBidAmount": "0",
+          "previousPricePerToken": "0",
+          "minimalBidPerToken": "400000000000",
+          "minimalBuyoutPerToken": "400000000000",
+          "newBidPerToken": "400000000000",
+          "totalBidAmount": "400000000000",
+          "refundBonusPerToken": "0",
+          "refundBonusAmount": "0",
+          "refundAmountToPreviousBidder": "0",
+          "newPricePerToken": "400000000000",
+          "newAmount": "400000000000",
+          "newRefundBonusPerToken": "20000000000",
+          "newRefundBonusAmount": "20000000000",
+          "protocolFeeAmount": "16000000000",
+          "royaltyAmount": "27600000000",
+          "listerAmount": "356400000000"
         },
-        "imageURL-5:1": {
-            "state": "BUY_MARKET",
-            "data": "http://localhost:3000/available-1-1.png"
+        "bidPriceStructureFormatted": {
+          "previousBidAmount": "0",
+          "previousPricePerToken": "0",
+          "minimalBidPerToken": "0.0₆4",
+          "minimalBuyoutPerToken": "0.0₆4",
+          "newBidPerToken": "0.0₆4",
+          "totalBidAmount": "0.0₆4",
+          "refundBonusPerToken": "0",
+          "refundBonusAmount": "0",
+          "refundAmountToPreviousBidder": "0",
+          "newPricePerToken": "0.0₆4",
+          "newAmount": "0.0₆4",
+          "newRefundBonusPerToken": "0.0₇2",
+          "newRefundBonusAmount": "0.0₇2",
+          "protocolFeeAmount": "0.0₇2",
+          "royaltyAmount": "0.0₇3",
+          "listerAmount": "0.0₆3"
         },
-        "linkURL": {
-            "state": "BUY_MARKET",
-            "data": "https://app.dsponsor.com/sepolia/offer/1/65329693524297118063646238334159138948524025175806621014596919199733788562630?tokenData=web3"
+        "bidPriceStructureUsdcFormatted": {
+          "previousBidAmount": "0",
+          "previousPricePerToken": "0",
+          "minimalBidPerToken": "0.29",
+          "minimalBuyoutPerToken": "0.29",
+          "newBidPerToken": "0.29",
+          "totalBidAmount": "0.29",
+          "refundBonusPerToken": "0",
+          "refundBonusAmount": "0",
+          "refundAmountToPreviousBidder": "0",
+          "newPricePerToken": "0.29",
+          "newAmount": "0.29",
+          "newRefundBonusPerToken": "0.014",
+          "newRefundBonusAmount": "0.014",
+          "protocolFeeAmount": "0.011",
+          "royaltyAmount": "0.02",
+          "listerAmount": "0.26"
+        },
+        "buyPriceStructure": {
+          "buyoutPricePerToken": "400000000000",
+          "listerBuyAmount": "356400000000",
+          "royaltiesBuyAmount": "27600000000",
+          "protocolFeeBuyAmount": "16000000000"
+        },
+        "buyPriceStructureFormatted": {
+          "buyoutPricePerToken": "0.0₆4",
+          "listerBuyAmount": "0.0₆3",
+          "royaltiesBuyAmount": "0.0₇3",
+          "protocolFeeBuyAmount": "0.0₇2"
+        },
+        "buyPriceStructureUsdcFormatted": {
+          "buyoutPricePerToken": "0.29",
+          "listerBuyAmount": "0.26",
+          "royaltiesBuyAmount": "0.02",
+          "protocolFeeBuyAmount": "0.011"
         }
+      }
     },
-    "101661046026135114031620108954831493212219976668510473490175828180454937635060": {
-        "_tokenData": "twitter",
-        "_buy": {
-            "link": "https://app.dsponsor.com/sepolia/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060?tokenData=twitter",
-            "mint": [
-                {
-                    "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
-                    "amount": "30000000",
-                    "currencySymbol": "USDC",
-                    "currencyDecimals": "6",
-                    "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
-                    "protocolFeeBps": "400",
-                    "mintPriceStructure": {
-                        "creatorAmount": "30000000",
-                        "protocolFeeAmount": "1200000",
-                        "totalAmount": "31200000"
-                    },
-                    "mintPriceStructureFormatted": {
-                        "creatorAmount": "30",
-                        "protocolFeeAmount": "1.2",
-                        "totalAmount": "31.2"
-                    }
-                }
-            ],
-            "secondary": null
-        },
-        "imageURL-5:1": {
-            "state": "BUY_MINT",
-            "data": "http://localhost:3000/available-1-1.png"
-        },
-        "linkURL": {
-            "state": "BUY_MINT",
-            "data": "https://app.dsponsor.com/sepolia/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060?tokenData=twitter"
-        }
+    "imageURL-5:1": {
+      "state": "BUY_MARKET",
+      "data": "http://localhost:3000/available-1-1.png"
     },
-    "64873369441774726751632143071124460964591437972899336413549633584093280026386": {
-        "_tokenData": "staking",
-        "_buy": {
-            "link": "https://app.dsponsor.com/sepolia/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386?tokenData=staking",
-            "mint": null,
-            "secondary": null
-        },
-        "imageURL-5:1": {
-            "state": "UNAVAILABLE",
-            "data": "http://localhost:3000/reserved-1-1.png"
-        },
-        "linkURL": {
-            "state": "UNAVAILABLE",
-            "data": "https://app.dsponsor.com/sepolia/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386?tokenData=staking"
-        }
+    "linkURL": {
+      "state": "BUY_MARKET",
+      "data": "https://app.dsponsor.com/11155111/offer/1/65329693524297118063646238334159138948524025175806621014596919199733788562630?tokenData=web3"
     }
+  },
+  "101661046026135114031620108954831493212219976668510473490175828180454937635060": {
+    "_tokenData": "twitter",
+    "_buy": {
+      "link": "https://app.dsponsor.com/11155111/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060?tokenData=twitter",
+      "mint": [
+        {
+          "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+          "amount": "30000000",
+          "currencySymbol": "USDC",
+          "currencyDecimals": "6",
+          "currencyPriceUSDC": "1000000",
+          "currencyPriceUSDCFormatted": "1.0",
+          "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
+          "protocolFeeBps": "400",
+          "mintPriceStructure": {
+            "creatorAmount": "30000000",
+            "protocolFeeAmount": "1200000",
+            "totalAmount": "31200000"
+          },
+          "mintPriceStructureFormatted": {
+            "creatorAmount": "30",
+            "protocolFeeAmount": "1.2",
+            "totalAmount": "31.2"
+          },
+          "mintPriceStructureUsdcFormatted": {
+            "creatorAmount": "30",
+            "protocolFeeAmount": "1.2",
+            "totalAmount": "31.2"
+          }
+        }
+      ],
+      "secondary": null
+    },
+    "imageURL-5:1": {
+      "state": "BUY_MINT",
+      "data": "http://localhost:3000/available-1-1.png"
+    },
+    "linkURL": {
+      "state": "BUY_MINT",
+      "data": "https://app.dsponsor.com/11155111/offer/1/101661046026135114031620108954831493212219976668510473490175828180454937635060?tokenData=twitter"
+    }
+  },
+  "64873369441774726751632143071124460964591437972899336413549633584093280026386": {
+    "_tokenData": "staking",
+    "_buy": {
+      "link": "https://app.dsponsor.com/11155111/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386?tokenData=staking",
+      "mint": null,
+      "secondary": null
+    },
+    "imageURL-5:1": {
+      "state": "UNAVAILABLE",
+      "data": "http://localhost:3000/reserved-1-1.png"
+    },
+    "linkURL": {
+      "state": "UNAVAILABLE",
+      "data": "https://app.dsponsor.com/11155111/offer/1/64873369441774726751632143071124460964591437972899336413549633584093280026386?tokenData=staking"
+    }
+  }
 }
 ```
 
@@ -811,11 +867,34 @@ Purpose: Relay any GraphQL request to the DSponsor subgraph.
 
 It also populate:
 
-* offer metadata (`offer.metadata`, if `adOffer --> metadataURL` is provided and valid)
-* token metadata (`token.metadata`, if `adOffer --> metadataURL` is provided and valid)
-* mint price (`price.mintPriceStructure` & `price.mintPriceStructureFormatted`,
-if `price --> amount` & `price --> currency` are provided)
-* secondary buy & bid structures (`marketplaceListing.bidPriceStructure` & `marketplaceListing.bidPriceStructureFormatted`,`marketplaceListing.buyPriceStructure` & `marketplaceListing.buyPriceStructureFormatted`, if `marketplaceListings --> reservePricePerToken`, `marketplaceListings --> buyoutPricePerToken`,  `marketplaceListings --> currency`, `marketplaceListings --> quantity`, `marketplaceListings --> bids --> totalBidAmount`, `nftContract --> royalty --> bps` are provided)
+* Metadata (if `adOffer --> metadataURL` is provided and valid)
+  * `offer.metadata`
+  * `token.metadata`
+* Mint information (if `price --> amount` & `price --> currency` are provided)
+  * `price.currencySymbol`
+  * `price.currencyDecimals`
+  * `price.currencyPriceUSDC`
+  * `price.currencyPriceUSDCFormatted`
+  * `price.minterAddress`
+  * `price.protocolFeeBps`
+  * `price.mintPriceStructure`
+  * `price.mintPriceStructureFormatted`
+  * `price.mintPriceStructureUsdcFormatted`
+* Secondary market information ( if `marketplaceListings --> reservePricePerToken`, `marketplaceListings --> buyoutPricePerToken`,  `marketplaceListings --> currency`, `marketplaceListings --> quantity`, `marketplaceListings --> bids --> totalBidAmount`, `nftContract --> royalty --> bps` are provided)
+  * `marketplaceListing.currencySymbol`
+  * `marketplaceListing.currencyDecimals`
+  * `marketplaceListing.currencyPriceUSDC`
+  * `marketplaceListing.currencyPriceUSDCFormatted`
+  * `marketplaceListing.marketplaceAddress`
+  * `marketplaceListing.protocolFeeBps`
+  * `marketplaceListing.minimalBidBps`
+  * `marketplaceListing.previousBidAmountBps`
+  * `marketplaceListing.bidPriceStructure`
+  * `marketplaceListing.bidPriceStructureFormatted`
+  * `marketplaceListing.bidPriceStructureUsdcFormatted`
+  * `marketplaceListing.buyPriceStructure`
+  * `marketplaceListing.buyPriceStructureFormatted`
+  * `marketplaceListing.buyPriceStructureUsdcFormatted`
 
 |Method|Endpoint|Parameters|
 |--|--|--|
@@ -884,7 +963,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
     }",
     "variables": {
       "offerId": "1",
-      "tokenId": "109438364007015322736766724051813704643042782151430130119908516857056060615695"
+      "tokenId": "70911028637056523786970493276452604132158040694527975633897316670791746250845"
     },
     "operationName": "OfferRequest"
   }'
@@ -911,6 +990,8 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
               "enabled": true,
               "currencySymbol": "USDC",
               "currencyDecimals": "6",
+              "currencyPriceUSDC": "1000000",
+              "currencyPriceUSDCFormatted": "1.0",
               "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
               "protocolFeeBps": "400",
               "mintPriceStructure": {
@@ -922,24 +1003,29 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                 "creatorAmount": "30",
                 "protocolFeeAmount": "1.2",
                 "totalAmount": "31.2"
+              },
+              "mintPriceStructureUsdcFormatted": {
+                "creatorAmount": "30",
+                "protocolFeeAmount": "1.2",
+                "totalAmount": "31.2"
               }
             }
           ],
           "tokens": [
             {
-              "tokenId": "109438364007015322736766724051813704643042782151430130119908516857056060615695",
+              "tokenId": "70911028637056523786970493276452604132158040694527975633897316670791746250845",
               "mint": {
-                "blockTimestamp": "1717183452",
-                "tokenData": "base"
+                "blockTimestamp": "1717182936",
+                "tokenData": "ordinals"
               },
               "prices": [],
               "marketplaceListings": [
                 {
-                  "id": "24",
+                  "id": "17",
                   "quantity": "1",
-                  "buyoutPricePerToken": "5000",
-                  "reservePricePerToken": "5000",
-                  "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
+                  "buyoutPricePerToken": "100000000000000000000",
+                  "reservePricePerToken": "15000000000000000",
+                  "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
                   "bids": [],
                   "token": {
                     "nftContract": {
@@ -950,8 +1036,10 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                       "allowList": false
                     }
                   },
-                  "currencySymbol": "USDC",
-                  "currencyDecimals": "6",
+                  "currencySymbol": "WETH",
+                  "currencyDecimals": "18",
+                  "currencyPriceUSDC": "717709127322",
+                  "currencyPriceUSDCFormatted": "717709.127322",
                   "marketplaceAddress": "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
                   "protocolFeeBps": "400",
                   "minimalBidBps": "1000",
@@ -959,57 +1047,81 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                   "bidPriceStructure": {
                     "previousBidAmount": "0",
                     "previousPricePerToken": "0",
-                    "minimalBidPerToken": "5000",
-                    "minimalBuyoutPerToken": "5000",
-                    "newBidPerToken": "5000",
-                    "totalBidAmount": "5000",
+                    "minimalBidPerToken": "15000000000000000",
+                    "minimalBuyoutPerToken": "100000000000000000000",
+                    "newBidPerToken": "15000000000000000",
+                    "totalBidAmount": "15000000000000000",
                     "refundBonusPerToken": "0",
                     "refundBonusAmount": "0",
                     "refundAmountToPreviousBidder": "0",
-                    "newPricePerToken": "5000",
-                    "newAmount": "5000",
-                    "newRefundBonusPerToken": "250",
-                    "newRefundBonusAmount": "250",
-                    "protocolFeeAmount": "200",
-                    "royaltyAmount": "345",
-                    "listerAmount": "4455"
+                    "newPricePerToken": "15000000000000000",
+                    "newAmount": "15000000000000000",
+                    "newRefundBonusPerToken": "750000000000000",
+                    "newRefundBonusAmount": "750000000000000",
+                    "protocolFeeAmount": "600000000000000",
+                    "royaltyAmount": "1035000000000000",
+                    "listerAmount": "13365000000000000"
                   },
                   "bidPriceStructureFormatted": {
                     "previousBidAmount": "0",
                     "previousPricePerToken": "0",
-                    "minimalBidPerToken": "0.005",
-                    "minimalBuyoutPerToken": "0.005",
-                    "newBidPerToken": "0.005",
-                    "totalBidAmount": "0.005",
+                    "minimalBidPerToken": "0.015",
+                    "minimalBuyoutPerToken": "100",
+                    "newBidPerToken": "0.015",
+                    "totalBidAmount": "0.015",
                     "refundBonusPerToken": "0",
                     "refundBonusAmount": "0",
                     "refundAmountToPreviousBidder": "0",
-                    "newPricePerToken": "0.005",
-                    "newAmount": "0.005",
-                    "newRefundBonusPerToken": "0.0₃2",
-                    "newRefundBonusAmount": "0.0₃2",
-                    "protocolFeeAmount": "0.0₃2",
-                    "royaltyAmount": "0.0₃3",
-                    "listerAmount": "0.004"
+                    "newPricePerToken": "0.015",
+                    "newAmount": "0.015",
+                    "newRefundBonusPerToken": "0.0₃7",
+                    "newRefundBonusAmount": "0.0₃7",
+                    "protocolFeeAmount": "0.0₃6",
+                    "royaltyAmount": "0.001",
+                    "listerAmount": "0.013"
+                  },
+                  "bidPriceStructureUsdcFormatted": {
+                    "previousBidAmount": "0",
+                    "previousPricePerToken": "0",
+                    "minimalBidPerToken": "10.8K",
+                    "minimalBuyoutPerToken": "71.8M",
+                    "newBidPerToken": "10.8K",
+                    "totalBidAmount": "10.8K",
+                    "refundBonusPerToken": "0",
+                    "refundBonusAmount": "0",
+                    "refundAmountToPreviousBidder": "0",
+                    "newPricePerToken": "10.8K",
+                    "newAmount": "10.8K",
+                    "newRefundBonusPerToken": "538.28",
+                    "newRefundBonusAmount": "538.28",
+                    "protocolFeeAmount": "430.63",
+                    "royaltyAmount": "742.83",
+                    "listerAmount": "9.6K"
                   },
                   "buyPriceStructure": {
-                    "buyoutPricePerToken": "5000",
-                    "listerBuyAmount": "4455",
-                    "royaltiesBuyAmount": "345",
-                    "protocolFeeBuyAmount": "200"
+                    "buyoutPricePerToken": "100000000000000000000",
+                    "listerBuyAmount": "89100000000000000000",
+                    "royaltiesBuyAmount": "6900000000000000000",
+                    "protocolFeeBuyAmount": "4000000000000000000"
                   },
                   "buyPriceStructureFormatted": {
-                    "buyoutPricePerToken": "0.005",
-                    "listerBuyAmount": "0.004",
-                    "royaltiesBuyAmount": "0.0₃3",
-                    "protocolFeeBuyAmount": "0.0₃2"
+                    "buyoutPricePerToken": "100",
+                    "listerBuyAmount": "89.1",
+                    "royaltiesBuyAmount": "6.9",
+                    "protocolFeeBuyAmount": "4"
+                  },
+                  "buyPriceStructureUsdcFormatted": {
+                    "buyoutPricePerToken": "71.8M",
+                    "listerBuyAmount": "63.9M",
+                    "royaltiesBuyAmount": "5M",
+                    "protocolFeeBuyAmount": "2.9M"
                   }
                 }
               ],
               "metadata": {
-                "name": "#base - Tokenized Ad Space",
-                "description": "Tokenized advertisement spaces link to the ticker 'base' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'base'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Abase",
+                "name": "#ordinals - Tokenized Ad Space",
+                "description": "Tokenized advertisement spaces link to the ticker 'ordinals' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'ordinals'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+                "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Aordinals",
                 "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
                 "external_link": "",
                 "valid_from": "2024-05-01T00:00:00Z",
@@ -1035,7 +1147,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                 "attributes": [
                   {
                     "trait_type": "Search Query",
-                    "value": "base"
+                    "value": "ordinals"
                   }
                 ]
               }

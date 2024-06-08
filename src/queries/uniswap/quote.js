@@ -27,7 +27,8 @@ export const getEthQuote = async (chainId, tokenOutAddr, amountOut, slippagePerC
     const quoterContract = new ethers.Contract(uniswapV3QuoterAddr, Quoter.abi, signer);
 
     [amountInEth] =
-      tokenOutAddr === WETH_ADDR || tokenOutAddr === "0x0000000000000000000000000000000000000000"
+      tokenOutAddr.toLowerCase() === WETH_ADDR.toLowerCase() ||
+      tokenOutAddr === "0x0000000000000000000000000000000000000000"
         ? [BigInt(amountOut.toString())]
         : await quoterContract.quoteExactOutputSingle.staticCall({
             tokenIn: WETH_ADDR,
