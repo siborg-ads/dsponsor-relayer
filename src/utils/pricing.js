@@ -80,39 +80,41 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
   const objKeys = Object.keys(obj);
 
   for (const key of objKeys) {
-    let formatted = formatUnits(obj[key], decimals);
-    res[key] = formatted;
+    if (obj[key] && obj[key].length) {
+      let formatted = formatUnits(obj[key], decimals);
+      res[key] = formatted;
 
-    try {
-      let formattedNb = numeral(formatted).value();
-      if (formattedNb < 0.001 && formattedNb > 0) {
-        const [, precision] = formatted.split(".");
-        const precisionSplit = precision.split("");
-        let firstNonZeroIndex = precisionSplit.findIndex((x) => x !== "0");
-        let nonZeroNb = Number(precisionSplit[firstNonZeroIndex]);
-        const nextNonZeroNb = nonZeroNb ? Number(precisionSplit[firstNonZeroIndex + 1]) : 0;
-        let lastNumber;
+      try {
+        let formattedNb = numeral(formatted).value();
+        if (formattedNb < 0.001 && formattedNb > 0) {
+          const [, precision] = formatted.split(".");
+          const precisionSplit = precision.split("");
+          let firstNonZeroIndex = precisionSplit.findIndex((x) => x !== "0");
+          let nonZeroNb = Number(precisionSplit[firstNonZeroIndex]);
+          const nextNonZeroNb = nonZeroNb ? Number(precisionSplit[firstNonZeroIndex + 1]) : 0;
+          let lastNumber;
 
-        if (nonZeroNb === 9 && nextNonZeroNb > 5) {
-          firstNonZeroIndex -= 1;
-          lastNumber = 1;
+          if (nonZeroNb === 9 && nextNonZeroNb > 5) {
+            firstNonZeroIndex -= 1;
+            lastNumber = 1;
+          } else {
+            lastNumber =
+              nextNonZeroNb > 5
+                ? Number(precisionSplit[firstNonZeroIndex]) + 1
+                : Number(precisionSplit[firstNonZeroIndex]);
+          }
+
+          res[`${key}`] = `0.0${toSubscript(firstNonZeroIndex)}${lastNumber}`;
+        } else if (formattedNb >= 0.001 && formattedNb < 0.1) {
+          res[`${key}`] = numeral(formatted).format("0.[000]");
+        } else if (formattedNb >= 0.1 && formattedNb < 1000) {
+          res[`${key}`] = numeral(formatted).format("0.[00]");
         } else {
-          lastNumber =
-            nextNonZeroNb > 5
-              ? Number(precisionSplit[firstNonZeroIndex]) + 1
-              : Number(precisionSplit[firstNonZeroIndex]);
+          res[`${key}`] = numeral(formatted).format("0.[0]a").toLocaleUpperCase();
         }
-
-        res[`${key}`] = `0.0${toSubscript(firstNonZeroIndex)}${lastNumber}`;
-      } else if (formattedNb >= 0.001 && formattedNb < 0.1) {
-        res[`${key}`] = numeral(formatted).format("0.[000]");
-      } else if (formattedNb >= 0.1 && formattedNb < 1000) {
-        res[`${key}`] = numeral(formatted).format("0.[00]");
-      } else {
-        res[`${key}`] = numeral(formatted).format("0.[0]a").toLocaleUpperCase();
+      } catch (e) {
+        console.error("error formatting ", formatted, e);
       }
-    } catch (e) {
-      console.error("error formatting ", formatted, e);
     }
   }
   return res;
