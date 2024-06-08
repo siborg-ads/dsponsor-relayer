@@ -99,7 +99,9 @@ export const MarketplaceBidFragment = /* GraphQL */ `
     bidder
     totalBidAmount # current bid / new price per token * quantity
     paidBidAmount # how much bidder paid
-    refundBonus # reward (outbid case)
+    refundBonus
+    refundAmount # refund (outbid case)
+    refundProfit # how much bidder gains from refund
     currency
     status
   }

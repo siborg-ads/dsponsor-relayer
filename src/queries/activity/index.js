@@ -149,7 +149,7 @@ export async function getSpendings(chainId) {
     creationTimestamp,
     bidder,
     paidBidAmount,
-    refundBonus,
+    refundProfit,
     currency,
     listing
   } of graphResult.data.marketplaceBids) {
@@ -160,16 +160,15 @@ export async function getSpendings(chainId) {
     }
 
     setupResult(bidder, currency);
-
-    const spent = BigInt(paidBidAmount) - BigInt(refundBonus);
-    result[bidder]["currenciesAmounts"][currency].bidSpent += spent;
-    result[bidder]["currenciesAmounts"][currency].totalSpent += spent;
     result[bidder].nbBids += 1;
 
-    if (refundBonus > BigInt("0")) {
-      result[bidder]["currenciesAmounts"][currency].bidRefundReceived += BigInt(refundBonus);
-      result[bidder]["currenciesAmounts"][currency].totalReceived += BigInt(refundBonus);
+    if (refundProfit > BigInt("0")) {
+      result[bidder]["currenciesAmounts"][currency].bidRefundReceived += BigInt(refundProfit);
+      result[bidder]["currenciesAmounts"][currency].totalReceived += BigInt(refundProfit);
       result[bidder].nbRefunds += 1;
+    } else {
+      result[bidder]["currenciesAmounts"][currency].bidSpent += BigInt(paidBidAmount);
+      result[bidder]["currenciesAmounts"][currency].totalSpent += BigInt(paidBidAmount);
     }
   }
 

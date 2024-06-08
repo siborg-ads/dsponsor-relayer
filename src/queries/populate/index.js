@@ -28,6 +28,36 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
     // if (!quantity) quantity = "1";
     // if (!royaltyBps) royaltyBps = "0";
 
+    const { decimals, symbol, priceUSDC, priceUSDCFormatted } = currency
+      ? (await getCurrencyInfos(chainId, currency)) || {}
+      : {};
+
+    listing = {
+      ...listing,
+      currencySymbol: symbol,
+      currencyDecimals: decimals ? decimals.toString() : undefined,
+      currencyPriceUSDC: priceUSDC,
+      currencyPriceUSDCFormatted: priceUSDCFormatted,
+      marketplaceAddress: address,
+      protocolFeeBps: BigInt(protocolFeeBps).toString(),
+      minimalBidBps: BigInt(minimalBidBps).toString(),
+      previousBidAmountBps: BigInt(previousBidAmountBps).toString()
+    };
+
+    if (decimals) {
+      listing.bids = listing.bids.map((b) => {
+        const { totalBidAmount, paidBidAmount, refundBonus, refundAmount, refundProfit } = b;
+        b.amountsFormatted = priceFormattedForAllValuesObject(decimals, {
+          totalBidAmount,
+          paidBidAmount,
+          refundBonus,
+          refundAmount,
+          refundProfit
+        });
+        return b;
+      });
+    }
+
     if (
       minimalBidBps &&
       reservePricePerToken &&
@@ -75,9 +105,6 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
         protocolFeeBuyAmount: protocolFeeBuyAmount.toString()
       };
 
-      const { decimals, symbol, priceUSDC, priceUSDCFormatted } =
-        (await getCurrencyInfos(chainId, currency)) || {};
-
       const buyPriceStructureFormatted = priceFormattedForAllValuesObject(
         decimals,
         buyPriceStructure
@@ -101,14 +128,6 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
 
       listing = {
         ...listing,
-        currencySymbol: symbol,
-        currencyDecimals: decimals.toString(),
-        currencyPriceUSDC: priceUSDC,
-        currencyPriceUSDCFormatted: priceUSDCFormatted,
-        marketplaceAddress: address,
-        protocolFeeBps: BigInt(protocolFeeBps).toString(),
-        minimalBidBps: BigInt(minimalBidBps).toString(),
-        previousBidAmountBps: BigInt(previousBidAmountBps).toString(),
         bidPriceStructure,
         bidPriceStructureFormatted,
         bidPriceStructureUsdcFormatted,
