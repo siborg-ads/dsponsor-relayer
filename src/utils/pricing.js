@@ -69,7 +69,13 @@ export const priceUsdcFormattedForAllValuesObject = async (chainId, obj, currenc
 
   const res = {};
   for (const key of Object.keys(obj)) {
-    res[key] = (BigInt(priceUSDC) * BigInt(obj[key])) / parseUnits("1", decimals);
+    if (obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
+      try {
+        res[key] = (BigInt(priceUSDC) * BigInt(obj[key])) / parseUnits("1", decimals);
+      } catch (e) {
+        // console.error("error formatting ", obj[key], e);
+      }
+    }
   }
 
   return priceFormattedForAllValuesObject(6, res);
@@ -80,11 +86,11 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
   const objKeys = Object.keys(obj);
 
   for (const key of objKeys) {
-    if (obj[key]) {
-      let formatted = formatUnits(obj[key], decimals);
-      res[key] = formatted;
-
+    if (obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
       try {
+        let formatted = formatUnits(obj[key], decimals);
+        res[key] = formatted;
+
         let formattedNb = numeral(formatted).value();
         if (formattedNb < 0.001 && formattedNb > 0) {
           const [, precision] = formatted.split(".");
@@ -113,7 +119,7 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
           res[`${key}`] = numeral(formatted).format("0.[0]a").toLocaleUpperCase();
         }
       } catch (e) {
-        console.error("error formatting ", formatted, e);
+        //  console.error("error formatting ", formatted, e);
       }
     }
   }
