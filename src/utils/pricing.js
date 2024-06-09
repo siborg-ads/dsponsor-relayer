@@ -80,7 +80,7 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
   const objKeys = Object.keys(obj);
 
   for (const key of objKeys) {
-    if (obj[key] && obj[key].length) {
+    if (obj[key]) {
       let formatted = formatUnits(obj[key], decimals);
       res[key] = formatted;
 
