@@ -1,7 +1,7 @@
 import { ethers, getAddress } from "ethers";
 import config from "@/config";
 import { getAllOffers, getHolders, getSpendings } from "@/queries/activity";
-import { priceFormattedForAllValuesObject } from "@/utils/pricing";
+import { priceFormattedForAllValuesObject } from "@/utils/string";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();

@@ -2,7 +2,7 @@ import { Alchemy } from "alchemy-sdk";
 import { parseUnits } from "ethers";
 import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
-import { getCurrencyInfos, priceFormattedForAllValuesObject } from "@/utils/pricing";
+import { getCurrencyInfos, priceFormattedForAllValuesObject } from "@/utils";
 
 export async function getAllOffers(chainId) {
   const geAllOffersQuery = /* GraphQL */ `

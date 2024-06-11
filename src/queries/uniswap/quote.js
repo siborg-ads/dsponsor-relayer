@@ -1,8 +1,7 @@
 import config from "@/config";
+import { priceFormattedForAllValuesObject } from "@/utils/string";
 import { ethers, getAddress } from "ethers";
 import Quoter from "@uniswap/v3-periphery/artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json";
-
-const { formatUnits } = ethers;
 
 export const getEthQuote = async (chainId, tokenOutAddr, amountOut, slippagePerCent = 0.3) => {
   const uniswapV3QuoterAddr = config?.[chainId]?.smartContracts?.UNISWAP_QUOTER?.address;
@@ -55,12 +54,19 @@ export const getEthQuote = async (chainId, tokenOutAddr, amountOut, slippagePerC
     console.error("Quote error", chainId, tokenOutAddr, amountOut, slippagePerCent);
   }
 
+  const {
+    amountInEth: amountInEthFormatted,
+    amountInEthWithSlippage: amountInEthWithSlippageFormatted
+  } = priceFormattedForAllValuesObject(18, { amountInEth, amountInEthWithSlippage });
+
+  const { amountUSDC: amountUSDCFormatted } = priceFormattedForAllValuesObject(6, { amountUSDC });
+
   return {
     amountInEth: amountInEth.toString(),
     amountInEthWithSlippage: amountInEthWithSlippage.toString(),
     amountUSDC: amountUSDC.toString(),
-    amountInEthFormatted: formatUnits(amountInEth, 18),
-    amountInEthWithSlippageFormatted: formatUnits(amountInEthWithSlippage, 18),
-    amountUSDCFormatted: formatUnits(amountUSDC, 6)
+    amountInEthFormatted,
+    amountInEthWithSlippageFormatted,
+    amountUSDCFormatted
   };
 };
