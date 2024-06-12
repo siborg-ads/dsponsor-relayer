@@ -46,38 +46,48 @@ export async function getHolders(chainId, nftContractAddresses) {
   return ownerBalances;
 }
 
-export async function getSpendings(chainId) {
-  const getSpendingsQuery = /* GraphQL */ `
-    query getSpendings($fromTimestamp: BigInt, $toTimestamp: BigInt) {
-      marketplaceBids(
-        orderBy: creationTimestamp
-        orderDirection: asc
-        where: { creationTimestamp_gte: $fromTimestamp, creationTimestamp_lte: $toTimestamp }
+export async function getSpendings(chainId, fromTimestamp = "0", toTimestamp = "99999999999") {
+  const getBidsQuery = /* GraphQL */ `
+    query getBids(
+      $fromTimestamp: BigInt
+      $toTimestamp: BigInt
+      $firstBids: Int
+      $skipBids: Int
+      $firstListings: Int
+      $skipListings: Int
+    ) {
+      marketplaceListings(
+        first: $firstListings
+        skip: $skipListings
+        where: {
+          listingType: Auction
+          bids_: { creationTimestamp_gte: $fromTimestamp, creationTimestamp_lte: $toTimestamp }
+        }
       ) {
-        ...MarketplaceBidFragment
-        amountSentToCreator
-        creatorRecipient
-        amountSentToProtocol
-        amountSentToSeller
-        sellerRecipient
-        listing {
-          token {
-            tokenId
-            nftContract {
+        status
+        currency
+        token {
+          tokenId
+          mint {
+            tokenData
+          }
+          nftContract {
+            id
+            adOffers {
               id
-              adOffers {
-                id
-                name
-                metadataURL
-              }
+              metadataURL
+              name
             }
           }
         }
-      }
-      revenueTransactions(
-        where: { blockTimestamp_gte: $fromTimestamp, blockTimestamp_lte: $toTimestamp }
-      ) {
-        ...RevenueTransactionFragment
+        bids(first: $firstBids, skip: $skipBids, orderBy: creationTimestamp, orderDirection: desc) {
+          ...MarketplaceBidFragment
+          amountSentToCreator
+          creatorRecipient
+          amountSentToProtocol
+          amountSentToSeller
+          sellerRecipient
+        }
       }
     }
   `;
@@ -88,6 +98,7 @@ export async function getSpendings(chainId) {
     bidderAddr: "0x0000000000000000000000000000000000000000",
     listingId: "0"
   };
+  let totalBids = 0;
 
   const setupResult = (addr, currency) => {
     if (!result[addr]) {
@@ -140,39 +151,85 @@ export async function getSpendings(chainId) {
     }
   };
 
-  const graphResult = await executeQuery(chainId, getSpendingsQuery, {
-    fromTimestamp: "0",
-    toTimestamp: "9999999999999999"
-  });
+  let noMoreListings = false;
+  let noMoreBids = false;
+  const firstBids = 1000;
+  let skipBids = 0;
+  const firstListings = 1000;
+  let skipListings = 0;
 
-  for (const {
-    creationTimestamp,
-    bidder,
-    paidBidAmount,
-    refundProfit,
-    currency,
-    listing
-  } of graphResult.data.marketplaceBids) {
-    if (creationTimestamp > lastBid.blockTimestamp) {
-      lastBid.blockTimestamp = creationTimestamp;
-      lastBid.bidderAddr = bidder;
-      lastBid.listing = listing;
+  while (!noMoreListings) {
+    noMoreListings = true;
+    while (!noMoreBids) {
+      noMoreBids = true;
+      const graphResult = await executeQuery(chainId, getBidsQuery, {
+        fromTimestamp,
+        toTimestamp,
+        firstBids,
+        skipBids,
+        firstListings,
+        skipListings
+      });
+
+      const { marketplaceListings } = graphResult.data;
+
+      if (marketplaceListings.length) {
+        noMoreListings = false;
+
+        for (const { bids, ...listing } of marketplaceListings) {
+          if (bids.length) {
+            noMoreBids = false;
+
+            for (const {
+              creationTimestamp,
+              bidder,
+              paidBidAmount,
+              refundProfit,
+              currency
+            } of bids) {
+              totalBids += 1;
+
+              if (creationTimestamp > lastBid.blockTimestamp) {
+                lastBid.blockTimestamp = creationTimestamp;
+                lastBid.bidderAddr = bidder;
+                lastBid.listing = listing;
+              }
+
+              setupResult(bidder, currency);
+              result[bidder].nbBids += 1;
+
+              if (refundProfit > BigInt("0")) {
+                result[bidder]["currenciesAmounts"][currency].bidRefundReceived +=
+                  BigInt(refundProfit);
+                result[bidder]["currenciesAmounts"][currency].totalReceived += BigInt(refundProfit);
+                result[bidder].nbRefunds += 1;
+
+                const refundAmount = BigInt(paidBidAmount) + BigInt(refundProfit);
+                result[bidder]["currenciesAmounts"][currency].bidSpent -= refundAmount;
+                result[bidder]["currenciesAmounts"][currency].totalSpent += refundAmount;
+              } else {
+                result[bidder]["currenciesAmounts"][currency].bidSpent += BigInt(paidBidAmount);
+                result[bidder]["currenciesAmounts"][currency].totalSpent += BigInt(paidBidAmount);
+              }
+            }
+          }
+        }
+      }
+      skipBids += firstBids;
     }
-
-    setupResult(bidder, currency);
-    result[bidder].nbBids += 1;
-
-    if (refundProfit > BigInt("0")) {
-      result[bidder]["currenciesAmounts"][currency].bidRefundReceived += BigInt(refundProfit);
-      result[bidder]["currenciesAmounts"][currency].totalReceived += BigInt(refundProfit);
-      result[bidder].nbRefunds += 1;
-    } else {
-      result[bidder]["currenciesAmounts"][currency].bidSpent += BigInt(paidBidAmount);
-      result[bidder]["currenciesAmounts"][currency].totalSpent += BigInt(paidBidAmount);
-    }
+    skipListings += firstListings;
   }
 
+  ////////////////////////////////
+
   /* @todo
+revenueTransactions(
+        where: { blockTimestamp_gte: $fromTimestamp, blockTimestamp_lte: $toTimestamp }
+      ) {
+        ...RevenueTransactionFragment
+      }
+
+
   for (const {
     marketplaceBids,
     marketplaceDirectBuys,
@@ -202,5 +259,5 @@ export async function getSpendings(chainId) {
     // delete result[addr]["currenciesAmounts"];
   }
 
-  return { lastBid, spendings: result };
+  return { totalBids, lastBid, spendings: result };
 }

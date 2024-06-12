@@ -16,17 +16,16 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
       minimalBidBps,
       previousBidAmountBps
     } = config[chainId].smartContracts.DSPONSOR_MARKETPLACE || {};
-    const { reservePricePerToken, buyoutPricePerToken, bids, currency, token } = listing || {};
+    const { reservePricePerToken, buyoutPricePerToken, bids, token } = listing || {};
 
     nftContract = token?.nftContract?.royalty ? token.nftContract : nftContract;
 
     const { royalty } = nftContract || {};
     let { bps: royaltyBps } = royalty || {};
 
-    let { quantity } = listing;
-
-    // if (!quantity) quantity = "1";
-    // if (!royaltyBps) royaltyBps = "0";
+    let { quantity, currency } = listing;
+    if (!quantity && bids && bids[0]) quantity = bids[0].quantity;
+    if (!currency && bids && bids[0]) currency = bids[0].currency;
 
     const { decimals, symbol, priceUSDC, priceUSDCFormatted } = currency
       ? (await getCurrencyInfos(chainId, currency)) || {}

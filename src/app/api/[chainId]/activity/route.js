@@ -17,7 +17,7 @@ export async function GET(request, context) {
   const nftContractAddresses = allOffers.map((offer) => offer.nftContract.id);
 
   const holders = await getHolders(chainId, nftContractAddresses);
-  const { lastBid, spendings } = await getSpendings(chainId);
+  const { lastBid, totalBids, spendings } = await getSpendings(chainId);
 
   const setupResultAddr = (addr) => {
     if (!result[addr]) {
@@ -121,6 +121,7 @@ export async function GET(request, context) {
     JSON.stringify(
       {
         lastUpdate: new Date().toJSON(),
+        totalBids,
         ...priceFormattedForAllValuesObject(6, { totalSpentUSDCAmount, totalBidRefundUSDCAmount }),
         nbHolders,
         lastBid: {
