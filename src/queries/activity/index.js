@@ -1,25 +1,41 @@
 import { Alchemy } from "alchemy-sdk";
-import { parseUnits } from "ethers";
+import { parseUnits, getAddress } from "ethers";
 import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
 import { getCurrencyInfos, priceFormattedForAllValuesObject } from "@/utils";
 
 export async function getAllOffers(chainId) {
-  const geAllOffersQuery = /* GraphQL */ `
-    query getAllOffers {
-      adOffers {
-        ...BaseAdOfferFragment
-        nftContract {
-          id
+  let skip = 0;
+  let offers = [];
+  let hasMore = true;
+
+  while (hasMore) {
+    const geAllOffersQuery = /* GraphQL */ `
+      query getAllOffers($skip: Int!) {
+        adOffers(first: 1000, skip: $skip) {
+          ...BaseAdOfferFragment
+          nftContract {
+            id
+          }
         }
       }
+    `;
+    const graphResult = await executeQuery(chainId, geAllOffersQuery, { skip });
+
+    if (graphResult.data.adOffers.length > 0) {
+      hasMore = true;
+      offers = [...offers, ...graphResult.data.adOffers];
+    } else {
+      hasMore = false;
     }
-  `;
-  const graphResult = await executeQuery(chainId, geAllOffersQuery);
-  return graphResult.data.adOffers;
+
+    skip += 1000;
+  }
+
+  return offers;
 }
 
-export async function getHolders(chainId, nftContractAddresses) {
+export async function getHolders(chainId, nftContractAddresses, userAddress) {
   const settings = {
     apiKey: process.env.NEXT_ALCHEMY_API_KEY,
     network: config[chainId].network
@@ -34,7 +50,8 @@ export async function getHolders(chainId, nftContractAddresses) {
       withTokenBalances: true
     });
 
-    for (const { ownerAddress, tokenBalances } of owners) {
+    for (let { ownerAddress, tokenBalances } of owners) {
+      ownerAddress = getAddress(ownerAddress);
       if (!ownerBalances[ownerAddress]) {
         ownerBalances[ownerAddress] = 0;
       }
@@ -43,54 +60,87 @@ export async function getHolders(chainId, nftContractAddresses) {
       }
     }
   }
-  return ownerBalances;
+  return userAddress
+    ? { [getAddress(userAddress)]: ownerBalances[getAddress(userAddress)] }
+    : ownerBalances;
 }
 
-export async function getSpendings(chainId, fromTimestamp = "0", toTimestamp = "99999999999") {
+export async function getSpendings(
+  chainId,
+  nftContractAddress,
+  userAddress,
+  fromTimestamp,
+  toTimestamp
+) {
+  nftContractAddress = nftContractAddress ? nftContractAddress.toLowerCase() : "";
+
+  if (!userAddress) userAddress = "";
+  if (!fromTimestamp) fromTimestamp = "0";
+  if (!toTimestamp) toTimestamp = "99999999999";
+
   const getBidsQuery = /* GraphQL */ `
     query getBids(
-      $fromTimestamp: BigInt
-      $toTimestamp: BigInt
-      $firstBids: Int
-      $skipBids: Int
-      $firstListings: Int
-      $skipListings: Int
+      $nftContractAddress: Bytes!
+      $userAddress: Bytes!
+      $fromTimestamp: BigInt!
+      $toTimestamp: BigInt!
+      $firstOffers: Int!
+      $skipOffers: Int!
+      $firstTokens: Int!
+      $skipTokens: Int!
     ) {
-      marketplaceListings(
-        first: $firstListings
-        skip: $skipListings
-        where: {
-          listingType: Auction
-          bids_: { creationTimestamp_gte: $fromTimestamp, creationTimestamp_lte: $toTimestamp }
-        }
+      adOffers(
+        first: $firstOffers
+        skip: $skipOffers
+        where: { nftContract_: { id_contains: $nftContractAddress } }
       ) {
-        status
-        currency
-        token {
-          tokenId
-          mint {
-            tokenData
-          }
-          nftContract {
-            id
-            adOffers {
-              id
-              metadataURL
-              name
+        id
+        metadataURL
+        name
+        nftContract {
+          id
+          tokens(first: $firstTokens, skip: $skipTokens) {
+            tokenId
+            mint {
+              tokenData
+            }
+            marketplaceListings(
+              first: 1000
+              orderBy: creationTimestamp
+              orderDirection: desc
+              where: {
+                listingType: Auction
+                bids_: {
+                  bidder_contains: $userAddress
+                  creationTimestamp_gte: $fromTimestamp
+                  creationTimestamp_lte: $toTimestamp
+                }
+              }
+            ) {
+              status
+              currency
+              bids(
+                first: 1000
+                orderBy: creationTimestamp
+                orderDirection: desc
+                where: { bidder_contains: $userAddress }
+              ) {
+                ...MarketplaceBidFragment
+              }
             }
           }
-        }
-        bids(first: $firstBids, skip: $skipBids, orderBy: creationTimestamp, orderDirection: desc) {
-          ...MarketplaceBidFragment
-          amountSentToCreator
-          creatorRecipient
-          amountSentToProtocol
-          amountSentToSeller
-          sellerRecipient
         }
       }
     }
   `;
+
+  let noMoreOffers = false;
+  let noMoreTokens = false;
+
+  const firstOffers = 1000;
+  let skipOffers = 0;
+  const firstTokens = 1000;
+  let skipTokens = 0;
 
   const result = {};
   const lastBid = {
@@ -151,73 +201,88 @@ export async function getSpendings(chainId, fromTimestamp = "0", toTimestamp = "
     }
   };
 
-  let noMoreListings = false;
-  let noMoreBids = false;
-  const firstBids = 1000;
-  let skipBids = 0;
-  const firstListings = 1000;
-  let skipListings = 0;
+  while (!noMoreOffers) {
+    noMoreOffers = true;
+    skipTokens = 0;
 
-  while (!noMoreListings) {
-    noMoreListings = true;
-    while (!noMoreBids) {
-      noMoreBids = true;
+    while (!noMoreTokens) {
+      noMoreTokens = true;
       const graphResult = await executeQuery(chainId, getBidsQuery, {
+        nftContractAddress,
+        userAddress,
         fromTimestamp,
         toTimestamp,
-        firstBids,
-        skipBids,
-        firstListings,
-        skipListings
+        firstOffers,
+        skipOffers,
+        firstTokens,
+        skipTokens
       });
 
-      const { marketplaceListings } = graphResult.data;
+      const { adOffers } = graphResult.data;
 
-      if (marketplaceListings.length) {
-        noMoreListings = false;
+      if (adOffers.length) {
+        noMoreOffers = false;
 
-        for (const { bids, ...listing } of marketplaceListings) {
-          if (bids.length) {
-            noMoreBids = false;
+        for (const {
+          id: offerId,
+          nftContract: { id: contractAddress, tokens }
+        } of adOffers) {
+          if (tokens.length) {
+            noMoreTokens = false;
 
-            for (const {
-              creationTimestamp,
-              bidder,
-              paidBidAmount,
-              refundProfit,
-              currency
-            } of bids) {
-              totalBids += 1;
+            for (const { tokenId, mint, metadata, marketplaceListings } of tokens) {
+              const tokenData = mint ? mint.tokenData : null;
 
-              if (creationTimestamp > lastBid.blockTimestamp) {
-                lastBid.blockTimestamp = creationTimestamp;
-                lastBid.bidderAddr = bidder;
-                lastBid.listing = listing;
-              }
+              for (const { bids } of marketplaceListings) {
+                if (bids.length) {
+                  noMoreTokens = false;
 
-              setupResult(bidder, currency);
-              result[bidder].nbBids += 1;
+                  for (const {
+                    creationTimestamp,
+                    bidder,
+                    paidBidAmount,
+                    refundProfit,
+                    currency
+                  } of bids) {
+                    totalBids += 1;
 
-              if (refundProfit > BigInt("0")) {
-                result[bidder]["currenciesAmounts"][currency].bidRefundReceived +=
-                  BigInt(refundProfit);
-                result[bidder]["currenciesAmounts"][currency].totalReceived += BigInt(refundProfit);
-                result[bidder].nbRefunds += 1;
+                    if (creationTimestamp > lastBid.blockTimestamp) {
+                      lastBid.blockTimestamp = creationTimestamp;
+                      lastBid.bidderAddr = bidder;
+                      lastBid.listing = { tokenId, contractAddress, offerId, tokenData, metadata };
+                    }
 
-                const refundAmount = BigInt(paidBidAmount) + BigInt(refundProfit);
-                result[bidder]["currenciesAmounts"][currency].bidSpent -= refundAmount;
-                result[bidder]["currenciesAmounts"][currency].totalSpent += refundAmount;
-              } else {
-                result[bidder]["currenciesAmounts"][currency].bidSpent += BigInt(paidBidAmount);
-                result[bidder]["currenciesAmounts"][currency].totalSpent += BigInt(paidBidAmount);
+                    setupResult(bidder, currency);
+                    result[bidder].nbBids += 1;
+
+                    if (refundProfit > BigInt("0")) {
+                      result[bidder]["currenciesAmounts"][currency].bidRefundReceived +=
+                        BigInt(refundProfit);
+                      result[bidder]["currenciesAmounts"][currency].totalReceived +=
+                        BigInt(refundProfit);
+                      result[bidder].nbRefunds += 1;
+
+                      result[bidder]["currenciesAmounts"][currency].bidSpent -=
+                        BigInt(refundProfit);
+                      result[bidder]["currenciesAmounts"][currency].totalSpent +=
+                        BigInt(refundProfit);
+                    } else {
+                      result[bidder]["currenciesAmounts"][currency].bidSpent +=
+                        BigInt(paidBidAmount);
+                      result[bidder]["currenciesAmounts"][currency].totalSpent +=
+                        BigInt(paidBidAmount);
+                    }
+                  }
+                }
               }
             }
           }
         }
+        skipTokens += firstTokens;
       }
-      skipBids += firstBids;
     }
-    skipListings += firstListings;
+
+    skipOffers += firstOffers;
   }
 
   ////////////////////////////////

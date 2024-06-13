@@ -9,15 +9,34 @@ BigInt.prototype.toJSON = function () {
 
 export async function GET(request, context) {
   const { chainId } = context.params;
-  const provider = new ethers.JsonRpcProvider(config[1].rpcURL);
+
+  const requestUrl = new URL(`${request.url}`);
+  const searchParams = requestUrl.searchParams;
+  const fromTimestamp = searchParams.get("fromTimestamp");
+  const toTimestamp = searchParams.get("toTimestamp");
+  const userAddress = searchParams.get("userAddress");
+  const nftContractAddress = searchParams.get("nftContractAddress");
+
+  const provider = new ethers.JsonRpcProvider(config[1].rpcURL); // ethereum RPC for ENS
+
+  let nftContractAddresses = [];
+  if (!nftContractAddress) {
+    const allOffers = await getAllOffers(chainId);
+    nftContractAddresses = allOffers.map((offer) => offer.nftContract.id);
+  } else {
+    nftContractAddresses = nftContractAddress.split(",");
+  }
+
+  const holders = await getHolders(chainId, nftContractAddresses, userAddress);
+  const { lastBid, totalBids, spendings } = await getSpendings(
+    chainId,
+    nftContractAddress,
+    userAddress,
+    fromTimestamp,
+    toTimestamp
+  );
 
   const result = {};
-
-  const allOffers = await getAllOffers(chainId);
-  const nftContractAddresses = allOffers.map((offer) => offer.nftContract.id);
-
-  const holders = await getHolders(chainId, nftContractAddresses);
-  const { lastBid, totalBids, spendings } = await getSpendings(chainId);
 
   const setupResultAddr = (addr) => {
     if (!result[addr]) {

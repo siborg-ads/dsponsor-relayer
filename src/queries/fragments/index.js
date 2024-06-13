@@ -94,6 +94,12 @@ export const AdProposalFragment = /* GraphQL */ `
 
 export const MarketplaceBidFragment = /* GraphQL */ `
   fragment MarketplaceBidFragment on MarketplaceBid {
+    amountSentToCreator
+    creatorRecipient
+    amountSentToProtocol
+    amountSentToSeller
+    sellerRecipient
+    ####
     creationTxHash
     creationTimestamp
     bidder
@@ -114,6 +120,14 @@ export const RevenueTransactionFragment = /* GraphQL */ `
 
     marketplaceBids {
       ...MarketplaceBidFragment
+      listing {
+        currency
+        token {
+          nftContract {
+            id
+          }
+        }
+      }
     }
     marketplaceDirectBuys {
       totalPricePaid
@@ -168,7 +182,12 @@ export const TokenFragment = /* GraphQL */ `
   fragment TokenFragment on Token {
     tokenId
     setInAllowList
-    marketplaceListings(where: { status: CREATED }) {
+    marketplaceListings(
+      first: 1000
+      orderBy: lastUpdateTimestamp
+      orderDirection: desc
+      where: { status: CREATED }
+    ) {
       id
       quantity
       listingType
