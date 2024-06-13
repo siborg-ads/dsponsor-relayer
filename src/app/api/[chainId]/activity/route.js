@@ -1,4 +1,7 @@
-import { ethers, getAddress } from "ethers";
+import {
+  // ethers,
+  getAddress
+} from "ethers";
 import config from "@/config";
 import { getAllOffers, getHolders, getSpendings } from "@/queries/activity";
 import { priceFormattedForAllValuesObject } from "@/utils/string";
@@ -17,18 +20,23 @@ export async function GET(request, context) {
   const userAddress = searchParams.get("userAddress");
   const nftContractAddress = searchParams.get("nftContractAddress");
 
-  const provider = new ethers.JsonRpcProvider(config[1].rpcURL); // ethereum RPC for ENS
+  const fetchOptions = {
+    next: { revalidate }
+  };
+
+  // const provider = new ethers.JsonRpcProvider(config[1].rpcURL); // ethereum RPC for ENS
 
   let nftContractAddresses = [];
   if (!nftContractAddress) {
-    const allOffers = await getAllOffers(chainId);
+    const allOffers = await getAllOffers(fetchOptions, chainId);
     nftContractAddresses = allOffers.map((offer) => offer.nftContract.id);
   } else {
     nftContractAddresses = nftContractAddress.split(",");
   }
 
   const holders = await getHolders(chainId, nftContractAddresses, userAddress);
-  const { lastBid, totalBids, spendings } = await getSpendings(
+  const { lastBid, totalBids, spendings, protocolFees, fetchDate } = await getSpendings(
+    fetchOptions,
     chainId,
     nftContractAddress,
     userAddress,
@@ -113,13 +121,28 @@ export async function GET(request, context) {
     .sort((a, b) => b.usdcAmounts.bidRefundReceived > a.usdcAmounts.bidRefundReceived)
     .map((e, i) => ({ ...e, bidRefundsRank: i + 1 }));
 
+  resultArray = resultArray
+    .sort((a, b) => {
+      if (a.usdcAmounts.totalProtocolFee > b.usdcAmounts.totalProtocolFee) {
+        return -1;
+      }
+      if (a.usdcAmounts.totalProtocolFee < b.usdcAmounts.totalProtocolFee) {
+        return 1;
+      }
+      return 0;
+    })
+    .map((e, i) => ({ ...e, totalProtocolFeeRank: i + 1 }));
+
   let nbHolders = 0;
+  let nbRevenueCalls = 0;
   let totalSpentUSDCAmount = BigInt("0");
   let totalBidRefundUSDCAmount = BigInt("0");
+  let totalProtocolRevenueUSDCAmount = BigInt("0");
 
   resultArray = await Promise.all(
     resultArray.map(async (e) => {
-      e.ens = await provider.lookupAddress(e.addr);
+      e.ens = null;
+      // e.ens = await provider.lookupAddress(e.addr);
       e.displayAddr = e.ens ? e.ens : e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
       if (e.balance > 0) nbHolders += 1;
       totalSpentUSDCAmount += e.usdcAmounts.totalSpent;
@@ -130,18 +153,35 @@ export async function GET(request, context) {
   );
 
   const lastBidderEns = lastBid.bidderAddr
-    ? await provider.lookupAddress(lastBid.bidderAddr)
+    ? // ? await provider.lookupAddress(lastBid.bidderAddr)
+      lastBid.bidderAddr
     : null;
   const lastBidderDisplayAddr = lastBidderEns
     ? lastBidderEns
     : lastBid.bidderAddr.slice(0, 6) + "..." + lastBid.bidderAddr.slice(-4);
 
+  const lastUpdate = new Date().toJSON();
+
+  const lastActivities = Object.values(protocolFees)
+    .sort((a, b) => b.blockTimestamp - a.blockTimestamp)
+    .map((e) => {
+      nbRevenueCalls += 1;
+      totalProtocolRevenueUSDCAmount += e.usdcAmount;
+      return { ...e, date: new Date(e.blockTimestamp * 1000) };
+    });
+
   return new Response(
     JSON.stringify(
       {
-        lastUpdate: new Date().toJSON(),
+        fetchDate,
+        lastUpdate,
         totalBids,
-        ...priceFormattedForAllValuesObject(6, { totalSpentUSDCAmount, totalBidRefundUSDCAmount }),
+        ...priceFormattedForAllValuesObject(6, {
+          totalProtocolRevenueUSDCAmount,
+          totalSpentUSDCAmount,
+          totalBidRefundUSDCAmount
+        }),
+        nbRevenueCalls,
         nbHolders,
         lastBid: {
           ...lastBid,
@@ -149,6 +189,7 @@ export async function GET(request, context) {
           lastBidderEns,
           date: new Date(lastBid.blockTimestamp * 1000)
         },
+        lastActivities,
         rankings: resultArray
       },
       null,
@@ -162,4 +203,4 @@ export async function GET(request, context) {
   );
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // 15 minutes

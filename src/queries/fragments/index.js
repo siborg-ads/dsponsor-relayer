@@ -36,6 +36,9 @@ const BaseNftContractFragment = /* GraphQL */ `
 
 const BaseProtocolFeesFragment = /* GraphQL */ `
   fragment BaseProtocolFeesFragment on CallWithProtocolFee {
+    id
+    blockTimestamp
+    transactionHash
     currency
     fee
     enabler

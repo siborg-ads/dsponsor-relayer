@@ -4,7 +4,7 @@ import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
 import { getCurrencyInfos, priceFormattedForAllValuesObject } from "@/utils";
 
-export async function getAllOffers(chainId) {
+export async function getAllOffers(fetchOptions, chainId) {
   let skip = 0;
   let offers = [];
   let hasMore = true;
@@ -20,7 +20,7 @@ export async function getAllOffers(chainId) {
         }
       }
     `;
-    const graphResult = await executeQuery(chainId, geAllOffersQuery, { skip });
+    const graphResult = await executeQuery(chainId, geAllOffersQuery, { skip }, fetchOptions);
 
     if (graphResult.data.adOffers.length > 0) {
       hasMore = true;
@@ -66,6 +66,7 @@ export async function getHolders(chainId, nftContractAddresses, userAddress) {
 }
 
 export async function getSpendings(
+  fetchOptions,
   chainId,
   nftContractAddress,
   userAddress,
@@ -78,8 +79,27 @@ export async function getSpendings(
   if (!fromTimestamp) fromTimestamp = "0";
   if (!toTimestamp) toTimestamp = "99999999999";
 
-  const getBidsQuery = /* GraphQL */ `
-    query getBids(
+  const getSpendingsQuery = /* GraphQL */ `
+    fragment RevenueTransactionFragmentFiltering on RevenueTransaction {
+      protocolFees(
+        where: {
+          and: [
+            { blockTimestamp_gte: $fromTimestamp }
+            { blockTimestamp_lte: $toTimestamp }
+            {
+              or: [
+                { enabler_contains: $userAddress }
+                { spender_contains: $userAddress }
+                { referralAdditionalInformation_contains: $userAddress }
+              ]
+            }
+          ]
+        }
+      ) {
+        ...BaseProtocolFeesFragment
+      }
+    }
+    query getSpendings(
       $nftContractAddress: Bytes!
       $userAddress: Bytes!
       $fromTimestamp: BigInt!
@@ -103,27 +123,32 @@ export async function getSpendings(
             tokenId
             mint {
               tokenData
-            }
-            marketplaceListings(
-              first: 1000
-              orderBy: creationTimestamp
-              orderDirection: desc
-              where: {
-                listingType: Auction
-                bids_: {
-                  bidder_contains: $userAddress
-                  creationTimestamp_gte: $fromTimestamp
-                  creationTimestamp_lte: $toTimestamp
-                }
+              revenueTransaction {
+                ...RevenueTransactionFragmentFiltering
               }
-            ) {
+            }
+            marketplaceListings(first: 1000, orderBy: creationTimestamp, orderDirection: desc) {
               status
               currency
+              directBuys {
+                revenueTransaction {
+                  ...RevenueTransactionFragmentFiltering
+                }
+              }
+              completedBid {
+                revenueTransaction {
+                  ...RevenueTransactionFragmentFiltering
+                }
+              }
               bids(
                 first: 1000
                 orderBy: creationTimestamp
                 orderDirection: desc
-                where: { bidder_contains: $userAddress }
+                where: {
+                  bidder_contains: $userAddress
+                  creationTimestamp_gte: $fromTimestamp
+                  creationTimestamp_lte: $toTimestamp
+                }
               ) {
                 ...MarketplaceBidFragment
               }
@@ -143,6 +168,7 @@ export async function getSpendings(
   let skipTokens = 0;
 
   const result = {};
+  const protocolFees = {};
   const lastBid = {
     blockTimestamp: 0,
     bidderAddr: "0x0000000000000000000000000000000000000000",
@@ -201,22 +227,65 @@ export async function getSpendings(
     }
   };
 
+  function processProtocolFee(protocolFeeObj, type) {
+    let {
+      id,
+      blockTimestamp,
+      transactionHash,
+      currency,
+      fee,
+      enabler,
+      spender,
+      referralAddresses
+    } = protocolFeeObj;
+
+    let refAddr = referralAddresses.length
+      ? referralAddresses[0]
+      : "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf";
+
+    enabler = getAddress(enabler);
+    spender = getAddress(spender);
+    refAddr = getAddress(refAddr);
+
+    [enabler, spender, refAddr].forEach((addr) => {
+      setupResult(addr, currency);
+      result[addr]["currenciesAmounts"][currency].totalProtocolFee += BigInt(fee);
+    });
+
+    protocolFees[id] = {
+      blockTimestamp,
+      transactionHash,
+      type,
+      currency,
+      fee,
+      enabler,
+      spender,
+      refAddr,
+      referralAddresses
+    };
+  }
+
   while (!noMoreOffers) {
     noMoreOffers = true;
     skipTokens = 0;
 
     while (!noMoreTokens) {
       noMoreTokens = true;
-      const graphResult = await executeQuery(chainId, getBidsQuery, {
-        nftContractAddress,
-        userAddress,
-        fromTimestamp,
-        toTimestamp,
-        firstOffers,
-        skipOffers,
-        firstTokens,
-        skipTokens
-      });
+      const graphResult = await executeQuery(
+        chainId,
+        getSpendingsQuery,
+        {
+          nftContractAddress,
+          userAddress,
+          fromTimestamp,
+          toTimestamp,
+          firstOffers,
+          skipOffers,
+          firstTokens,
+          skipTokens
+        },
+        fetchOptions
+      );
 
       const { adOffers } = graphResult.data;
 
@@ -231,13 +300,41 @@ export async function getSpendings(
             noMoreTokens = false;
 
             for (const { tokenId, mint, metadata, marketplaceListings } of tokens) {
-              const tokenData = mint ? mint.tokenData : null;
+              const { tokenData, revenueTransaction: revenueTransactionMint } = mint ? mint : {};
 
-              for (const { bids } of marketplaceListings) {
+              if (
+                revenueTransactionMint &&
+                revenueTransactionMint.protocolFees &&
+                revenueTransactionMint.protocolFees.length
+              ) {
+                for (const protocolFeeObj of revenueTransactionMint.protocolFees) {
+                  processProtocolFee(protocolFeeObj, "mint");
+                }
+              }
+
+              for (const { bids, directBuys, completedBid } of marketplaceListings) {
+                for (const { revenueTransaction } of directBuys) {
+                  if (revenueTransaction && revenueTransaction.protocolFees) {
+                    for (const protocolFeeObj of revenueTransaction.protocolFees) {
+                      processProtocolFee(protocolFeeObj, "buy");
+                    }
+                  }
+                }
+
+                if (
+                  completedBid &&
+                  completedBid.revenueTransaction &&
+                  completedBid.revenueTransaction.protocolFees
+                ) {
+                  for (const protocolFeeObj of completedBid.revenueTransaction.protocolFees) {
+                    processProtocolFee(protocolFeeObj, "auction");
+                  }
+                }
+
                 if (bids.length) {
                   noMoreTokens = false;
 
-                  for (const {
+                  for (let {
                     creationTimestamp,
                     bidder,
                     paidBidAmount,
@@ -252,6 +349,7 @@ export async function getSpendings(
                       lastBid.listing = { tokenId, contractAddress, offerId, tokenData, metadata };
                     }
 
+                    bidder = getAddress(bidder);
                     setupResult(bidder, currency);
                     result[bidder].nbBids += 1;
 
@@ -287,24 +385,6 @@ export async function getSpendings(
 
   ////////////////////////////////
 
-  /* @todo
-revenueTransactions(
-        where: { blockTimestamp_gte: $fromTimestamp, blockTimestamp_lte: $toTimestamp }
-      ) {
-        ...RevenueTransactionFragment
-      }
-
-
-  for (const {
-    marketplaceBids,
-    marketplaceDirectBuys,
-    marketplaceOffers,
-    mint,
-    protocolFees
-  } of graphResult.data.revenueTransactions) {
-  }
-    */
-
   for (const addr of Object.keys(result)) {
     for (const currency of Object.keys(result[addr]["currenciesAmounts"])) {
       const { symbol, decimals, priceUSDC } = await getCurrencyInfos(chainId, currency);
@@ -324,5 +404,21 @@ revenueTransactions(
     // delete result[addr]["currenciesAmounts"];
   }
 
-  return { totalBids, lastBid, spendings: result };
+  for (const protocolFeeId of Object.keys(protocolFees)) {
+    const { currency, fee } = protocolFees[protocolFeeId];
+    const { symbol, decimals, priceUSDC } = await getCurrencyInfos(chainId, currency);
+    const usdcAmount = (BigInt(priceUSDC) * BigInt(fee)) / parseUnits("1", decimals);
+    protocolFees[protocolFeeId] = {
+      ...protocolFees[protocolFeeId],
+      symbol,
+      decimals,
+      usdcAmount,
+      formattedAmounts: {
+        ...priceFormattedForAllValuesObject(decimals, { fee }),
+        ...priceFormattedForAllValuesObject(6, { usdcAmount })
+      }
+    };
+  }
+
+  return { totalBids, lastBid, spendings: result, protocolFees };
 }
