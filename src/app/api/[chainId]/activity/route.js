@@ -1,4 +1,5 @@
 import {
+  formatUnits,
   // ethers,
   getAddress
 } from "ethers";
@@ -34,15 +35,10 @@ export async function GET(request, context) {
     nftContractAddresses = nftContractAddress.split(",");
   }
 
-  const holders = await getHolders(chainId, nftContractAddresses, userAddress);
-  const { lastBid, totalBids, spendings, protocolFees, fetchDate } = await getSpendings(
-    fetchOptions,
-    chainId,
-    nftContractAddress,
-    userAddress,
-    fromTimestamp,
-    toTimestamp
-  );
+  const [holders, { lastBid, totalBids, spendings, protocolFees }] = await Promise.all([
+    getHolders(chainId, nftContractAddresses, userAddress),
+    getSpendings(fetchOptions, chainId, nftContractAddress, userAddress, fromTimestamp, toTimestamp)
+  ]);
 
   const result = {};
 
@@ -53,28 +49,13 @@ export async function GET(request, context) {
         balance: 0,
         //
         nbBids: 0,
-        nbWinningBids: 0,
         nbRefunds: 0,
-        nbSoldBids: 0,
-        nbBuys: 0,
-        nbSoldBuys: 0,
-        nbOffers: 0,
-        nbSoldOffers: 0,
-        nbMints: 0,
-        nbSoldMint: 0,
         usdcAmounts: {
           // total USDC
           totalSpent: BigInt("0"),
           totalReceived: BigInt("0"),
           bidSpent: BigInt("0"),
           bidRefundReceived: BigInt("0"),
-          bidReceived: BigInt("0"),
-          buySpent: BigInt("0"),
-          buyReceived: BigInt("0"),
-          offerSpent: BigInt("0"),
-          offerReceived: BigInt("0"),
-          mintSpent: BigInt("0"),
-          mintReceived: BigInt("0"),
           totalProtocolFee: BigInt("0")
         }
       };
@@ -121,8 +102,40 @@ export async function GET(request, context) {
     .sort((a, b) => b.usdcAmounts.bidRefundReceived > a.usdcAmounts.bidRefundReceived)
     .map((e, i) => ({ ...e, bidRefundsRank: i + 1 }));
 
+  const protocolFeeCurrency = config[chainId].smartContracts.WETH;
+  const valueToPoints = (value, currency) => {
+    // WETH ; decimals = 18 ; we want 1 WETH = 1000 points
+    return value && currency == protocolFeeCurrency.address
+      ? Number(formatUnits(value.toString(), 15))
+      : 0;
+  };
+
   resultArray = resultArray
     .sort((a, b) => {
+      const aAmount =
+        a?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
+      const bAmount =
+        b?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
+
+      if (aAmount > bAmount) {
+        return -1;
+      }
+      if (aAmount < bAmount) {
+        return 1;
+      }
+      return 0;
+    })
+    .map((e, i) => {
+      const totalProtocolFee =
+        e?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
+      const points = valueToPoints(totalProtocolFee, protocolFeeCurrency.address);
+
+      return { points, ...e, totalProtocolFeeRank: i + 1 };
+    });
+  /*
+  Above includes WETH only, 
+    PREVIOUS VERSION : include all currencies, total can change at anytime according to coin prices
+  .sort((a, b) => {
       if (a.usdcAmounts.totalProtocolFee > b.usdcAmounts.totalProtocolFee) {
         return -1;
       }
@@ -131,7 +144,8 @@ export async function GET(request, context) {
       }
       return 0;
     })
-    .map((e, i) => ({ ...e, totalProtocolFeeRank: i + 1 }));
+      .map((e, i) => ({ ...e, totalProtocolFeeRank: i + 1 })
+    */
 
   let nbHolders = 0;
   let nbRevenueCalls = 0;
@@ -141,9 +155,8 @@ export async function GET(request, context) {
 
   resultArray = await Promise.all(
     resultArray.map(async (e) => {
-      e.ens = null;
       // e.ens = await provider.lookupAddress(e.addr);
-      e.displayAddr = e.ens ? e.ens : e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
+      e.displayAddr = e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
       if (e.balance > 0) nbHolders += 1;
       totalSpentUSDCAmount += e.usdcAmounts.totalSpent;
       totalBidRefundUSDCAmount += e.usdcAmounts.bidRefundReceived;
@@ -167,14 +180,15 @@ export async function GET(request, context) {
     .map((e) => {
       nbRevenueCalls += 1;
       totalProtocolRevenueUSDCAmount += e.usdcAmount;
+      e.points = valueToPoints(e.fee, e.currency);
       return { ...e, date: new Date(e.blockTimestamp * 1000) };
     });
 
   return new Response(
     JSON.stringify(
       {
-        fetchDate,
         lastUpdate,
+        protocolFeeCurrency, // WETH
         totalBids,
         ...priceFormattedForAllValuesObject(6, {
           totalProtocolRevenueUSDCAmount,
@@ -186,7 +200,6 @@ export async function GET(request, context) {
         lastBid: {
           ...lastBid,
           lastBidderDisplayAddr,
-          lastBidderEns,
           date: new Date(lastBid.blockTimestamp * 1000)
         },
         lastActivities,
