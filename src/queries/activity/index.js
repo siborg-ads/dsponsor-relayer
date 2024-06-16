@@ -10,7 +10,7 @@ export async function getAllOffers(fetchOptions, chainId) {
   let hasMore = true;
 
   while (hasMore) {
-    const geAllOffersQuery = /* GraphQL */ `
+    const getAllOffersQuery = /* GraphQL */ `
       query getAllOffers($skip: Int!) {
         adOffers(first: 1000, skip: $skip) {
           ...BaseAdOfferFragment
@@ -20,7 +20,7 @@ export async function getAllOffers(fetchOptions, chainId) {
         }
       }
     `;
-    const graphResult = await executeQuery(chainId, geAllOffersQuery, { skip }, fetchOptions);
+    const graphResult = await executeQuery(chainId, getAllOffersQuery, { skip }, fetchOptions);
 
     if (graphResult.data.adOffers.length > 0) {
       hasMore = true;

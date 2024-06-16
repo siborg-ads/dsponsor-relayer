@@ -591,6 +591,194 @@ curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250
 
 </details>
 
+### Users activity
+
+Purpose: Retrieve all users activity
+
+|Method|Endpoint|Parameters|
+|--|--|--|
+|`GET`|`/activity`| `fromTimestamp` (optionnal), `toTimestamp` (optionnal), `userAddress` (optionnal), `nftContractAddress` (optionnal)|
+
+<details>
+
+<summary>
+ Example
+</summary>
+
+#### Request
+
+```bash
+curl 'https://relayer.dsponsor.com/api/11155111/activity?fromTimestamp=1718356967&toTimestamp=1718469107&userAddress=0x8333c1B5131CC694c3A238E41e50cbc236e73DbC&nftContractAddress=0x51A533E5FBc542B0Df00c352D8A8A65Fff1727ac'
+```
+
+#### Response
+
+```json
+{
+    "lastUpdate": "2024-06-16T15:49:41.464Z",
+    "protocolFeeCurrency": {
+        "address": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+        "decimals": 18,
+        "symbol": "WETH"
+    },
+    "totalBids": 6,
+    "totalProtocolRevenueUSDCAmount": "1.96",
+    "totalSpentUSDCAmount": "49.07",
+    "totalBidRefundUSDCAmount": "1.14",
+    "nbRevenueCalls": 2,
+    "nbHolders": 1,
+    "lastBid": {
+        "blockTimestamp": "1718458056",
+        "bidderAddr": "0x8333c1b5131cc694c3a238e41e50cbc236e73dbc",
+        "listingId": "0",
+        "listing": {
+            "tokenId": "110771216890900307486995680796878979552050216338441285842533727414245120540081",
+            "contractAddress": "0x51a533e5fbc542b0df00c352d8a8a65fff1727ac",
+            "offerId": "1",
+            "tokenData": "airdrop",
+            "metadata": {
+                "name": "#airdrop - Tokenized Ad Space",
+                "description": "Tokenized advertisement spaces link to the ticker 'airdrop' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'airdrop'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+                "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Aairdrop",
+                "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
+                "external_link": "",
+                "valid_from": "2024-05-01T00:00:00Z",
+                "valid_to": "2024-10-31T23:59:59Z",
+                "categories": [
+                    "Community",
+                    "NFT",
+                    "Crypto"
+                ],
+                "token_metadata": {
+                    "name": "#{tokenData} - Tokenized Ad Space",
+                    "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+                    "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
+                    "external_url": "",
+                    "attributes": [
+                        {
+                            "trait_type": "Search Query",
+                            "value": "{tokenData}"
+                        }
+                    ]
+                },
+                "external_url": "",
+                "attributes": [
+                    {
+                        "trait_type": "Search Query",
+                        "value": "airdrop"
+                    }
+                ]
+            }
+        },
+        "lastBidderDisplayAddr": "0x8333c1b5131cc694c3a238e41e50cbc236e73dbc",
+        "date": "2024-06-15T13:27:36.000Z"
+    },
+    "lastActivities": [
+        {
+            "blockTimestamp": "1718458056",
+            "transactionHash": "0x26263b34fe1a75d93008409f0217e0d29e62a8c2cda4e5e296d1c5915b5c384e",
+            "type": "auction",
+            "currency": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+            "fee": "11610000000000",
+            "enabler": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+            "spender": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+            "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
+            "referralAddresses": [
+                "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf"
+            ],
+            "symbol": "WETH",
+            "decimals": 18,
+            "usdcAmount": "1359388",
+            "formattedAmounts": {
+                "fee": "0.0₄1",
+                "usdcAmount": "1.36"
+            },
+            "points": 0.01161,
+            "date": "2024-06-15T13:27:36.000Z"
+        },
+        {
+            "blockTimestamp": "1718356968",
+            "transactionHash": "0xb39aa7b3b899841f913fd27874b427a7c6e04e46cdd69d53759a7b0b9ab1bd34",
+            "type": "auction",
+            "currency": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+            "fee": "599776",
+            "enabler": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+            "spender": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+            "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
+            "referralAddresses": [
+                "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf"
+            ],
+            "symbol": "USDC",
+            "decimals": 6,
+            "usdcAmount": "599776",
+            "formattedAmounts": {
+                "fee": "0.6",
+                "usdcAmount": "0.6"
+            },
+            "points": 0,
+            "date": "2024-06-14T09:22:48.000Z"
+        }
+    ],
+    "rankings": [
+        {
+            "points": 0.02322,
+            "addr": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+            "balance": 1,
+            "nbBids": 6,
+            "nbRefunds": 2,
+            "usdcAmounts": {
+                "totalSpent": "49.07",
+                "totalReceived": "1.14",
+                "bidSpent": "49.07",
+                "bidRefundReceived": "1.14",
+                "totalProtocolFee": "3.92"
+            },
+            "currenciesAmounts": {
+                "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14": {
+                    "totalSpent": "290250000000000",
+                    "totalReceived": "9750000000000",
+                    "bidSpent": "290250000000000",
+                    "bidRefundReceived": "9750000000000",
+                    "totalProtocolFee": "23220000000000",
+                    "formatted": {
+                        "symbol": "WETH",
+                        "priceUSDC": "117.1K",
+                        "totalSpent": "0.0₃3",
+                        "totalReceived": "0.0₄1",
+                        "bidSpent": "0.0₃3",
+                        "bidRefundReceived": "0.0₄1",
+                        "totalProtocolFee": "0.0₄2"
+                    }
+                },
+                "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8": {
+                    "totalSpent": "15090000",
+                    "totalReceived": "0",
+                    "bidSpent": "15090000",
+                    "bidRefundReceived": "0",
+                    "totalProtocolFee": "1199552",
+                    "formatted": {
+                        "symbol": "USDC",
+                        "priceUSDC": "1",
+                        "totalSpent": "15.09",
+                        "totalReceived": "0",
+                        "bidSpent": "15.09",
+                        "bidRefundReceived": "0",
+                        "totalProtocolFee": "1.2"
+                    }
+                }
+            },
+            "holdersRank": 1,
+            "spendersRank": 1,
+            "bidRefundsRank": 1,
+            "totalProtocolFeeRank": 1,
+            "displayAddr": "0x8333...3DbC"
+        }
+    ]
+}
+```
+
+</details>
+
 ### Ad spaces data for an offer
 
 Purpose: Retrieve data to display on sponsors' interfaces.
@@ -945,7 +1133,12 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
               reservePricePerToken
               currency
               bids {
-                totalBidAmount
+                creationTimestamp
+                creationTxHash                
+                bidder
+                status
+                paidBidAmount
+                refundProfit
               }
               token {
                 nftContract {
@@ -963,7 +1156,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
     }",
     "variables": {
       "offerId": "1",
-      "tokenId": "70911028637056523786970493276452604132158040694527975633897316670791746250845"
+      "tokenId": "11777442963095900354619381756649335357223894488042819701855156355147179312657"
     },
     "operationName": "OfferRequest"
   }'
@@ -991,7 +1184,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
               "currencySymbol": "USDC",
               "currencyDecimals": "6",
               "currencyPriceUSDC": "1000000",
-              "currencyPriceUSDCFormatted": "1.0",
+              "currencyPriceUSDCFormatted": "1",
               "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
               "protocolFeeBps": "400",
               "mintPriceStructure": {
@@ -1013,20 +1206,57 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
           ],
           "tokens": [
             {
-              "tokenId": "70911028637056523786970493276452604132158040694527975633897316670791746250845",
+              "tokenId": "11777442963095900354619381756649335357223894488042819701855156355147179312657",
               "mint": {
-                "blockTimestamp": "1717182936",
-                "tokenData": "ordinals"
+                "blockTimestamp": "1717182264",
+                "tokenData": "halving"
               },
               "prices": [],
               "marketplaceListings": [
                 {
-                  "id": "17",
+                  "id": "9",
                   "quantity": "1",
                   "buyoutPricePerToken": "100000000000000000000",
                   "reservePricePerToken": "15000000000000000",
                   "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-                  "bids": [],
+                  "bids": [
+                    {
+                      "creationTimestamp": "1717589772",
+                      "creationTxHash": "0x66ad3d1f74d5cf42b499358070a0bcb9eefe7c7e59ed9ab7ca278a9ada0b5bcd",
+                      "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
+                      "status": "CANCELLED",
+                      "paidBidAmount": "15000000000000000",
+                      "refundProfit": "750000000000000",
+                      "amountsFormatted": {
+                        "paidBidAmount": "0.015",
+                        "refundProfit": "0.0₃7"
+                      }
+                    },
+                    {
+                      "creationTimestamp": "1717592064",
+                      "creationTxHash": "0x996bd910880da0c5e4c98188a2b41aaf1dcfbacfd2d5a7c1b3291fcaff829426",
+                      "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
+                      "status": "CANCELLED",
+                      "paidBidAmount": "16500000000000000",
+                      "refundProfit": "37500000000000",
+                      "amountsFormatted": {
+                        "paidBidAmount": "0.017",
+                        "refundProfit": "0.0₄4"
+                      }
+                    },
+                    {
+                      "creationTimestamp": "1717592220",
+                      "creationTxHash": "0xfd76497bc453d9b3cb1a675c0500ec521c1124c6a81c46f2c8676ab7e1ae784d",
+                      "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
+                      "status": "CREATED",
+                      "paidBidAmount": "17325000000000000",
+                      "refundProfit": "0",
+                      "amountsFormatted": {
+                        "paidBidAmount": "0.017",
+                        "refundProfit": "0"
+                      }
+                    }
+                  ],
                   "token": {
                     "nftContract": {
                       "royalty": {
@@ -1038,8 +1268,8 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                   },
                   "currencySymbol": "WETH",
                   "currencyDecimals": "18",
-                  "currencyPriceUSDC": "717709127322",
-                  "currencyPriceUSDCFormatted": "717709.127322",
+                  "currencyPriceUSDC": "117087691120",
+                  "currencyPriceUSDCFormatted": "117.1K",
                   "marketplaceAddress": "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
                   "protocolFeeBps": "400",
                   "minimalBidBps": "1000",
@@ -1083,20 +1313,20 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                   "bidPriceStructureUsdcFormatted": {
                     "previousBidAmount": "0",
                     "previousPricePerToken": "0",
-                    "minimalBidPerToken": "10.8K",
-                    "minimalBuyoutPerToken": "71.8M",
-                    "newBidPerToken": "10.8K",
-                    "totalBidAmount": "10.8K",
+                    "minimalBidPerToken": "1.8K",
+                    "minimalBuyoutPerToken": "11.7M",
+                    "newBidPerToken": "1.8K",
+                    "totalBidAmount": "1.8K",
                     "refundBonusPerToken": "0",
                     "refundBonusAmount": "0",
                     "refundAmountToPreviousBidder": "0",
-                    "newPricePerToken": "10.8K",
-                    "newAmount": "10.8K",
-                    "newRefundBonusPerToken": "538.28",
-                    "newRefundBonusAmount": "538.28",
-                    "protocolFeeAmount": "430.63",
-                    "royaltyAmount": "742.83",
-                    "listerAmount": "9.6K"
+                    "newPricePerToken": "1.8K",
+                    "newAmount": "1.8K",
+                    "newRefundBonusPerToken": "87.82",
+                    "newRefundBonusAmount": "87.82",
+                    "protocolFeeAmount": "70.25",
+                    "royaltyAmount": "121.19",
+                    "listerAmount": "1.6K"
                   },
                   "buyPriceStructure": {
                     "buyoutPricePerToken": "100000000000000000000",
@@ -1111,17 +1341,17 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                     "protocolFeeBuyAmount": "4"
                   },
                   "buyPriceStructureUsdcFormatted": {
-                    "buyoutPricePerToken": "71.8M",
-                    "listerBuyAmount": "63.9M",
-                    "royaltiesBuyAmount": "5M",
-                    "protocolFeeBuyAmount": "2.9M"
+                    "buyoutPricePerToken": "11.7M",
+                    "listerBuyAmount": "10.4M",
+                    "royaltiesBuyAmount": "807.9K",
+                    "protocolFeeBuyAmount": "468.4K"
                   }
                 }
               ],
               "metadata": {
-                "name": "#ordinals - Tokenized Ad Space",
-                "description": "Tokenized advertisement spaces link to the ticker 'ordinals' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'ordinals'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Aordinals",
+                "name": "#halving - Tokenized Ad Space",
+                "description": "Tokenized advertisement spaces link to the ticker 'halving' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'halving'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
+                "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Ahalving",
                 "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
                 "external_link": "",
                 "valid_from": "2024-05-01T00:00:00Z",
@@ -1147,7 +1377,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                 "attributes": [
                   {
                     "trait_type": "Search Query",
-                    "value": "ordinals"
+                    "value": "halving"
                   }
                 ]
               }

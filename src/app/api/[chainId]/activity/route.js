@@ -22,7 +22,7 @@ export async function GET(request, context) {
   const nftContractAddress = searchParams.get("nftContractAddress");
 
   const fetchOptions = {
-    next: { revalidate }
+    // next: { revalidate }
   };
 
   // const provider = new ethers.JsonRpcProvider(config[1].rpcURL); // ethereum RPC for ENS
@@ -80,7 +80,12 @@ export async function GET(request, context) {
 
   let resultArray = Object.keys(result)
     .map((key) => result[key])
-    .filter((e) => !smartContractsAddresses.includes(e.addr));
+    .filter((e) => {
+      const isSCAddr = smartContractsAddresses.includes(e.addr);
+      const filterByUser = userAddress ? e.addr == userAddress : true;
+
+      return !isSCAddr && filterByUser;
+    });
 
   resultArray = resultArray
     .sort((a, b) => b.balance - a.balance)
@@ -176,6 +181,7 @@ export async function GET(request, context) {
   const lastUpdate = new Date().toJSON();
 
   const lastActivities = Object.values(protocolFees)
+
     .sort((a, b) => b.blockTimestamp - a.blockTimestamp)
     .map((e) => {
       nbRevenueCalls += 1;
@@ -210,10 +216,11 @@ export async function GET(request, context) {
     ),
     {
       headers: {
-        "content-type": "application/json"
+        "content-type": "application/json",
+        "CDN-Cache-Control": "public, s-maxage=600, stale-while-revalidate=60"
       }
     }
   );
 }
 
-export const revalidate = 900; // 15 minutes
+export const revalidate = 900; // 15 minutes - may be useless
