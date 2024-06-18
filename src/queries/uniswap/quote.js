@@ -5,9 +5,13 @@ import Quoter from "@uniswap/v3-periphery/artifacts/contracts/lens/QuoterV2.sol/
 
 export const getEthQuote = async (chainId, tokenOutAddr, amountOut, slippagePerCent = 0.3) => {
   const uniswapV3QuoterAddr = config?.[chainId]?.smartContracts?.UNISWAP_QUOTER?.address;
-  const WETH_ADDR = config?.[chainId]?.smartContracts?.WETH?.address;
+  const WNATIVE_ADDR = config?.[chainId]?.smartContracts?.WNATIVE?.address;
   const USDC_ADDR = config?.[chainId]?.smartContracts?.USDC?.address;
   const rpcURL = config?.[chainId]?.rpcURL;
+
+  const supportedCurrencies = Object.keys(config?.[chainId]?.smartContracts).map((key) =>
+    getAddress(config?.[chainId]?.smartContracts[key]?.address)
+  );
 
   let amountInEth = "0";
   let amountInEthWithSlippage = "0";
@@ -15,41 +19,46 @@ export const getEthQuote = async (chainId, tokenOutAddr, amountOut, slippagePerC
 
   try {
     if (tokenOutAddr === "0x0000000000000000000000000000000000000000") {
-      tokenOutAddr = config?.[chainId]?.smartContracts?.WNATIVE?.address || WETH_ADDR;
+      tokenOutAddr = WNATIVE_ADDR;
     }
+
+    tokenOutAddr = getAddress(tokenOutAddr);
 
     if (slippagePerCent < 0.01 || slippagePerCent > 100) slippagePerCent = 0.3;
 
-    const provider = new ethers.JsonRpcProvider(rpcURL);
-    const signer = ethers.Wallet.createRandom().connect(provider);
+    if (supportedCurrencies.includes(tokenOutAddr)) {
+      const provider = new ethers.JsonRpcProvider(rpcURL);
+      const signer = ethers.Wallet.createRandom().connect(provider);
 
-    const quoterContract = new ethers.Contract(uniswapV3QuoterAddr, Quoter.abi, signer);
+      const quoterContract = new ethers.Contract(uniswapV3QuoterAddr, Quoter.abi, signer);
 
-    [amountInEth] =
-      getAddress(tokenOutAddr) === getAddress(WETH_ADDR) ||
-      tokenOutAddr === "0x0000000000000000000000000000000000000000"
-        ? [BigInt(amountOut.toString())]
-        : await quoterContract.quoteExactOutputSingle.staticCall({
-            tokenIn: WETH_ADDR,
-            tokenOut: tokenOutAddr,
-            fee: 3000,
-            amount: amountOut,
-            sqrtPriceLimitX96: 0
-          });
+      [amountInEth] =
+        tokenOutAddr == WNATIVE_ADDR
+          ? [BigInt(amountOut.toString())]
+          : await quoterContract.quoteExactOutputSingle.staticCall({
+              tokenIn: WNATIVE_ADDR,
+              tokenOut: tokenOutAddr,
+              fee: 3000,
+              amount: amountOut,
+              sqrtPriceLimitX96: 0
+            });
 
-    [amountUSDC] = await quoterContract.quoteExactInputSingle.staticCall({
-      tokenIn: WETH_ADDR,
-      tokenOut: USDC_ADDR,
-      fee: 3000,
-      amountIn: amountInEth,
-      sqrtPriceLimitX96: 0
-    });
+      [amountUSDC] = await quoterContract.quoteExactInputSingle.staticCall({
+        tokenIn: WNATIVE_ADDR,
+        tokenOut: USDC_ADDR,
+        fee: 3000,
+        amountIn: amountInEth,
+        sqrtPriceLimitX96: 0
+      });
 
-    const slippageMul = 10000;
-    const slippage = slippageMul + (slippagePerCent * slippageMul) / 100;
+      const slippageMul = 10000;
+      const slippage = slippageMul + (slippagePerCent * slippageMul) / 100;
 
-    amountInEthWithSlippage =
-      (amountInEth * BigInt(slippage.toString())) / BigInt(slippageMul.toString());
+      amountInEthWithSlippage =
+        tokenOutAddr == WNATIVE_ADDR
+          ? amountInEth
+          : (amountInEth * BigInt(slippage.toString())) / BigInt(slippageMul.toString());
+    }
   } catch (e) {
     console.error("Quote error", chainId, tokenOutAddr, amountOut, slippagePerCent);
   }

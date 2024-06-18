@@ -22,6 +22,7 @@ export async function GET(request, context) {
   const nftContractAddress = searchParams.get("nftContractAddress");
 
   const fetchOptions = {
+    populate: false
     // next: { revalidate }
   };
 
@@ -35,10 +36,18 @@ export async function GET(request, context) {
     nftContractAddresses = nftContractAddress.split(",");
   }
 
-  const [holders, { lastBid, totalBids, spendings, protocolFees }] = await Promise.all([
-    getHolders(chainId, nftContractAddresses, userAddress),
-    getSpendings(fetchOptions, chainId, nftContractAddress, userAddress, fromTimestamp, toTimestamp)
-  ]);
+  const [holders, { lastBid, totalBids, spendings, protocolFees, protocolFeeCurrency }] =
+    await Promise.all([
+      getHolders(chainId, nftContractAddresses, userAddress),
+      getSpendings(
+        fetchOptions,
+        chainId,
+        nftContractAddress,
+        userAddress,
+        fromTimestamp,
+        toTimestamp
+      )
+    ]);
 
   const result = {};
 
@@ -50,6 +59,9 @@ export async function GET(request, context) {
         //
         nbBids: 0,
         nbRefunds: 0,
+        nbProtocolFeeBuys: 0,
+        nbProtocolFeeSells: 0,
+        nbProtocolFeeReferrals: 0,
         usdcAmounts: {
           // total USDC
           totalSpent: BigInt("0"),
@@ -82,9 +94,13 @@ export async function GET(request, context) {
     .map((key) => result[key])
     .filter((e) => {
       const isSCAddr = smartContractsAddresses.includes(e.addr);
+      const isExcludedRankAddress = [
+        "0x9a7FAC267228f536A8f250E65d7C4CA7d39De766",
+        "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf"
+      ].includes(e.addr);
       const filterByUser = userAddress ? e.addr == userAddress : true;
 
-      return !isSCAddr && filterByUser;
+      return !isSCAddr && !isExcludedRankAddress && filterByUser;
     });
 
   resultArray = resultArray
@@ -107,11 +123,10 @@ export async function GET(request, context) {
     .sort((a, b) => b.usdcAmounts.bidRefundReceived > a.usdcAmounts.bidRefundReceived)
     .map((e, i) => ({ ...e, bidRefundsRank: i + 1 }));
 
-  const protocolFeeCurrency = config[chainId].smartContracts.WETH;
   const valueToPoints = (value, currency) => {
     // WETH ; decimals = 18 ; we want 1 WETH = 1000 points
     return value && currency == protocolFeeCurrency.address
-      ? Number(formatUnits(value.toString(), 15))
+      ? Number(Number(formatUnits(value.toString(), 13)).toFixed(0))
       : 0;
   };
 
@@ -190,37 +205,36 @@ export async function GET(request, context) {
       return { ...e, date: new Date(e.blockTimestamp * 1000) };
     });
 
-  return new Response(
-    JSON.stringify(
-      {
-        lastUpdate,
-        protocolFeeCurrency, // WETH
-        totalBids,
-        ...priceFormattedForAllValuesObject(6, {
-          totalProtocolRevenueUSDCAmount,
-          totalSpentUSDCAmount,
-          totalBidRefundUSDCAmount
-        }),
-        nbRevenueCalls,
-        nbHolders,
-        lastBid: {
-          ...lastBid,
-          lastBidderDisplayAddr,
-          date: new Date(lastBid.blockTimestamp * 1000)
-        },
-        lastActivities,
-        rankings: resultArray
-      },
-      null,
-      4
-    ),
+  const response = JSON.stringify(
     {
-      headers: {
-        "content-type": "application/json",
-        "CDN-Cache-Control": "public, s-maxage=600, stale-while-revalidate=60"
-      }
-    }
+      lastUpdate,
+      protocolFeeCurrency, // WETH
+      totalBids,
+      ...priceFormattedForAllValuesObject(6, {
+        totalProtocolRevenueUSDCAmount,
+        totalSpentUSDCAmount,
+        totalBidRefundUSDCAmount
+      }),
+      nbRevenueCalls,
+      nbHolders,
+      lastBid: {
+        ...lastBid,
+        lastBidderDisplayAddr,
+        date: new Date(lastBid.blockTimestamp * 1000)
+      },
+      lastActivities,
+      rankings: resultArray
+    },
+    null,
+    4
   );
+
+  return new Response(response, {
+    headers: {
+      "content-type": "application/json",
+      "CDN-Cache-Control": "public, s-maxage=600, stale-while-revalidate=60"
+    }
+  });
 }
 
 export const revalidate = 900; // 15 minutes - may be useless

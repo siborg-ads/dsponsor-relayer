@@ -676,11 +676,11 @@ curl 'https://relayer.dsponsor.com/api/11155111/activity?fromTimestamp=171835696
     "lastActivities": [
         {
             "blockTimestamp": "1718458056",
-            "transactionHash": "0x26263b34fe1a75d93008409f0217e0d29e62a8c2cda4e5e296d1c5915b5c384e",
+            "transactionHash": "0x26263b34fe1a75d93008409f0217e0d29e62a8c2cda4e5e296d1c5915b5c384f",
             "type": "auction",
             "currency": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
             "fee": "11610000000000",
-            "enabler": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+            "enabler": "0x628427629c3Ba817eCE0085DB11aF83c131D1F05",
             "spender": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
             "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
             "referralAddresses": [
@@ -726,6 +726,9 @@ curl 'https://relayer.dsponsor.com/api/11155111/activity?fromTimestamp=171835696
             "balance": 1,
             "nbBids": 6,
             "nbRefunds": 2,
+            "nbProtocolFeeBuys": 2,
+            "nbProtocolFeeSells": 1,
+            "nbProtocolFeeReferrals": 0,
             "usdcAmounts": {
                 "totalSpent": "49.07",
                 "totalReceived": "1.14",

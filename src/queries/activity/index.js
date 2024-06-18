@@ -7,30 +7,31 @@ import { getCurrencyInfos, priceFormattedForAllValuesObject } from "@/utils";
 export async function getAllOffers(fetchOptions, chainId) {
   let skip = 0;
   let offers = [];
-  let hasMore = true;
+  // let hasMore = true;
 
-  while (hasMore) {
-    const getAllOffersQuery = /* GraphQL */ `
-      query getAllOffers($skip: Int!) {
-        adOffers(first: 1000, skip: $skip) {
-          ...BaseAdOfferFragment
-          nftContract {
-            id
-          }
+  // @dev : no pagination for now
+  //  while (hasMore) {
+  const getAllOffersQuery = /* GraphQL */ `
+    query getAllOffers($skip: Int!) {
+      adOffers(first: 1000, skip: $skip) {
+        ...BaseAdOfferFragment
+        nftContract {
+          id
         }
       }
-    `;
-    const graphResult = await executeQuery(chainId, getAllOffersQuery, { skip }, fetchOptions);
-
-    if (graphResult.data.adOffers.length > 0) {
-      hasMore = true;
-      offers = [...offers, ...graphResult.data.adOffers];
-    } else {
-      hasMore = false;
     }
+  `;
+  const graphResult = await executeQuery(chainId, getAllOffersQuery, { skip }, fetchOptions);
 
-    skip += 1000;
+  if (graphResult.data.adOffers.length > 0) {
+    // hasMore = true;
+    offers = [...offers, ...graphResult.data.adOffers];
+  } else {
+    // hasMore = false;
   }
+
+  skip += 1000;
+  // }
 
   return offers;
 }
@@ -163,8 +164,8 @@ export async function getSpendings(
     }
   `;
 
-  let noMoreOffers = false;
-  let noMoreTokens = false;
+  // let noMoreOffers = false;
+  // let noMoreTokens = false;
 
   const firstOffers = 1000;
   let skipOffers = 0;
@@ -180,11 +181,16 @@ export async function getSpendings(
   };
   let totalBids = 0;
 
+  const protocolFeeCurrency = config[chainId].smartContracts.WETH;
+
   const setupResult = (addr, currency) => {
     if (!result[addr]) {
       result[addr] = {
         nbBids: 0,
         nbRefunds: 0,
+        nbProtocolFeeBuys: 0,
+        nbProtocolFeeSells: 0,
+        nbProtocolFeeReferrals: 0,
         usdcAmounts: {
           // total USDC
           totalSpent: BigInt("0"),
@@ -234,6 +240,12 @@ export async function getSpendings(
       result[addr]["currenciesAmounts"][currency].totalProtocolFee += BigInt(fee);
     });
 
+    if (currency === protocolFeeCurrency.address) {
+      result[enabler].nbProtocolFeeSells += 1;
+      result[spender].nbProtocolFeeBuys += 1;
+      result[refAddr].nbProtocolFeeReferrals += 1;
+    }
+
     protocolFees[id] = {
       blockTimestamp,
       transactionHash,
@@ -247,124 +259,122 @@ export async function getSpendings(
     };
   }
 
-  while (!noMoreOffers) {
-    noMoreOffers = true;
-    skipTokens = 0;
+  // @we disable the while loop for now - no need for pagination right now
+  // while (!noMoreOffers) {
+  // noMoreOffers = true;
+  // noMoreTokens = false;
+  skipTokens = 0;
 
-    while (!noMoreTokens) {
-      noMoreTokens = true;
-      const graphResult = await executeQuery(
-        chainId,
-        getSpendingsQuery,
-        {
-          nftContractAddress,
-          userAddress,
-          fromTimestamp,
-          toTimestamp,
-          firstOffers,
-          skipOffers,
-          firstTokens,
-          skipTokens
-        },
-        fetchOptions
-      );
+  // while (!noMoreTokens) {
+  // noMoreTokens = true;
 
-      const { adOffers } = graphResult.data;
+  const graphResult = await executeQuery(
+    chainId,
+    getSpendingsQuery,
+    {
+      nftContractAddress,
+      userAddress,
+      fromTimestamp,
+      toTimestamp,
+      firstOffers,
+      skipOffers,
+      firstTokens,
+      skipTokens
+    },
+    fetchOptions
+  );
 
-      if (adOffers.length) {
-        noMoreOffers = false;
+  const { adOffers } = graphResult.data;
 
-        for (const {
-          id: offerId,
-          nftContract: { id: contractAddress, tokens }
-        } of adOffers) {
-          if (tokens.length) {
-            noMoreTokens = false;
+  if (adOffers.length) {
+    // noMoreOffers = false;
 
-            for (const { tokenId, mint, metadata, marketplaceListings } of tokens) {
-              const { tokenData, revenueTransaction: revenueTransactionMint } = mint ? mint : {};
+    for (const {
+      id: offerId,
+      nftContract: { id: contractAddress, tokens }
+    } of adOffers) {
+      if (tokens.length) {
+        // noMoreTokens = false;
 
-              if (
-                revenueTransactionMint &&
-                revenueTransactionMint.protocolFees &&
-                revenueTransactionMint.protocolFees.length
-              ) {
-                for (const protocolFeeObj of revenueTransactionMint.protocolFees) {
-                  processProtocolFee(protocolFeeObj, "mint");
+        for (const { tokenId, mint, metadata, marketplaceListings } of tokens) {
+          const { tokenData, revenueTransaction: revenueTransactionMint } = mint ? mint : {};
+
+          if (
+            revenueTransactionMint &&
+            revenueTransactionMint.protocolFees &&
+            revenueTransactionMint.protocolFees.length
+          ) {
+            for (const protocolFeeObj of revenueTransactionMint.protocolFees) {
+              processProtocolFee(protocolFeeObj, "mint");
+            }
+          }
+
+          for (const { bids, directBuys, completedBid } of marketplaceListings) {
+            for (const { revenueTransaction } of directBuys) {
+              if (revenueTransaction && revenueTransaction.protocolFees) {
+                for (const protocolFeeObj of revenueTransaction.protocolFees) {
+                  processProtocolFee(protocolFeeObj, "buy");
                 }
               }
+            }
 
-              for (const { bids, directBuys, completedBid } of marketplaceListings) {
-                for (const { revenueTransaction } of directBuys) {
-                  if (revenueTransaction && revenueTransaction.protocolFees) {
-                    for (const protocolFeeObj of revenueTransaction.protocolFees) {
-                      processProtocolFee(protocolFeeObj, "buy");
-                    }
-                  }
+            if (
+              completedBid &&
+              completedBid.revenueTransaction &&
+              completedBid.revenueTransaction.protocolFees
+            ) {
+              for (const protocolFeeObj of completedBid.revenueTransaction.protocolFees) {
+                processProtocolFee(protocolFeeObj, "auction");
+              }
+            }
+
+            if (bids.length) {
+              // noMoreTokens = false;
+
+              for (let {
+                creationTimestamp,
+                bidder,
+                paidBidAmount,
+                refundProfit,
+                currency
+              } of bids) {
+                totalBids += 1;
+
+                if (creationTimestamp > lastBid.blockTimestamp) {
+                  lastBid.blockTimestamp = creationTimestamp;
+                  lastBid.bidderAddr = bidder;
+                  lastBid.listing = { tokenId, contractAddress, offerId, tokenData, metadata };
                 }
 
-                if (
-                  completedBid &&
-                  completedBid.revenueTransaction &&
-                  completedBid.revenueTransaction.protocolFees
-                ) {
-                  for (const protocolFeeObj of completedBid.revenueTransaction.protocolFees) {
-                    processProtocolFee(protocolFeeObj, "auction");
-                  }
-                }
+                bidder = getAddress(bidder);
+                currency = getAddress(currency);
+                setupResult(bidder, currency);
+                result[bidder].nbBids += 1;
 
-                if (bids.length) {
-                  noMoreTokens = false;
+                if (refundProfit > BigInt("0")) {
+                  result[bidder]["currenciesAmounts"][currency].bidRefundReceived +=
+                    BigInt(refundProfit);
+                  result[bidder]["currenciesAmounts"][currency].totalReceived +=
+                    BigInt(refundProfit);
+                  result[bidder].nbRefunds += 1;
 
-                  for (let {
-                    creationTimestamp,
-                    bidder,
-                    paidBidAmount,
-                    refundProfit,
-                    currency
-                  } of bids) {
-                    totalBids += 1;
-
-                    if (creationTimestamp > lastBid.blockTimestamp) {
-                      lastBid.blockTimestamp = creationTimestamp;
-                      lastBid.bidderAddr = bidder;
-                      lastBid.listing = { tokenId, contractAddress, offerId, tokenData, metadata };
-                    }
-
-                    bidder = getAddress(bidder);
-                    currency = getAddress(currency);
-                    setupResult(bidder, currency);
-                    result[bidder].nbBids += 1;
-
-                    if (refundProfit > BigInt("0")) {
-                      result[bidder]["currenciesAmounts"][currency].bidRefundReceived +=
-                        BigInt(refundProfit);
-                      result[bidder]["currenciesAmounts"][currency].totalReceived +=
-                        BigInt(refundProfit);
-                      result[bidder].nbRefunds += 1;
-
-                      result[bidder]["currenciesAmounts"][currency].bidSpent -=
-                        BigInt(refundProfit);
-                      result[bidder]["currenciesAmounts"][currency].totalSpent -=
-                        BigInt(refundProfit);
-                    } else {
-                      result[bidder]["currenciesAmounts"][currency].bidSpent +=
-                        BigInt(paidBidAmount);
-                      result[bidder]["currenciesAmounts"][currency].totalSpent +=
-                        BigInt(paidBidAmount);
-                    }
-                  }
+                  result[bidder]["currenciesAmounts"][currency].bidSpent -= BigInt(refundProfit);
+                  result[bidder]["currenciesAmounts"][currency].totalSpent -= BigInt(refundProfit);
+                } else {
+                  result[bidder]["currenciesAmounts"][currency].bidSpent += BigInt(paidBidAmount);
+                  result[bidder]["currenciesAmounts"][currency].totalSpent += BigInt(paidBidAmount);
                 }
               }
             }
           }
         }
-        skipTokens += firstTokens;
       }
     }
-
-    skipOffers += firstOffers;
+    skipTokens += firstTokens;
   }
+  // }
+  skipOffers += firstOffers;
+  //  }
 
   ////////////////////////////////
 
@@ -403,5 +413,5 @@ export async function getSpendings(
     };
   }
 
-  return { totalBids, lastBid, spendings: result, protocolFees };
+  return { totalBids, lastBid, spendings: result, protocolFees, protocolFeeCurrency };
 }
