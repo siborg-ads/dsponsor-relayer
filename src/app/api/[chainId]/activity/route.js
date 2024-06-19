@@ -125,9 +125,13 @@ export async function GET(request, context) {
 
   const valueToPoints = (value, currency) => {
     // WETH ; decimals = 18 ; we want 1 WETH = 1000 points
-    return value && currency == protocolFeeCurrency.address
-      ? Number(Number(formatUnits(value.toString(), 13)).toFixed(0))
-      : 0;
+
+    const points =
+      value && currency == protocolFeeCurrency.address
+        ? Number(formatUnits(value.toString(), 13))
+        : 0;
+
+    return points > 1 ? Number(points.toFixed(0)) : points;
   };
 
   resultArray = resultArray
