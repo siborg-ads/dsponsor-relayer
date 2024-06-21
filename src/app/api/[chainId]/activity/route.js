@@ -120,7 +120,15 @@ export async function GET(request, context) {
     .map((e, i) => ({ ...e, spendersRank: i + 1 }));
 
   resultArray = resultArray
-    .sort((a, b) => b.usdcAmounts.bidRefundReceived > a.usdcAmounts.bidRefundReceived)
+    .sort((a, b) => {
+      if (a.usdcAmounts.bidRefundReceived > b.usdcAmounts.bidRefundReceived) {
+        return -1;
+      }
+      if (a.usdcAmounts.bidRefundReceived < b.usdcAmounts.bidRefundReceived) {
+        return 1;
+      }
+      return 0;
+    })
     .map((e, i) => ({ ...e, bidRefundsRank: i + 1 }));
 
   const valueToPoints = (value, currency) => {
