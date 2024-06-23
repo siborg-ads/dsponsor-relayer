@@ -18,7 +18,9 @@ export async function GET(request, context) {
   const searchParams = requestUrl.searchParams;
   const fromTimestamp = searchParams.get("fromTimestamp");
   const toTimestamp = searchParams.get("toTimestamp");
-  const userAddress = searchParams.get("userAddress");
+  const userAddress = searchParams.get("userAddress")
+    ? getAddress(searchParams.get("userAddress"))
+    : null;
   const nftContractAddress = searchParams.get("nftContractAddress");
 
   const fetchOptions = {
@@ -197,6 +199,7 @@ export async function GET(request, context) {
     })
   );
 
+  lastBid.bidderAddr = lastBid.bidderAddr ? getAddress(lastBid.bidderAddr) : null;
   const lastBidderEns = lastBid.bidderAddr
     ? // ? await provider.lookupAddress(lastBid.bidderAddr)
       lastBid.bidderAddr
