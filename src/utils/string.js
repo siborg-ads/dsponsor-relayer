@@ -13,7 +13,7 @@ export function stringToUint256(s) {
   return BigInt(keccak256(toUtf8Bytes(normalizeString(s)))).toString();
 }
 
-export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
+export const priceFormattedForAllValuesObject = (decimals = 18, obj, negativeToZero = false) => {
   const res = {};
   const objKeys = Object.keys(obj);
 
@@ -21,9 +21,16 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj) => {
     if (obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
       try {
         let formatted = formatUnits(obj[key], decimals);
-        res[key] = formatted;
 
         let formattedNb = numeral(formatted).value();
+
+        if (negativeToZero && formattedNb < 0) {
+          formattedNb = 0;
+          formatted = "0";
+        }
+
+        res[key] = formatted;
+
         if (formattedNb < 0.001 && formattedNb > 0) {
           const [, precision] = formatted.split(".");
           const precisionSplit = precision.split("");

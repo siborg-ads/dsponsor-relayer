@@ -194,7 +194,8 @@ export async function GET(request, context) {
       if (e.balance > 0) nbHolders += 1;
       totalSpentUSDCAmount += e.usdcAmounts.totalSpent;
       totalBidRefundUSDCAmount += e.usdcAmounts.bidRefundReceived;
-      e.usdcAmounts = priceFormattedForAllValuesObject(6, e.usdcAmounts);
+      const negativeToZero = true;
+      e.usdcAmounts = priceFormattedForAllValuesObject(6, e.usdcAmounts, negativeToZero);
       return e;
     })
   );
