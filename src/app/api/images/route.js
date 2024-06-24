@@ -14,7 +14,7 @@ export async function GET(req) {
           width: "1080px",
           height: "1080px",
           backgroundImage:
-            "url('https://bafybeic6tte5wg5q2gdtgqihxza3g2bap2x7awziiybclzemr5qvbukfsq.ipfs.nftstorage.link/')",
+            "url('https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmdBodpqyrH6M8mYFrQNdokZMZArPfvY2cKoeHXKiSb4RQ')",
           backgroundSize: "cover",
           display: "flex",
           justifyContent: "flex-start",
