@@ -8,6 +8,58 @@ const config = {
     rpcURL: "https://ethereum-rpc.publicnode.com"
   },
 
+  // base
+  8453: {
+    chainName: "base",
+    network: Network.BASE_MAINNET,
+
+    appURL: "https://app.dsponsor.com",
+    creditsURL: "https://dsponsor.com",
+    explorerURL: "https://basescan.org",
+    relayerURL: process.env.NEXT_DEV_URL
+      ? process.env.NEXT_DEV_URL
+      : "https://relayer.dsponsor.com",
+    rpcURL: "https://mainnet.base.org",
+    subgraphURL: `https://gateway-arbitrum.network.thegraph.com/api/${process.env.THEGRAPH_API_KEY}/subgraphs/id/5VzXGF3GZBgtDcbMik1t9HgzNxL4do69ozgiJfMEFBSN`,
+
+    smartContracts: {
+      DSPONSOR_ADMIN: {
+        address: "0xC6cCe35375883872826DdF3C30557F16Ec4DD94c",
+        feeBps: "400"
+      },
+      DSPONSOR_MARKETPLACE: {
+        address: "0x86aDf604B5B72d270654F3A0798cabeBC677C7fc",
+        feeBps: "400",
+        minimalBidBps: "1000",
+        previousBidAmountBps: "500"
+      },
+      UNISWAP_QUOTER: {
+        address: "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a"
+      },
+      NATIVE: {
+        address: "0x0000000000000000000000000000000000000000",
+        decimals: 18,
+        symbol: "ETH"
+      },
+      WNATIVE: {
+        address: "0x4200000000000000000000000000000000000006",
+        decimals: 18,
+        symbol: "WETH"
+      },
+      USDC: {
+        address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        decimals: 6,
+        symbol: "USDC"
+      },
+      WETH: {
+        address: "0x4200000000000000000000000000000000000006",
+        decimals: 18,
+        symbol: "WETH",
+        isProtocolFeeCurrency: true
+      }
+    }
+  },
+
   // base-sepolia
   84532: {
     chainName: "base-sepolia",
@@ -76,11 +128,11 @@ const config = {
 
     smartContracts: {
       DSPONSOR_ADMIN: {
-        address: "0x22554D70702C60A5fa30297908005B6cE19eEf51",
+        address: "0x10E0447dDB66f1d33E6b10dB5099FBa231ceCE5C",
         feeBps: "400"
       },
       DSPONSOR_MARKETPLACE: {
-        address: "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
+        address: "0x0B7f100940f4152D01B42A626ab73f7A62dd7cdC",
         feeBps: "400",
         minimalBidBps: "1000",
         previousBidAmountBps: "500"

@@ -33,8 +33,6 @@ export async function executeQuery(chainId, query, variables, options) {
 
   const result = await request.json();
 
-  // console.log({ query, variables });
-
   const populate = typeof options?.populate === "undefined" ? true : options.populate;
   if (populate && result?.data) {
     await populateSubgraphResult(chainId, result);
