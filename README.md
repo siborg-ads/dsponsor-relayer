@@ -9,7 +9,7 @@ The Relayer App provides API endpoints and UI components for the [DSponsor ecosy
 ```
 NEXT_ALCHEMY_API_KEY=<your-alchemy-api-key>
 NEXT_DEV_URL=http://localhost:3000
-THEGRAPH_API_KEY=xxxxxxxx
+SUBGRAPH_ALCHEMY_KEY=xxxxxxxxxx
 ```
 
 2. Install dependencies and run the project:
