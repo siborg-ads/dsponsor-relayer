@@ -105,7 +105,9 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
       });
 
       if (secondaryTokenId) {
-        const { listingType } = _validatedAds[secondaryTokenId]._buy.secondary;
+        const { listingType, currencySymbol, buyoutPricePerToken, bidPriceStructureFormatted } =
+          _validatedAds[secondaryTokenId]._buy.secondary;
+        const { minimalBidPerToken } = bidPriceStructureFormatted || {};
 
         const action = listingType === "Direct" ? actions.BUY : actions.BID;
 
@@ -115,7 +117,8 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
             action={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txres`}
             target={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txdata/${action}`}
           >
-            {action}
+            {action} ({listingType === "Direct" ? buyoutPricePerToken : minimalBidPerToken}{" "}
+            {currencySymbol})
           </Button.Transaction>
         );
         intents.push(
