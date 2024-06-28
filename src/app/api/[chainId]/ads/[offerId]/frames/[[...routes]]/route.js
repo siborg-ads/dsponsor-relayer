@@ -75,8 +75,11 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
   }
 
   if (tokenDataInput || buttonValue == "tokenDataInput") {
+    items = ["none"];
+    image = `${config[chainId].relayerURL}/cover.jpg`;
     intents.push(<TextInput placeholder={tokenDataInput ? tokenDataInput : "..."} />);
     intents.push(<Button action={`/api/${chainId}/ads/${offerId}/frames`}>Lookup</Button>);
+    intents.push(<Button.Link href={`${config[chainId].appURL}`}>Marketplace</Button.Link>);
   }
 
   if (items.includes("sale")) {
@@ -165,6 +168,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
   }
 
   if (!image) {
+    /*
     image = (
       <Box grow alignVertical="center" backgroundColor="background" padding="32">
         <VStack gap="4">
@@ -175,6 +179,8 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
         </VStack>
       </Box>
     );
+    */
+    image = `${config[chainId].relayerURL}/reserved-1.91-1.png`;
     ratio = "1.91:1";
   }
   if (intents.length === 0) {
@@ -186,7 +192,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
   }
 
   const browserLocation =
-    _tokenIds && _tokenIds.length == 1
+    _tokenIds && _tokenIds.length == 1 && !tokenDataInput
       ? `${config[chainId].appURL}/${chainId}/offer/${offerId}/${_tokenIds[0]}`
       : `${config[chainId].appURL}/${chainId}/offer/${offerId}`;
 
