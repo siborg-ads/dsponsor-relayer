@@ -105,9 +105,12 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
       });
 
       if (secondaryTokenId) {
-        const { listingType, currencySymbol, buyoutPricePerToken, bidPriceStructureFormatted } =
+        const { listingType, buyoutPricePerToken, bidPriceStructure, currency } =
           _validatedAds[secondaryTokenId]._buy.secondary;
-        const { minimalBidPerToken } = bidPriceStructureFormatted || {};
+        const { minimalBidPerToken } = bidPriceStructure || {};
+
+        const amount = listingType === "Direct" ? buyoutPricePerToken : minimalBidPerToken;
+        const { amountInEthFormatted } = await getEthQuote(chainId, currency, amount);
 
         const action = listingType === "Direct" ? actions.BUY : actions.BID;
 
@@ -117,8 +120,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
             action={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txres`}
             target={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txdata/${action}`}
           >
-            {action} ({listingType === "Direct" ? buyoutPricePerToken : minimalBidPerToken}{" "}
-            {currencySymbol})
+            {action} (≈ {amountInEthFormatted} ETH)
           </Button.Transaction>
         );
         intents.push(
@@ -183,7 +185,17 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
     );
   }
 
+  const browserLocation =
+    _tokenIds && _tokenIds.length == 1
+      ? `${config[chainId].appURL}/${chainId}/offer/${offerId}/${_tokenIds[0]}`
+      : `${config[chainId].appURL}/${chainId}/offer/${offerId}`;
+
   return c.res({
+    title: "SiBorg Ads",
+    browserLocation,
+    headers: {
+      "cache-control": "max-age=0"
+    },
     image,
     imageAspectRatio: ratio,
     intents
