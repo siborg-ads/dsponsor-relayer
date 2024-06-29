@@ -24,10 +24,19 @@ export async function GET(request, context) {
 
   const alchemy = new Alchemy(settings);
 
-  const nftsForOwner = await alchemy.nft.getNftsForOwner(address);
+  let tokens = [];
+  let pageKey = null;
+
+  do {
+    const { ownedNfts, pageKey: newPageKey } = await alchemy.nft.getNftsForOwner(address, {
+      pageKey
+    });
+    pageKey = newPageKey;
+    tokens = tokens.concat(ownedNfts);
+  } while (pageKey);
 
   let possibleTokens = [];
-  for (const nft of nftsForOwner.ownedNfts) {
+  for (const nft of tokens) {
     if (nft.tokenId) {
       possibleTokens.push({
         tokenId: nft.tokenId,
