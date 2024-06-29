@@ -20,7 +20,8 @@ const config = {
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
     rpcURL: "https://mainnet.base.org",
-    subgraphURL: `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/d-media--737814/DSponsor/api`,
+    subgraphURL: `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/dsponsors-team--672881/dsponsor-subgraph/api`,
+    // `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/d-media--737814/DSponsor/api`,
     // `https://gateway-arbitrum.network.thegraph.com/api/${process.env.THEGRAPH_API_KEY}/subgraphs/id/5VzXGF3GZBgtDcbMik1t9HgzNxL4do69ozgiJfMEFBSN`,
 
     smartContracts: {
