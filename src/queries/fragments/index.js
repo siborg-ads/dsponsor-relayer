@@ -215,6 +215,30 @@ export const TokenFragment = /* GraphQL */ `
       currency
       amount
     }
+    currentProposals {
+      adOffer {
+        id
+      }
+      adParameter {
+        id
+      }
+      pendingProposal {
+        status
+        data
+        creationTimestamp
+      }
+      acceptedProposal {
+        status
+        data
+        creationTimestamp
+      }
+      rejectedProposal {
+        status
+        data
+        rejectReason
+        creationTimestamp
+      }
+    }
   }
 `;
 
