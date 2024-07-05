@@ -260,6 +260,7 @@ async function populateAdOffer(adOffer) {
     }
   }
 
+  /*
   if (!adOffer.metadata) {
     adOffer.metadata = {
       name: "Untitled",
@@ -267,6 +268,7 @@ async function populateAdOffer(adOffer) {
       image: "https://via.placeholder.com/500x500?text=Unknown"
     };
   }
+  */
 }
 
 export async function populateSubgraphResult(chainId, queryResult) {
