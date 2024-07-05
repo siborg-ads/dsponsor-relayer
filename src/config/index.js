@@ -19,7 +19,8 @@ const config = {
     relayerURL: process.env.NEXT_DEV_URL
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
-    rpcURL: "https://mainnet.base.org",
+    rpcURL: "https://rpc.shield3.com/v3/base-mainnet/yGiqtfXB245zW2C0FNN0U8Y9rI0oFN3OjwbOhNif/rpc",
+    // rpcURL: "https://mainnet.base.org",
     subgraphURL: `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/dsponsors-team--672881/dsponsor-subgraph/api`,
     // `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/d-media--737814/DSponsor/api`,
     // `https://gateway-arbitrum.network.thegraph.com/api/${process.env.THEGRAPH_API_KEY}/subgraphs/id/5VzXGF3GZBgtDcbMik1t9HgzNxL4do69ozgiJfMEFBSN`,
@@ -125,7 +126,8 @@ const config = {
     relayerURL: process.env.NEXT_DEV_URL
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
-    rpcURL: "https://ethereum-sepolia-rpc.publicnode.com",
+    rpcURL: "https://rpc.shield3.com/v3/sepolia/yGiqtfXB245zW2C0FNN0U8Y9rI0oFN3OjwbOhNif/rpc",
+    // rpcURL: "https://ethereum-sepolia-rpc.publicnode.com",
     subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest",
 
     smartContracts: {
