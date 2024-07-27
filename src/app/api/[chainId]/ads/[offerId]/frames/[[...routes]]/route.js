@@ -113,10 +113,12 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
         const { minimalBidPerToken } = bidPriceStructure || {};
 
         const amount = listingType === "Direct" ? buyoutPricePerToken : minimalBidPerToken;
+        const shield3Check = true;
         const { amountInEthFormatted, shield3Decisions } = await getEthQuote(
           chainId,
           currency,
-          amount
+          amount,
+          shield3Check
         );
 
         const action = listingType === "Direct" ? actions.BUY : actions.BID;
