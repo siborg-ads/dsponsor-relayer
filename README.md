@@ -1446,7 +1446,7 @@ Purpose: When paying by credit card or through a frame, only native payments are
 
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET`|`/prices`|`token` (required), `amount` (required), `splippage` (optionnal), `recipient` (optionnal)|
+|`GET`|`/prices`|`token` (required), `amount` (required), `splippage` (optionnal), `recipient` (optionnal), `check` (optionnal)|
 
 <details>
 
@@ -1514,7 +1514,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1
 #### Request
 
 ```bash
-curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x4200000000000000000000000000000000000006&amount=10000000000000000000&slippage=0.3'
+curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x4200000000000000000000000000000000000006&amount=10000000000000000000&slippage=0.3&check=shield3'
 ```
 
 #### Response
@@ -1565,7 +1565,7 @@ curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x420000000000000000000
 #### Request
 
 ```bash
-curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x4200000000000000000000000000000000000006&amount=1000000000&slippage=0.3&recipient=0x098b716b8aaf21512996dc57eb0615e2383e2f96'
+curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x4200000000000000000000000000000000000006&amount=1000000000&slippage=0.3&recipient=0x098b716b8aaf21512996dc57eb0615e2383e2f96&check=shield3'
 ```
 
 #### Response
