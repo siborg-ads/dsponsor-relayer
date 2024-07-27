@@ -70,8 +70,8 @@ export const getEthQuote = async (
 
       try {
         // Check if the transaction will be secure
-        // - we activated Uniswap trade slippage & amounts thresolds + Forta Scam & OFAC policies
-        // - it only works with Native thresold policy (and not ERC20 value & uniswap slippage)
+        // - we activated Uniswap trade slippage & amounts thresolds + OFAC policies
+        // - it does not work with ERC20 value & uniswap slippage
         //
         // TEST values:
         // recipient = "0x6aabdd49a7f97f5242fd0fd6938987e039827666" // forta block

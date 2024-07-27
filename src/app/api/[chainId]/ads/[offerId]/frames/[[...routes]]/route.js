@@ -119,8 +119,6 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
           amount
         );
 
-        console.log("shield3Decisions", shield3Decisions, amount, amountInEthFormatted);
-
         const action = listingType === "Direct" ? actions.BUY : actions.BID;
 
         const shield3BlockingDecision = shield3Decisions?.find(
