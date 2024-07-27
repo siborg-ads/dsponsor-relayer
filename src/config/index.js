@@ -5,7 +5,44 @@ const config = {
   1: {
     chainName: "ethereum",
     network: Network.ETH,
-    rpcURL: "https://ethereum-rpc.publicnode.com"
+    rpcURL: "https://ethereum-rpc.publicnode.com",
+    shield3RpcURL:
+      "https://rpc.shield3.com/v3/ethereum-mainnet/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
+
+    smartContracts: {
+      UNISWAP_QUOTER: {
+        address: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e"
+      },
+      UNISWAP_SWAP_ROUTER: {
+        address: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+      },
+      NATIVE: {
+        address: "0x0000000000000000000000000000000000000000",
+        decimals: 18,
+        symbol: "ETH"
+      },
+      WNATIVE: {
+        address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        decimals: 18,
+        symbol: "WETH"
+      },
+      UNI: {
+        address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        decimals: 18,
+        symbol: "UNI"
+      },
+      USDC: {
+        address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        decimals: 6,
+        symbol: "USDC"
+      },
+      WETH: {
+        address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        decimals: 18,
+        symbol: "WETH",
+        isProtocolFeeCurrency: true
+      }
+    }
   },
 
   // base
@@ -20,8 +57,9 @@ const config = {
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
     rpcURL: "https://mainnet.base.org",
+    shield3RpcURL:
+      "https://rpc.shield3.com/v3/base-mainnet/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
     subgraphURL: `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/dsponsors-team--672881/dsponsor-subgraph/api`,
-    // `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/d-media--737814/DSponsor/api`,
     // `https://gateway-arbitrum.network.thegraph.com/api/${process.env.THEGRAPH_API_KEY}/subgraphs/id/5VzXGF3GZBgtDcbMik1t9HgzNxL4do69ozgiJfMEFBSN`,
 
     smartContracts: {
@@ -37,6 +75,9 @@ const config = {
       },
       UNISWAP_QUOTER: {
         address: "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a"
+      },
+      UNISWAP_SWAP_ROUTER: {
+        address: "0x2626664c2603336E57B271c5C0b26F421741e481"
       },
       NATIVE: {
         address: "0x0000000000000000000000000000000000000000",
@@ -74,6 +115,8 @@ const config = {
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
     rpcURL: "https://sepolia.base.org",
+    shield3RpcURL:
+      "https://rpc.shield3.com/v3/base-sepolia/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
     subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-base-sepolia/version/latest",
 
     smartContracts: {
@@ -89,6 +132,9 @@ const config = {
       },
       UNISWAP_QUOTER: {
         address: "0xC5290058841028F1614F3A6F0F5816cAd0df5E27"
+      },
+      UNISWAP_SWAP_ROUTER: {
+        address: "0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4"
       },
       NATIVE: {
         address: "0x0000000000000000000000000000000000000000",
@@ -126,6 +172,8 @@ const config = {
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
     rpcURL: "https://ethereum-sepolia-rpc.publicnode.com",
+    shield3RpcURL:
+      "https://rpc.shield3.com/v3/sepolia/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
     subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest",
 
     smartContracts: {
@@ -141,6 +189,9 @@ const config = {
       },
       UNISWAP_QUOTER: {
         address: "0xEd1f6473345F45b75F8179591dd5bA1888cf2FB3"
+      },
+      UNISWAP_SWAP_ROUTER: {
+        address: "0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E"
       },
       NATIVE: {
         address: "0x0000000000000000000000000000000000000000",
@@ -162,7 +213,6 @@ const config = {
         decimals: 6,
         symbol: "USDC"
       },
-
       WETH: {
         address: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
         decimals: 18,

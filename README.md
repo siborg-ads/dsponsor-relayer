@@ -1436,18 +1436,22 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
 
 </details>
 
-### Price quotes
+### Price quote
 
-Purpose: Retrieve USD and ETH prices for a specific token from Uniswap.
+Purpose: When paying by credit card or through a frame, only native payments are possible. To mint, bid, or buy ad space tokens billed in another currency, a swap from ETH to the desired currency is performed by DSponsor smart contracts. This route provides all the necessary information to complete a purchase with ETH.
+
+1. Retrieves USD and ETH prices for a specific token. Data is fetched from Uniswap quoter.
+  
+2. Uses [Shield3](https://www.shield3.com/) to check security and compliance policies. It verifies if the recipient and token smart contract are not on the OFAC addresses list. It also checks if the transaction involves more than 1 ETH. Slippage threshold detection will be added later.
 
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET`|`/prices`|`token` (required), `amount` (required), `splippage` (required)|
+|`GET`|`/prices`|`token` (required), `amount` (required), `splippage` (optionnal), `recipient` (optionnal), `check` (optionnal)|
 
 <details>
 
 <summary>
- Example (0.00002 UNI, 0.3% slippage)
+ Simple example: 0.00002 UNI, 0.3% slippage
 </summary>
 
 #### Request
@@ -1460,12 +1464,144 @@ curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1
 
 ```json
 {
-  "amountInEth": "108438648604539",
-  "amountInEthWithSlippage": "108763964550352",
-  "amountUSDC": "236459484",
-  "amountInEthFormatted": "0.000108438648604539",
-  "amountInEthWithSlippageFormatted": "0.000108763964550352",
-  "amountUSDCFormatted": "236.459484"
+  "amountInEth": "111748006458193",
+  "amountInEthWithSlippage": "112083250477567",
+  "amountUSDC": "86634487",
+  "amountInEthFormatted": "0.0₃1",
+  "amountInEthWithSlippageFormatted": "0.0₃1",
+  "amountUSDCFormatted": "86.63",
+  "shield3Decisions": [
+    {
+      "icon": "check",
+      "label": "ALLOW",
+      "severity": 1,
+      "entryType": "decision"
+    },
+    {
+      "policyId": "802ca990-23cf-4436-be76-9fc0fa0ed7b0",
+      "name": "OFAC SDN block native and ERC20 transactions",
+      "description": "Block native transfers, ERC20 transfers, and ERC20 approvals to OFAC addresses",
+      "policyIcon": "block",
+      "icon": "check",
+      "label": "OFAC SANCTION",
+      "severity": 1,
+      "entryType": "reason",
+      "decision": "Allow"
+    },
+    {
+      "policyId": "f3e79f77-b531-4fef-9ac7-1f22f7b8a309",
+      "name": "Native value thresholds",
+      "description": "Block native value transactions over a certain threshold, and require MFA for transactions over a lower threshold",
+      "policyIcon": "bell",
+      "icon": "check",
+      "label": "TRANSACTION THRESHOLD",
+      "severity": 1,
+      "entryType": "reason",
+      "decision": "Allow"
+    }
+  ]
+}
+```
+
+</details>
+
+<details>
+
+<summary>
+ Shield3 block decision - Native value thresold : 10 WETH (> 1 ETH)
+</summary>
+
+#### Request
+
+```bash
+curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x4200000000000000000000000000000000000006&amount=10000000000000000000&slippage=0.3&check=shield3'
+```
+
+#### Response
+
+```json
+{
+  "amountInEth": "10000000000000000000",
+  "amountInEthWithSlippage": "10000000000000000000",
+  "amountUSDC": "32469295336",
+  "amountInEthFormatted": "10",
+  "amountInEthWithSlippageFormatted": "10",
+  "amountUSDCFormatted": "32.5K",
+  "shield3Decisions": [
+    {
+      "policyId": "802ca990-23cf-4436-be76-9fc0fa0ed7b0",
+      "name": "OFAC SDN block native and ERC20 transactions",
+      "description": "Block native transfers, ERC20 transfers, and ERC20 approvals to OFAC addresses",
+      "policyIcon": "block",
+      "icon": "check",
+      "label": "OFAC SANCTION",
+      "severity": 1,
+      "entryType": "reason",
+      "decision": "Allow"
+    },
+    {
+      "policyId": "f3e79f77-b531-4fef-9ac7-1f22f7b8a309",
+      "name": "Native value thresholds",
+      "description": "Block native value transactions over a certain threshold, and require MFA for transactions over a lower threshold",
+      "policyIcon": "bell",
+      "icon": "block",
+      "label": "TRANSACTION THRESHOLD",
+      "severity": 0,
+      "entryType": "reason",
+      "decision": "Block"
+    }
+  ]
+}
+```
+
+</details>
+
+<details>
+
+<summary>
+ Shield3 block decision - Ronin Bridge Exploiter (0x098b716b8aaf21512996dc57eb0615e2383e2f96) is recipient
+</summary>
+
+#### Request
+
+```bash
+curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x4200000000000000000000000000000000000006&amount=1000000000&slippage=0.3&recipient=0x098b716b8aaf21512996dc57eb0615e2383e2f96&check=shield3'
+```
+
+#### Response
+
+```json
+{
+  "amountInEth": "1000000000",
+  "amountInEthWithSlippage": "1000000000",
+  "amountUSDC": "3",
+  "amountInEthFormatted": "0.0₈1",
+  "amountInEthWithSlippageFormatted": "0.0₈1",
+  "amountUSDCFormatted": "0.0₅3",
+  "shield3Decisions": [
+    {
+      "policyId": "802ca990-23cf-4436-be76-9fc0fa0ed7b0",
+      "name": "OFAC SDN block native and ERC20 transactions",
+      "description": "Block native transfers, ERC20 transfers, and ERC20 approvals to OFAC addresses",
+      "policyIcon": "block",
+      "icon": "block",
+      "label": "OFAC SANCTION",
+      "severity": 0,
+      "entryType": "reason",
+      "decision": "Block"
+    },
+    {
+      "policyId": "f3e79f77-b531-4fef-9ac7-1f22f7b8a309",
+      "name": "Native value thresholds",
+      "description": "Block native value transactions over a certain threshold, and require MFA for transactions over a lower threshold",
+      "policyIcon": "bell",
+      "icon": "check",
+      "label": "TRANSACTION THRESHOLD",
+      "severity": 1,
+      "entryType": "reason",
+      "decision": "Allow"
+    }
+  ]
 }
 ```
 
