@@ -118,6 +118,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
           chainId,
           currency,
           amount,
+          0.3,
           shield3Check
         );
 
