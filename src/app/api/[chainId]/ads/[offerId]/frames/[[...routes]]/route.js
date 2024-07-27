@@ -113,19 +113,43 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
         const { minimalBidPerToken } = bidPriceStructure || {};
 
         const amount = listingType === "Direct" ? buyoutPricePerToken : minimalBidPerToken;
-        const { amountInEthFormatted } = await getEthQuote(chainId, currency, amount);
+        const { amountInEthFormatted, shield3Decisions } = await getEthQuote(
+          chainId,
+          currency,
+          amount
+        );
+
+        console.log("shield3Decisions", shield3Decisions, amount, amountInEthFormatted);
 
         const action = listingType === "Direct" ? actions.BUY : actions.BID;
 
-        image = _validatedAds[secondaryTokenId][imageURL].data;
-        intents.push(
-          <Button.Transaction
-            action={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txres`}
-            target={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txdata/${action}`}
-          >
-            {action} (≈ {amountInEthFormatted} ETH)
-          </Button.Transaction>
+        const shield3BlockingDecision = shield3Decisions?.find(
+          (decision) => decision?.decision === "Block"
         );
+
+        if (shield3BlockingDecision) {
+          image = (
+            <Box grow alignVertical="center" backgroundColor="background" padding="32">
+              <VStack gap="4">
+                <Heading>Shield3 Protection</Heading>
+                <Text color="text200" size="20">
+                  Cannot {action} due to {shield3BlockingDecision?.name}
+                </Text>
+              </VStack>
+            </Box>
+          );
+        } else {
+          image = _validatedAds[secondaryTokenId][imageURL].data;
+          intents.push(
+            <Button.Transaction
+              action={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txres`}
+              target={`/api/${chainId}/ads/${offerId}/frames/${secondaryTokenId}/txdata/${action}`}
+            >
+              {action} (≈ {amountInEthFormatted} ETH)
+            </Button.Transaction>
+          );
+        }
+
         intents.push(
           <Button.Link href={_validatedAds[secondaryTokenId][linkURL].data}>Details</Button.Link>
         );
