@@ -297,9 +297,15 @@ Example
 
 </summary>
 
+##### HTML code
+
 ```html
   <img src="https://relayer.dsponsor.com/11155111/integrations/1/DynamicBanner/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
 ```
+
+##### Result
+
+  <img src="https://relayer.dsponsor.com/11155111/integrations/1/DynamicBanner/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
 
 </details>
 
