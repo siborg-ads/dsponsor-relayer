@@ -7,6 +7,7 @@ import DSponsorAdminABI from "@/config/abis/DSponsorAdmin.js";
 import DSponsorMarketplaceABI from "@/config/abis/DSponsorMarketplace.js";
 import { getRandomAdData, getValidatedAds } from "@/queries/ads";
 import { getEthQuote } from "@/queries/uniswap/quote";
+import { isValidUrl } from "@/utils";
 import { Button, Frog, TextInput } from "frog";
 import { handle } from "frog/next";
 import { createSystem } from "frog/ui";
@@ -176,10 +177,12 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
 
   let contentType;
   try {
-    const imageResponse = await fetch(image, {
-      method: "HEAD"
-    });
-    contentType = imageResponse.headers.get("Content-Type");
+    if (isValidUrl(image)) {
+      const imageResponse = await fetch(image, {
+        method: "HEAD"
+      });
+      contentType = imageResponse.headers.get("Content-Type");
+    }
   } catch (error) {
     console.error("error fetching image", image);
   }

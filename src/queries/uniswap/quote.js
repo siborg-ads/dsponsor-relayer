@@ -147,7 +147,7 @@ export const getEthQuote = async (
       }
     }
   } catch (e) {
-    console.error("Quote error", chainId, tokenOutAddr, amountOut, slippagePerCent);
+    // console.error("Quote error", chainId, tokenOutAddr, amountOut, slippagePerCent);
   }
 
   const {

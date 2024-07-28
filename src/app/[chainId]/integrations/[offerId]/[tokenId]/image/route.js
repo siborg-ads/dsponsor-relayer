@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdDataForToken } from "@/queries/ads";
+import { isValidUrl } from "@/utils";
 
 export async function GET(request, context) {
   const { offerId, tokenId, chainId } = context.params;
@@ -19,12 +20,18 @@ export async function GET(request, context) {
   let blob;
 
   try {
-    const res = await fetch(imgUrl);
-    blob = await res.blob();
+    if (isValidUrl(imgUrl)) {
+      const res = await fetch(imgUrl);
+      blob = await res.blob();
 
-    const headers = new Headers();
-    headers.set("Content-Type", "image/*");
-    return new NextResponse(blob, { status: 200, statusText: "OK", headers });
+      const headers = new Headers();
+      headers.set("Content-Type", "image/*");
+      return new NextResponse(blob, { status: 200, statusText: "OK", headers });
+    } else {
+      return new Response("Invalid image URL", {
+        status: 400
+      });
+    }
   } catch (e) {
     console.error("Error fetching image", imgUrl);
     return new Response("Error fetching image", {

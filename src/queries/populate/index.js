@@ -4,6 +4,7 @@ import {
   getCurrencyInfos,
   getMinimalBidPerToken,
   isObject,
+  isValidUrl,
   priceFormattedForAllValuesObject,
   priceUsdcFormattedForAllValuesObject
 } from "@/utils";
@@ -233,7 +234,7 @@ async function populateTokens(token) {
 async function populateAdOffer(adOffer) {
   const { metadataURL, nftContract } = adOffer;
 
-  if (metadataURL) {
+  if (isValidUrl(metadataURL)) {
     try {
       const metadataRequest = await fetch(metadataURL, {
         headers: {
