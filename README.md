@@ -282,6 +282,27 @@ Example
 
 </details>
 
+#### Image only
+
+Use for: Newsletter, GitHub repo, ...
+
+|Method|Endpoint|Parameters|
+|--|--|--|
+|`GET`|`/DynamicBanner/image`|`ratio` (default: `1:1`), `tokenIds` (default to all from the offer)|
+
+<details>
+
+<summary>
+Example
+
+</summary>
+
+```html
+  <img src="https://relayer.dsponsor.com/11155111/integrations/1/DynamicBanner/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+```
+
+</details>
+
 ## API endpoints
 
 API base URL: `https://relayer.dsponsor.com/api/[chainId]`
