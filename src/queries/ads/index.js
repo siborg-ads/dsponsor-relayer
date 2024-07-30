@@ -241,7 +241,7 @@ export async function getDefaultImg({
     } else if (ratio === "1:1") {
       return `${baseURL}/available-1-1.png`;
     } /* if (ratio === "5:1") */ else {
-      return `${baseURL}/available-5-1.jpg`;
+      return `${baseURL}/available-5-1.png`;
     }
   }
 }
