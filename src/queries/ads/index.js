@@ -238,8 +238,10 @@ export async function getDefaultImg({
   } else if (type === "available") {
     if (ratio === "1.91:1") {
       return `${baseURL}/available-1.91-1.png`;
-    } else {
+    } else if (ratio === "1:1") {
       return `${baseURL}/available-1-1.png`;
+    } /* if (ratio === "5:1") */ else {
+      return `${baseURL}/available-5-1.jpg`;
     }
   }
 }
