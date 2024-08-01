@@ -19,7 +19,9 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
     } = config[chainId].smartContracts.DSPONSOR_MARKETPLACE || {};
     let { reservePricePerToken, buyoutPricePerToken, bids, token } = listing || {};
 
-    const validPopulatedBids = bids && ((bids[0] && bids[0].creationTimestamp) || bids.length == 0);
+    const validPopulatedBids =
+      bids &&
+      ((bids[0] && bids[0].creationTimestamp && bids[0].totalBidAmount) || bids.length == 0);
     if (validPopulatedBids) {
       bids = bids.sort((a, b) => b.creationTimestamp - a.creationTimestamp);
     }

@@ -27,7 +27,7 @@ export async function GET(request, context) {
 
   try {
     if (isValidUrl(imgUrl)) {
-      const res = await fetch(imgUrl);
+      const res = await fetch(imgUrl, { cache: "force-cache" });
       blob = await res.blob();
 
       const headers = new Headers();
