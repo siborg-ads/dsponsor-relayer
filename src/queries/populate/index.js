@@ -17,7 +17,12 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
       minimalBidBps,
       previousBidAmountBps
     } = config[chainId].smartContracts.DSPONSOR_MARKETPLACE || {};
-    const { reservePricePerToken, buyoutPricePerToken, bids, token } = listing || {};
+    let { reservePricePerToken, buyoutPricePerToken, bids, token } = listing || {};
+
+    const validPopulatedBids = bids && ((bids[0] && bids[0].creationTimestamp) || bids.length == 0);
+    if (validPopulatedBids) {
+      bids = bids.sort((a, b) => b.creationTimestamp - a.creationTimestamp);
+    }
 
     nftContract = token?.nftContract?.royalty ? token.nftContract : nftContract;
 
@@ -62,7 +67,7 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
       minimalBidBps &&
       reservePricePerToken &&
       buyoutPricePerToken &&
-      bids &&
+      validPopulatedBids &&
       currency &&
       royaltyBps &&
       quantity &&
