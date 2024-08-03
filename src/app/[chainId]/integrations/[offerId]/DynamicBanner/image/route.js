@@ -7,17 +7,20 @@ export async function GET(request, context) {
   const requestUrl = new URL(`${request.url}`);
   const searchParams = requestUrl.searchParams;
   const tokenIds = searchParams.get("tokenIds");
-  let ratio = searchParams.get("ratio");
-  ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
+  const ratio = searchParams.get("ratio");
+  // ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
 
-  let imgUrl, blob;
+  const adParameterIds =
+    ratio?.length && /^\d+:\d+$/.test(ratio) ? [`imageURL-${ratio}`] : ["imageURL"];
+
+  let imgUrl;
 
   const { randomAd, _adParameterIds } =
     (await getRandomAdData({
       chainId,
       adOfferId: offerId,
       tokenIds: tokenIds?.split(","),
-      adParameterIds: [`imageURL-${ratio}`]
+      adParameterIds
     })) || {};
 
   if (randomAd) {
@@ -27,12 +30,7 @@ export async function GET(request, context) {
 
   try {
     if (isValidUrl(imgUrl)) {
-      const res = await fetch(imgUrl, { cache: "force-cache" });
-      blob = await res.blob();
-
-      const headers = new Headers();
-      headers.set("Content-Type", "image/*");
-      return new NextResponse(blob, { status: 200, statusText: "OK", headers });
+      return NextResponse.redirect(imgUrl, 307);
     } else {
       return new Response("Invalid image URL", {
         status: 400

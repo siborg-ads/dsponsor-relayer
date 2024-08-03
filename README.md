@@ -33,7 +33,7 @@ Purpose: Retrieve the image for an ad offer token.
 
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET`|`/[tokenId]/image`|`adParameterId` (default: `imageURL`)|
+|`GET`|`/[tokenId]/image`|`ratio`, `adParameterId` (default: `imageURL`)|
 
 <details>
 
@@ -77,7 +77,7 @@ Use for: Web
 
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET`|`/ClickableLogosGrid/iFrame`|`bgColor` (default: `0d102d`), `ratio` (default: `1:1`), `previewTokenId`, `previewImage`, `previewLink`|
+|`GET`|`/ClickableLogosGrid/iFrame`|`bgColor` (default: `0d102d`), `ratio`, `previewTokenId`, `previewImage`, `previewLink`|
 
 <details>
 
@@ -236,7 +236,7 @@ Use for: Web
 
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET`|`/DynamicBanner/iFrame`|`bgColor` (default: `0d102d`), `ratio` (default: `1:1`), `tokenIds` (default to all from the offer), `previewImage`, `previewLink`|
+|`GET`|`/DynamicBanner/iFrame`|`bgColor` (default: `0d102d`), `ratio`, `tokenIds` (default to all from the offer), `previewImage`, `previewLink`|
 
 <details>
 
@@ -288,7 +288,7 @@ Use for: Newsletter, GitHub repo, ...
 
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET`|`/DynamicBanner/image`|`ratio` (default: `1:1`), `tokenIds` (default to all from the offer)|
+|`GET`|`/DynamicBanner/image`|`ratio`, `tokenIds` (default to all from the offer)|
 
 <details>
 
