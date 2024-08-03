@@ -212,7 +212,17 @@ export async function getValidatedAds({
 
   return Object.assign(
     {
-      _tokenIds: tokenIds,
+      _tokenIds: tokenIds.sort((strA, strB) => {
+        const a = BigInt(strA);
+        const b = BigInt(strB);
+        if (a > b) {
+          return 1;
+        } else if (a < b) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }),
       _tokenData: tokenDatas,
       _adParameterIds: adParameterIds
     },
