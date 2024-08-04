@@ -37,7 +37,11 @@ export default async function DynamicBannerIframePage(req) {
         chainId,
         adOfferId: offerId,
         tokenIds: tokenIds?.split(","),
-        adParameterIds
+        adParameterIds,
+        options: {
+          populate: false,
+          next: { revalidate: 15 * 60 } // 15 minutes
+        }
       })) || {};
     const { _lastUpdate } = _validatedAds || {};
     lastUpdate = _lastUpdate;
@@ -92,5 +96,3 @@ DynamicBannerIframePage.getLayout = function getLayout(page) {
     </html>
   );
 };
-
-export const revalidate = 900; // 15 minutes

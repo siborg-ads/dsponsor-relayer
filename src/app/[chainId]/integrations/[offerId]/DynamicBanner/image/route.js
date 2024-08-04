@@ -19,7 +19,11 @@ export async function GET(request, context) {
       chainId,
       adOfferId: offerId,
       tokenIds: tokenIds?.split(","),
-      adParameterIds
+      adParameterIds,
+      options: {
+        populate: false,
+        next: { revalidate: 15 * 60 } // 15 minutes
+      }
     })) || {};
 
   if (randomAd) {

@@ -11,13 +11,17 @@ export async function GET(request, context) {
   const defaultAdParameterKey =
     ratio?.length && /^\d+:\d+$/.test(ratio) ? `imageURL-${ratio}` : "imageURL";
 
-  const imgUrl = await getAdDataForToken(
+  const imgUrl = await getAdDataForToken({
     chainId,
     offerId,
     tokenId,
     adParameterId,
-    defaultAdParameterKey
-  );
+    defaultAdParameterKey,
+    options: {
+      populate: false,
+      next: { revalidate: 15 * 60 } // 15 minutes
+    }
+  });
 
   try {
     if (isValidUrl(imgUrl)) {

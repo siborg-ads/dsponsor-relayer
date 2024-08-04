@@ -22,6 +22,11 @@ export const getValidatedAdsForTokensQuery = /* GraphQL */ `
 
 const getValidatedAdsForOfferQuery = /* GraphQL */ `
   query getValidatedAds($adOfferId: String) {
+    _meta {
+      block {
+        timestamp
+      }
+    }
     adOffers(where: { id: $adOfferId }) {
       ...AdOfferFragment
     }
@@ -36,7 +41,8 @@ export async function getValidatedAds({
   adOfferId,
   tokenIds,
   tokenDatas,
-  adParameterIds
+  adParameterIds,
+  options
 }) {
   // const chainName = config[chainId]?.chainName;
   const appURL = config[chainId]?.appURL;
@@ -62,7 +68,7 @@ export async function getValidatedAds({
     variables.tokenIds = tokenIds;
   }
 
-  const graphResult = await executeQuery(chainId, query, variables);
+  const graphResult = await executeQuery(chainId, query, variables, options);
 
   if (
     !graphResult ||
@@ -225,7 +231,7 @@ export async function getValidatedAds({
       }),
       _tokenData: tokenDatas,
       _adParameterIds: adParameterIds,
-      _lastUpdate: new Date().toJSON()
+      _lastUpdate: new Date(Number(graphResult?.data?._meta?.block?.timestamp) * 1000).toJSON()
     },
 
     result
@@ -302,20 +308,22 @@ export async function getDefaultAdData(
   return data;
 }
 
-export async function getAdDataForToken(
+export async function getAdDataForToken({
   chainId,
   adOfferId,
   tokenId,
   adParameterId,
-  defaultAdParameterKey
-) {
+  defaultAdParameterKey,
+  options
+}) {
   let adParameterKey = adParameterId ? adParameterId : defaultAdParameterKey;
 
   const result = await getValidatedAds({
     chainId,
     adOfferId,
-    tokenIds: [tokenId],
-    adParameterIds: [adParameterKey]
+    // tokenIds: [tokenId],
+    adParameterIds: [adParameterKey],
+    options
   });
 
   const { _adParameterIds } = result;
@@ -329,14 +337,16 @@ export const getRandomAdData = async ({
   adOfferId,
   tokenIds,
   tokenDatas,
-  adParameterIds
+  adParameterIds,
+  options
 }) => {
   const response = await getValidatedAds({
     chainId,
     adOfferId,
     tokenIds,
     tokenDatas,
-    adParameterIds
+    adParameterIds,
+    options
   });
 
   if (

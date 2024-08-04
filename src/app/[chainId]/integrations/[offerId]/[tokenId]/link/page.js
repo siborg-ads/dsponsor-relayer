@@ -13,13 +13,17 @@ const AdLink = ({ params, searchParams }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const url = await getAdDataForToken(
+      const url = await getAdDataForToken({
         chainId,
         offerId,
         tokenId,
         adParameterId,
-        defaultAdParameterKey
-      );
+        defaultAdParameterKey,
+        options: {
+          populate: false,
+          next: { revalidate: 15 * 60 } // 15 minutes
+        }
+      });
       setUrl(url);
     };
     fetchData();
@@ -33,5 +37,3 @@ const AdLink = ({ params, searchParams }) => {
   window.location.href = url;
 };
 export default AdLink;
-
-export const dynamic = "force-dynamic";

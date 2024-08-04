@@ -40,5 +40,3 @@ export async function generateMetadata({ params, searchParams }) {
 export default function FarcasterFramePage() {
   return <span>DSponsor Frame</span>;
 }
-
-export const dynamic = "force-dynamic";
