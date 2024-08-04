@@ -15,7 +15,7 @@ const AdLink = ({ params, searchParams }) => {
     const fetchData = async () => {
       const url = await getAdDataForToken({
         chainId,
-        offerId,
+        adOfferId: offerId,
         tokenId,
         adParameterId,
         defaultAdParameterKey,

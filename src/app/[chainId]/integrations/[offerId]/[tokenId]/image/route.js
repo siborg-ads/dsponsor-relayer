@@ -13,7 +13,7 @@ export async function GET(request, context) {
 
   const imgUrl = await getAdDataForToken({
     chainId,
-    offerId,
+    adOfferId: offerId,
     tokenId,
     adParameterId,
     defaultAdParameterKey,
