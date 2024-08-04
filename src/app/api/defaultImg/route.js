@@ -26,8 +26,8 @@ export async function GET(req) {
           fontSize: 40 * width,
           letterSpacing: -2,
           fontWeight: 700,
-          textAlign: "center",
-          lineHeight: "300px"
+          textAlign: "center"
+          //  lineHeight: "300px"
         }}
       >
         <div
