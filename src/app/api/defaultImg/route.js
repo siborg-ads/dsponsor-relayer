@@ -8,7 +8,17 @@ export async function GET(req) {
   let ratio = searchParams.get("ratio");
   ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
 
-  const [width, height] = ratio.split(":").map(Number);
+  let [width, height] = ratio.split(":").map(Number);
+
+  // Calculate the scaling factor to ensure the largest dimension is 1000
+  const scaleFactor = Math.min(1000 / width, 1000 / height);
+
+  width = Math.round(width * scaleFactor);
+  height = Math.round(height * scaleFactor);
+
+  // Calculate the font size dynamically based on the dimensions
+  const baseFontSize = 100; // Base font size for scaling
+  const fontSize = Math.min((width / text.length) * 1.5, height / 3, baseFontSize);
 
   const textColor = searchParams.get("textColor") ? `#${searchParams.get("textColor")}` : "#8A4CEF";
 
@@ -23,9 +33,9 @@ export async function GET(req) {
           justifyContent: "center",
           flexDirection: "column",
           backgroundImage: `linear-gradient(to bottom, #2A2833, #2A2833)`,
-          fontSize: 40 * width,
+          fontSize: `${fontSize}px`,
           letterSpacing: -2,
-          fontWeight: 700,
+          // fontWeight: 700,
           textAlign: "center"
           //  lineHeight: "300px"
         }}
@@ -43,8 +53,8 @@ export async function GET(req) {
       </div>
     ),
     {
-      width: 400 * width,
-      height: 400 * height
+      width,
+      height
     }
   );
 }
