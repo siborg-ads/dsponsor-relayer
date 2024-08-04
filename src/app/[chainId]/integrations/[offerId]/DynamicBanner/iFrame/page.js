@@ -20,6 +20,7 @@ export default async function DynamicBannerIframePage(req) {
       : [`imageURL`, "linkURL"];
 
   let ad;
+  let lastUpdate;
 
   if (previewImage && previewLink) {
     ad = {
@@ -29,14 +30,17 @@ export default async function DynamicBannerIframePage(req) {
         imageURL: previewImage
       }
     };
+    lastUpdate = new Date().toJSON();
   } else {
-    const { randomAd, _adParameterIds } =
+    const { randomAd, _adParameterIds, _validatedAds } =
       (await getRandomAdData({
         chainId,
         adOfferId: offerId,
         tokenIds: tokenIds?.split(","),
         adParameterIds
       })) || {};
+    const { _lastUpdate } = _validatedAds || {};
+    lastUpdate = _lastUpdate;
 
     if (randomAd) {
       const [imageKey, linkKey] = _adParameterIds;
@@ -73,6 +77,7 @@ export default async function DynamicBannerIframePage(req) {
           chainId={chainId}
           colSizes={colSizes?.length ? colSizes.split(",") : undefined}
           ratio={ratio}
+          lastUpdate={lastUpdate}
         />
       </body>
     </html>
@@ -88,4 +93,4 @@ DynamicBannerIframePage.getLayout = function getLayout(page) {
   );
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // 15 minutes

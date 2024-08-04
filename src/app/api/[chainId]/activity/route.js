@@ -253,4 +253,4 @@ export async function GET(request, context) {
   });
 }
 
-export const revalidate = 900; // 15 minutes - may be useless
+export const revalidate = 900; // 15 minutes

@@ -92,6 +92,7 @@ export default async function ClickableLogosGridIframePage(req) {
           chainId={chainId}
           colSizes={colSizes?.length ? colSizes.split(",") : undefined}
           ratio={ratio}
+          lastUpdate={response._lastUpdate}
         />
       </body>
     </html>
@@ -107,4 +108,4 @@ ClickableLogosGridIframePage.getLayout = function getLayout(page) {
   );
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // 15 minutes

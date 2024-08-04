@@ -224,8 +224,10 @@ export async function getValidatedAds({
         }
       }),
       _tokenData: tokenDatas,
-      _adParameterIds: adParameterIds
+      _adParameterIds: adParameterIds,
+      _lastUpdate: new Date().toJSON()
     },
+
     result
   );
 }
