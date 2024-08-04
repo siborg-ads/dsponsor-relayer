@@ -239,20 +239,28 @@ export async function getDefaultImg({
 }) {
   const baseURL = config[chainId].relayerURL;
 
+  const ratioStr = ratio ? `&ratio=${ratio}` : "";
+
   if (type === "reserved") {
+    return `${baseURL}/api/defaultImg?text=Reserved token&textColor=FFFFFF${ratioStr}`;
+    /*
     if (ratio === "1.91:1") {
       return `${baseURL}/reserved-1.91-1.png`;
     } else {
       return `${baseURL}/reserved-1-1.png`;
     }
+    */
   } else if (type === "available") {
+    /*
     if (ratio === "1.91:1") {
       return `${baseURL}/available-1.91-1.png`;
     } else if (ratio === "1:1") {
       return `${baseURL}/available-1-1.png`;
-    } /* if (ratio === "5:1") */ else {
+    }  else {
       return `${baseURL}/available-5-1.png`;
     }
+    */
+    return `${baseURL}/api/defaultImg?text=Own this ad space${ratioStr}`;
   }
 }
 
@@ -267,8 +275,14 @@ export async function getDefaultAdData(
 ) {
   let data = null;
 
-  const { base, originalId } = adParameter;
-  const [, ratio] = originalId.split("-");
+  const { base, variants, originalId } = adParameter;
+  let [, ratio] = originalId.split("-");
+
+  ratio = ratio
+    ? ratio
+    : variants?.length && /^\d+:\d+$/.test(variants[0])
+      ? variants[0]
+      : undefined;
 
   if (base === "imageURL") {
     if (state === "BUY_MINT" || state === "BUY_MARKET") {

@@ -8,7 +8,6 @@ export async function GET(request, context) {
   const searchParams = requestUrl.searchParams;
   const tokenIds = searchParams.get("tokenIds");
   const ratio = searchParams.get("ratio");
-  // ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
 
   const adParameterIds =
     ratio?.length && /^\d+:\d+$/.test(ratio) ? [`imageURL-${ratio}`] : ["imageURL"];
