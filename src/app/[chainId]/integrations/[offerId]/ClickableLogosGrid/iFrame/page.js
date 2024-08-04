@@ -14,12 +14,15 @@ export default async function ClickableLogosGridIframePage(req) {
   const { chainId, offerId } = req.params;
   const { bgColor, colSizes, previewTokenId, previewImage, previewLink } = req.searchParams;
   let { ratio } = req.searchParams;
-  ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
+  let adParameterIds =
+    ratio?.length && /^\d+:\d+$/.test(ratio)
+      ? [`imageURL-${ratio}`, "linkURL"]
+      : [`imageURL`, "linkURL"];
 
   const response = await getValidatedAds({
     chainId,
     adOfferId: offerId,
-    adParameterIds: [`imageURL-${ratio}`, "linkURL"]
+    adParameterIds
   });
 
   if (!response) {
@@ -30,11 +33,16 @@ export default async function ClickableLogosGridIframePage(req) {
     );
   }
 
-  const adParameterIds = response._adParameterIds;
+  adParameterIds = response._adParameterIds;
   const [imageKey, linkKey] = adParameterIds;
 
-  // const imageKeyParts = imageKey.split("-");
-  // ratio = imageKeyParts.length === 2 ? imageKeyParts[1] : ratio;
+  const imageKeyParts = imageKey.split("-");
+  ratio =
+    ratio?.length && /^\d+:\d+$/.test(ratio)
+      ? ratio
+      : imageKeyParts.length === 2
+        ? imageKeyParts[1]
+        : ratio;
 
   if (adParameterIds?.length !== 2) {
     return (

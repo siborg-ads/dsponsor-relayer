@@ -14,7 +14,10 @@ export default async function DynamicBannerIframePage(req) {
   const { chainId, offerId } = req.params;
   const { bgColor, colSizes, previewImage, previewLink, tokenIds } = req.searchParams;
   let { ratio } = req.searchParams;
-  ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "5:1";
+  const adParameterIds =
+    ratio?.length && /^\d+:\d+$/.test(ratio)
+      ? [`imageURL-${ratio}`, "linkURL"]
+      : [`imageURL`, "linkURL"];
 
   let ad;
 
@@ -32,7 +35,7 @@ export default async function DynamicBannerIframePage(req) {
         chainId,
         adOfferId: offerId,
         tokenIds: tokenIds?.split(","),
-        adParameterIds: [`imageURL-${ratio}`, "linkURL"]
+        adParameterIds
       })) || {};
 
     if (randomAd) {
@@ -45,6 +48,16 @@ export default async function DynamicBannerIframePage(req) {
         }
       };
     }
+
+    const [imageKey] = _adParameterIds;
+
+    const imageKeyParts = imageKey.split("-");
+    ratio =
+      ratio?.length && /^\d+:\d+$/.test(ratio)
+        ? ratio
+        : imageKeyParts.length === 2
+          ? imageKeyParts[1]
+          : ratio;
   }
 
   if (!ad) {
