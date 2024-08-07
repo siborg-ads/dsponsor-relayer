@@ -19,9 +19,11 @@ export async function POST(request, context) {
 }
 
 export async function GET(request, context) {
-  const requestUrl = new URL(`${request.url}`);
-  const { query, variables, options } = requestUrl.searchParams;
   const { chainId } = context.params;
+  const requestUrl = new URL(`${request.url}`);
+  const query = requestUrl.searchParams.get("query");
+  const variables = JSON.parse(requestUrl.searchParams.get("variables")) || {};
+  const options = JSON.parse(requestUrl.searchParams.get("options")) || {};
 
   const graphResult = await executeQuery(chainId, query, variables, options);
 
