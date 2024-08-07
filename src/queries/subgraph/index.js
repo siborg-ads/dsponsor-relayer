@@ -29,7 +29,10 @@ export async function executeQuery(chainId, query, variables, options) {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
 
+  // console.log("executeQuery", options);
+  console.time("executeQuery");
   const request = await fetch(url, requestInit);
+  console.timeEnd("executeQuery");
 
   const result = await request.json();
 
