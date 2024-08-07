@@ -25,9 +25,6 @@ export async function executeQuery(chainId, query, variables, options) {
 
   if (options?.next) {
     requestInit.next = options.next;
-    if (options.next.tags) {
-      requestInit.cache = "force-cache";
-    }
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
