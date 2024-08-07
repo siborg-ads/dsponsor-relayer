@@ -25,14 +25,16 @@ export async function executeQuery(chainId, query, variables, options) {
 
   if (options?.next) {
     requestInit.next = options.next;
+    if (options.next.tags) {
+      requestInit.cache = "force-cache";
+    }
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
 
-  // console.log("executeQuery", options);
-  console.time("executeQuery");
+  // console.time("executeQuery");
   const request = await fetch(url, requestInit);
-  console.timeEnd("executeQuery");
+  // console.timeEnd("executeQuery");
 
   const result = await request.json();
 
