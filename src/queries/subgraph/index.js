@@ -1,8 +1,23 @@
+import { memoize } from "nextjs-better-unstable-cache";
 import config from "@/config";
 import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
 
 export async function executeQuery(chainId, query, variables, options) {
+  return options?.cacheTags?.length && options?.cacheTags !== "no-store"
+    ? _getCachedQuery(chainId, query, variables, options)
+    : _executeQuery(chainId, query, variables, options);
+}
+
+const _getCachedQuery = memoize(_executeQuery, {
+  revalidateTags: (chainId, query, variables, options) =>
+    options?.cacheTags?.length
+      ? options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
+      : ["generic-cache-tag"],
+  log: ["dedupe", "datacache", "verbose"]
+});
+
+async function _executeQuery(chainId, query, variables, options) {
   const url = config ? config[chainId]?.subgraphURL : null;
 
   if (!url) {
@@ -23,11 +38,18 @@ export async function executeQuery(chainId, query, variables, options) {
     body: JSON.stringify({ query, variables })
   };
 
+  /*
   if (options?.next) {
     requestInit.next = options.next;
+    
+    if (options.next.tags) {
+      requestInit.cache ="force-cache";
+    }
+    
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
+  */
 
   // console.time("executeQuery");
   const request = await fetch(url, requestInit);

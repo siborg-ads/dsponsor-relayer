@@ -18,6 +18,7 @@ export async function POST(request, context) {
   });
 }
 
+/*
 export async function GET(request, context) {
   const { chainId } = context.params;
   const requestUrl = new URL(`${request.url}`);
@@ -39,3 +40,4 @@ export async function GET(request, context) {
     }
   });
 }
+*/
