@@ -1,21 +1,21 @@
-import { memoize } from "nextjs-better-unstable-cache";
+import { unstable_cache as cache } from "next/cache";
 import config from "@/config";
 import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
 
 export async function executeQuery(chainId, query, variables, options) {
   return options?.cacheTags?.length && options?.cacheTags !== "no-store"
-    ? _getCachedQuery(chainId, query, variables, options)
+    ? cache(
+        async (chainId, query, variables, options) => {
+          return _executeQuery(chainId, query, variables, options);
+        },
+        ["graph"],
+        {
+          tags: options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
+        }
+      )(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
 }
-
-const _getCachedQuery = memoize(_executeQuery, {
-  revalidateTags: (chainId, query, variables, options) =>
-    options?.cacheTags?.length
-      ? options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
-      : ["generic-cache-tag"],
-  log: ["dedupe", "datacache", "verbose"]
-});
 
 async function _executeQuery(chainId, query, variables, options) {
   const url = config ? config[chainId]?.subgraphURL : null;
