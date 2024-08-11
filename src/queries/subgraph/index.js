@@ -38,18 +38,12 @@ async function _executeQuery(chainId, query, variables, options) {
     body: JSON.stringify({ query, variables })
   };
 
-  /*
-  if (options?.next) {
-    requestInit.next = options.next;
-    
-    if (options.next.tags) {
-      requestInit.cache ="force-cache";
-    }
-    
+  if (options?.cacheTags) {
+    console.log("cacheTags", options.cacheTags);
+    requestInit.cache = "force-cache";
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
-  */
 
   // console.time("executeQuery");
   const request = await fetch(url, requestInit);
