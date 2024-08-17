@@ -1,3 +1,4 @@
+import { GraphQLClient } from "graphql-request";
 import { unstable_cache as cache } from "next/cache";
 import config from "@/config";
 import { populateSubgraphResult } from "@/queries/populate";
@@ -45,11 +46,14 @@ async function _executeQuery(chainId, query, variables, options) {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
 
-  // console.time("executeQuery");
-  const request = await fetch(url, requestInit);
-  // console.timeEnd("executeQuery");
+  const client = new GraphQLClient(url);
+  const result = await client.request({ url, document: query, variables });
+  console.log({ result });
 
-  const result = await request.json();
+  // console.time("executeQuery");
+  // const request = await fetch(url, requestInit);
+  // console.timeEnd("executeQuery");
+  // const result = await request.json();
 
   const populate = typeof options?.populate === "undefined" ? true : options.populate;
   if (populate && result?.data) {
