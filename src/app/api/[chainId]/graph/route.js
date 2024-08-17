@@ -1,9 +1,11 @@
-import { executeQuery } from "@/queries/subgraph";
+import { executeCacheQuery, executeQuery } from "@/queries/subgraph";
 
 export async function POST(request, context) {
   const { query, variables, options } = await request.json();
   const { chainId } = context.params;
-  const graphResult = await executeQuery(chainId, query, variables, options);
+  const graphResult = options?.cacheTags
+    ? await executeCacheQuery(chainId, query, variables, options)
+    : await executeQuery(chainId, query, variables, options);
 
   if (!graphResult) {
     return new Response("Error executing query", {
@@ -18,7 +20,7 @@ export async function POST(request, context) {
   });
 }
 
-export const fetchCache = "default-cache";
+// export const fetchCache = "default-cache";
 
 /*
 export async function GET(request, context) {
