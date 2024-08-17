@@ -18,6 +18,8 @@ export async function POST(request, context) {
   });
 }
 
+export const fetchCache = "default-cache";
+
 /*
 export async function GET(request, context) {
   const { chainId } = context.params;
