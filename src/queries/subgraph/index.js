@@ -1,6 +1,6 @@
 import { unstable_cache as cache } from "next/cache";
 import config from "@/config";
-import { populateSubgraphResult } from "@/queries/populate";
+// import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
 
 /*
@@ -21,7 +21,12 @@ export async function executeQuery(chainId, query, variables, options) {
 
 export const executeCacheQuery = cache(executeQuery, ["graph"], { tags: ["graph"] });
 
-export async function executeQuery(chainId, query, variables, options) {
+export async function executeQuery(
+  chainId,
+  query,
+  variables
+  //  options
+) {
   const url = config ? config[chainId]?.subgraphURL : null;
 
   if (!url) {
@@ -42,7 +47,7 @@ export async function executeQuery(chainId, query, variables, options) {
     body: JSON.stringify({ query, variables })
   };
 
-  /*
+  /*  
   if (options?.cacheTags) {
     console.log("cacheTags", options.cacheTags);
     requestInit.next = { tags: options.cacheTags };
@@ -66,5 +71,5 @@ export async function executeQuery(chainId, query, variables, options) {
   return result;
 */
 
-  return { now: Date.now() };
+  return { requestInit, now: Date.now() };
 }
