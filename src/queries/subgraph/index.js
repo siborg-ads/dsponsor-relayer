@@ -1,9 +1,8 @@
 import { unstable_cache as cache } from "next/cache";
 import config from "@/config";
-// import { populateSubgraphResult } from "@/queries/populate";
+import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
 
-/*
 export async function executeQuery(chainId, query, variables, options) {
   return options?.cacheTags?.length && options?.cacheTags !== "no-store"
     ? cache(
@@ -17,16 +16,8 @@ export async function executeQuery(chainId, query, variables, options) {
       )(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
 }
-*/
 
-export const executeCacheQuery = cache(executeQuery, ["graph"], { tags: ["graph"] });
-
-export async function executeQuery(
-  chainId,
-  query,
-  variables
-  //  options
-) {
+async function _executeQuery(chainId, query, variables, options) {
   const url = config ? config[chainId]?.subgraphURL : null;
 
   if (!url) {
@@ -56,7 +47,6 @@ export async function executeQuery(
   }
   */
 
-  /*
   console.time("executeQuery");
   const request = await fetch(url, requestInit);
   console.timeEnd("executeQuery");
@@ -67,9 +57,5 @@ export async function executeQuery(
     await populateSubgraphResult(chainId, result);
   }
 
-
   return result;
-*/
-
-  return { requestInit, now: Date.now() };
 }

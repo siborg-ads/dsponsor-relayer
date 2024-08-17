@@ -12,7 +12,6 @@ const nextConfig = {
   },
   async headers() {
     return [
-      /*
       {
         // matching all API routes
         source: "/api/:path*",
@@ -30,7 +29,7 @@ const nextConfig = {
           }
         ]
       },
-      */
+
       {
         source: "/:chainId/ad/:offerId/:tokenId/image",
         headers: [
