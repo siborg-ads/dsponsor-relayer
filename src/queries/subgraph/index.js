@@ -40,7 +40,7 @@ async function _executeQuery(chainId, query, variables, options) {
 
   if (options?.cacheTags) {
     console.log("cacheTags", options.cacheTags);
-    requestInit.cache = "force-cache";
+    requestInit.next = { tags: options.cacheTags };
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
