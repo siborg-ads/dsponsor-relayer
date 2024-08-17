@@ -51,6 +51,7 @@ export async function executeQuery(chainId, query, variables, options) {
   }
   */
 
+  /*
   console.time("executeQuery");
   const request = await fetch(url, requestInit);
   console.timeEnd("executeQuery");
@@ -61,5 +62,9 @@ export async function executeQuery(chainId, query, variables, options) {
     await populateSubgraphResult(chainId, result);
   }
 
+
   return result;
+*/
+
+  return { now: Date.now() };
 }
