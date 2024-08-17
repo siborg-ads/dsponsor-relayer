@@ -9,11 +9,10 @@ export async function executeQuery(chainId, query, variables, options) {
         async (chainId, query, variables, options) => {
           return _executeQuery(chainId, query, variables, options);
         },
-        ["graph"],
-        {
-          revalidate: 60
-          //          tags: options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
-        }
+        ["graph"]
+        //        {
+        //          tags: options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
+        //        }
       )(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
 }
