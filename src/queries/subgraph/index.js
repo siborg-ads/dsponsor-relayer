@@ -11,7 +11,8 @@ export async function executeQuery(chainId, query, variables, options) {
         },
         ["graph"],
         {
-          tags: options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
+          revalidate: 60
+          //          tags: options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
         }
       )(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
