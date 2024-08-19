@@ -4,20 +4,21 @@ import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
 
 export async function executeQuery(chainId, query, variables, options) {
-  return options?.cacheTags?.length && options?.cacheTags !== "no-store"
+  return options?.next?.tags?.length
     ? cache(
         async (chainId, query, variables, options) => {
           return _executeQuery(chainId, query, variables, options);
         },
-        ["graph"]
-        //        {
-        //          tags: options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
-        //        }
+        ["graph"],
+        {
+          tags: options.next.tags
+        }
       )(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
 }
 
 async function _executeQuery(chainId, query, variables, options) {
+  console.log("_executeQuery");
   const url = config ? config[chainId]?.subgraphURL : null;
 
   if (!url) {
@@ -38,14 +39,12 @@ async function _executeQuery(chainId, query, variables, options) {
     body: JSON.stringify({ query, variables })
   };
 
-  /*  
-  if (options?.cacheTags) {
-    console.log("cacheTags", options.cacheTags);
-    requestInit.next = { tags: options.cacheTags };
+  if (options.next) {
+    console.log("cacheTags", options.next);
+    requestInit.next = options.next;
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
-  */
 
   console.time("executeQuery");
   const request = await fetch(url, requestInit);
