@@ -1,7 +1,6 @@
 import { revalidateTag } from "next/cache";
 
 export async function GET(request) {
-  request;
   const tags = request.nextUrl.searchParams.get("tags");
   let revalidated = 0;
 
@@ -12,8 +11,5 @@ export async function GET(request) {
     }
   }
 
-  // revalidatePath("/api/8453/graph");
-  // revalidated++;
-
-  return Response.json({ revalidated, now: Date.now() });
+  return Response.json({ revalidated, now: new Date() });
 }

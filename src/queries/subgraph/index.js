@@ -18,7 +18,6 @@ export async function executeQuery(chainId, query, variables, options) {
 }
 
 async function _executeQuery(chainId, query, variables, options) {
-  console.log("_executeQuery");
   const url = config ? config[chainId]?.subgraphURL : null;
 
   if (!url) {
@@ -40,15 +39,12 @@ async function _executeQuery(chainId, query, variables, options) {
   };
 
   if (options.next) {
-    console.log("cacheTags", options.next);
     requestInit.next = options.next;
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
 
-  console.time("executeQuery");
   const request = await fetch(url, requestInit);
-  console.timeEnd("executeQuery");
   const result = await request.json();
 
   const populate = typeof options?.populate === "undefined" ? true : options.populate;

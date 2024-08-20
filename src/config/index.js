@@ -51,7 +51,7 @@ const config = {
     network: Network.BASE_MAINNET,
 
     appURL: "https://app.dsponsor.com",
-    creditsURL: "https://dsponsor.com",
+    creditsURL: "https://app.dsponsor.com",
     explorerURL: "https://basescan.org",
     relayerURL: process.env.NEXT_DEV_URL
       ? process.env.NEXT_DEV_URL

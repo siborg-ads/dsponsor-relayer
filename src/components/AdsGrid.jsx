@@ -4,9 +4,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import config from "@/config";
 import { getDefaultImg } from "@/queries/ads";
-const AdsGrid = ({ ads, chainId, ratio, lastUpdate }) => {
+
+const AdsGrid = ({ ads, bgColor, chainId, ratio, lastUpdate }) => {
   ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
   ads = ads?.length ? ads : [];
+  bgColor = bgColor ? `#${bgColor}` : "#0d102d";
 
   const defaultImg = getDefaultImg({ chainId, type: "reserved", ratio });
   const gridContainerRef = useRef(null);
@@ -98,7 +100,7 @@ const AdsGrid = ({ ads, chainId, ratio, lastUpdate }) => {
           {ads.map((ad, index) => (
             <div
               key={index}
-              className="relative overflow-hidden rounded border border-blue-500 bg-[#00143e] text-black hover:border-[#9abffb] hover:bg-[#353f75]"
+              className={`relative overflow-hidden rounded border border-blue-500 bg-[${bgColor}] text-black hover:border-[#9abffb] hover:bg-[#353f75]`}
               style={{ width: `100%`, height: `100%` }}
             >
               <a
@@ -120,9 +122,9 @@ const AdsGrid = ({ ads, chainId, ratio, lastUpdate }) => {
           ))}
         </div>
         <div className="flex justify-end mt-2">
-          <span className="pr-2 text-right text-[0.65em] text-orange-300 hover:text-orange-500">
+          <span className="pr-2 text-right text-[0.65em] text-purple-800 text-purple-800">
             <a href={config[chainId].creditsURL} target="_blank" rel="noreferrer">
-              Last Update : {lastUpdate} - Powered by DSponsor
+              Last Update : {lastUpdate} - Powered by SiBorg Ads (DSponsor protocol)
             </a>
           </span>
         </div>
