@@ -22,11 +22,6 @@ export const getValidatedAdsForTokensQuery = /* GraphQL */ `
 
 const getValidatedAdsForOfferQuery = /* GraphQL */ `
   query getValidatedAds($adOfferId: String) {
-    _meta {
-      block {
-        timestamp
-      }
-    }
     adOffers(where: { id: $adOfferId }) {
       ...AdOfferFragment
     }
@@ -250,7 +245,7 @@ export async function getDefaultImg({
   const ratioStr = ratio ? `&ratio=${ratio}` : "";
 
   if (type === "reserved") {
-    return `${baseURL}/api/defaultImg?text=Reserved token&textColor=FFFFFF${ratioStr}`;
+    return `${baseURL}/api/defaultImg?text=Reserved ad space&textColor=FFFFFF${ratioStr}`;
     /*
     if (ratio === "1.91:1") {
       return `${baseURL}/reserved-1.91-1.png`;

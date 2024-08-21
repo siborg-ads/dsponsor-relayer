@@ -108,8 +108,8 @@ const config = {
     chainName: "base-sepolia",
     network: Network.BASE_SEPOLIA,
 
-    appURL: "https://app.dsponsor.com",
-    creditsURL: "https://dsponsor.com",
+    appURL: "https://app.testnet.dsponsor.com",
+    creditsURL: "https://app.dsponsor.com",
     explorerURL: "https://sepolia.basescan.org/",
     relayerURL: process.env.NEXT_DEV_URL
       ? process.env.NEXT_DEV_URL
@@ -165,8 +165,8 @@ const config = {
     chainName: "sepolia",
     network: Network.ETH_SEPOLIA,
 
-    appURL: "https://app.dsponsor.com",
-    creditsURL: "https://dsponsor.com",
+    appURL: "https://app.testnet.dsponsor.com",
+    creditsURL: "https://app.testnet.dsponsor.com",
     explorerURL: "https://sepolia.etherscan.io",
     relayerURL: process.env.NEXT_DEV_URL
       ? process.env.NEXT_DEV_URL

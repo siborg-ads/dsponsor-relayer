@@ -29,6 +29,22 @@ async function _executeQuery(chainId, query, variables, options) {
     ${query}
   `;
 
+  // Find the closing curly brace of the query and insert the _meta block before it
+  const lastCurlyBraceIndex = query.lastIndexOf("}");
+  // Define the _meta block with timestamp
+
+  const metaBlock = `
+    _meta {
+        block {
+          timestamp
+        }
+    }
+  `;
+
+  if (lastCurlyBraceIndex !== -1) {
+    query = query.slice(0, lastCurlyBraceIndex) + metaBlock + query.slice(lastCurlyBraceIndex);
+  }
+
   const requestInit = {
     method: "POST",
     headers: {
@@ -38,7 +54,7 @@ async function _executeQuery(chainId, query, variables, options) {
     body: JSON.stringify({ query, variables })
   };
 
-  if (options.next) {
+  if (options?.next) {
     requestInit.next = options.next;
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";

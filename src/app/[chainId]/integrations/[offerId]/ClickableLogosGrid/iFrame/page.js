@@ -19,8 +19,6 @@ export default async function ClickableLogosGridIframePage(req) {
       ? [`imageURL-${ratio}`, "linkURL"]
       : [`imageURL`, "linkURL"];
 
-  console.log("ClickableLogosGridIframePage");
-
   const response = await getValidatedAds({
     chainId,
     adOfferId: offerId,
