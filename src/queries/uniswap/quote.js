@@ -6,8 +6,8 @@ import { memoize } from "nextjs-better-unstable-cache";
 import Quoter from "@uniswap/v3-periphery/artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json";
 
 export const getEthQuote = memoize(_getEthQuote, {
-  duration: 5 * 60, // 5 minutes
-  log: ["datacache", "verbose"]
+  revalidateTags: ["cron"],
+  log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
 });
 
 async function _getEthQuote(

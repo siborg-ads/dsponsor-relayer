@@ -32,8 +32,6 @@ export async function getOfferTokensFromNftContract(chainId, nftContract, tokenI
     return null;
   }
 
-  console.log(graphResult);
-
   return {
     _lastUpdate: new Date(Number(graphResult?.data?._meta?.block?.timestamp) * 1000).toJSON(),
     ...graphResult.data.adOffers[0]

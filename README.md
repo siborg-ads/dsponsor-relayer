@@ -15,7 +15,7 @@ SUBGRAPH_ALCHEMY_KEY=xxxxxxxxxx
 2. Install dependencies and run the project:
 
 ```bash
-npm i # install node dependencies
+npm i -f # force install node dependencies
 npm run dev # run next app locally
 ```
 

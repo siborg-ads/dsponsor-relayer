@@ -7,7 +7,7 @@ export async function executeQuery(chainId, query, variables, options) {
   return options?.next?.tags?.length
     ? memoize(_executeQuery, {
         revalidateTags: (chainId, query, variables, options) => options.next.tags,
-        log: ["datacache", "verbose"]
+        log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
       })(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
 }
