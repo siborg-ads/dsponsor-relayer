@@ -1,19 +1,14 @@
-import { unstable_cache as cache } from "next/cache";
+import { memoize } from "nextjs-better-unstable-cache";
 import config from "@/config";
 import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
 
 export async function executeQuery(chainId, query, variables, options) {
   return options?.next?.tags?.length
-    ? cache(
-        async (chainId, query, variables, options) => {
-          return _executeQuery(chainId, query, variables, options);
-        },
-        ["graph"],
-        {
-          tags: options.next.tags
-        }
-      )(chainId, query, variables, options)
+    ? memoize(_executeQuery, {
+        revalidateTags: (chainId, query, variables, options) => options.next.tags,
+        log: ["datacache", "verbose"]
+      })(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
 }
 
@@ -41,7 +36,7 @@ async function _executeQuery(chainId, query, variables, options) {
     }
   `;
 
-  if (lastCurlyBraceIndex !== -1) {
+  if (query.includes("query IntrospectionQuery") === false && lastCurlyBraceIndex !== -1) {
     query = query.slice(0, lastCurlyBraceIndex) + metaBlock + query.slice(lastCurlyBraceIndex);
   }
 

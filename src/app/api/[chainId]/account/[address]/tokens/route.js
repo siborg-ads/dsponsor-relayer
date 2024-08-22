@@ -1,6 +1,5 @@
-import config from "@/config";
+import { getHoldings } from "@/queries/activity";
 import { getOfferTokensFromNftContracts } from "@/queries/offers";
-import { Alchemy } from "alchemy-sdk";
 
 export async function GET(request, context) {
   const { chainId, address } = context.params;
@@ -17,44 +16,7 @@ export async function GET(request, context) {
     });
   }
 
-  const settings = {
-    apiKey: process.env.NEXT_ALCHEMY_API_KEY,
-    network: config[chainId].network
-  };
-
-  const alchemy = new Alchemy(settings);
-
-  let tokens = [];
-  let pageKey = null;
-
-  do {
-    const { ownedNfts, pageKey: newPageKey } = await alchemy.nft.getNftsForOwner(address, {
-      pageKey
-    });
-    pageKey = newPageKey;
-    tokens = tokens.concat(ownedNfts);
-  } while (pageKey);
-
-  let possibleTokens = [];
-  for (const nft of tokens) {
-    if (nft.tokenId) {
-      possibleTokens.push({
-        tokenId: nft.tokenId,
-        tokenUri: nft.tokenUri,
-        nftContractAddress: nft.contract.address.toLowerCase(),
-        ownerAddress: address,
-        name: nft.contract.name,
-        symbol: nft.contract.symbol,
-        balance: nft.balance,
-        timeLastUpdated: nft.timeLastUpdated
-      });
-    }
-  }
-
-  const nftContracts = [...new Set(possibleTokens.map((token) => token.nftContractAddress))];
-  const tokenIds = [
-    ...new Set(possibleTokens.map((token) => `${token.nftContractAddress}-${token.tokenId}`))
-  ];
+  const { nftContracts, tokenIds } = await getHoldings(chainId, address);
 
   const result = await getOfferTokensFromNftContracts(chainId, nftContracts, tokenIds);
 
@@ -70,5 +32,3 @@ export async function GET(request, context) {
     }
   });
 }
-
-export const dynamic = "force-dynamic";

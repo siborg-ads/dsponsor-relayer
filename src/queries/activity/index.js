@@ -3,8 +3,9 @@ import { parseUnits, getAddress } from "ethers";
 import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
 import { getCurrencyInfos, priceFormattedForAllValuesObject } from "@/utils";
+import { memoize } from "nextjs-better-unstable-cache";
 
-export async function getAllOffers(fetchOptions, chainId) {
+export async function getAllOffers(chainId, options) {
   let skip = 0;
   let offers = [];
   // let hasMore = true;
@@ -21,7 +22,9 @@ export async function getAllOffers(fetchOptions, chainId) {
       }
     }
   `;
-  const graphResult = await executeQuery(chainId, getAllOffersQuery, { skip }, fetchOptions);
+  const baseOptions = { populate: false, next: { tags: [`${chainId}-adOffers`] } };
+  options = options ? { ...baseOptions, ...options } : baseOptions;
+  const graphResult = await executeQuery(chainId, getAllOffersQuery, { skip }, options);
 
   if (graphResult.data.adOffers.length > 0) {
     // hasMore = true;
@@ -36,21 +39,31 @@ export async function getAllOffers(fetchOptions, chainId) {
   return offers;
 }
 
-export async function getHolders(chainId, nftContractAddresses, userAddress) {
+export const getHoldersForNftContract = memoize(_getHoldersForNftContract, {
+  revalidateTags: (chainId, nftContractAddress) => [
+    `${chainId}-nftContract-${getAddress(nftContractAddress)}`
+  ],
+  log: ["datacache", "verbose"]
+});
+
+async function _getHoldersForNftContract(chainId, nftContractAddress) {
   const settings = {
     apiKey: process.env.NEXT_ALCHEMY_API_KEY,
     network: config[chainId].network
   };
-
   const alchemy = new Alchemy(settings);
+  const { owners } = await alchemy.nft.getOwnersForContract(nftContractAddress, {
+    withTokenBalances: true
+  });
 
+  return owners;
+}
+
+export async function getHolders(chainId, nftContractAddresses, userAddress) {
   const ownerBalances = {};
 
   for (const nftContractAddress of nftContractAddresses) {
-    const { owners } = await alchemy.nft.getOwnersForContract(nftContractAddress, {
-      withTokenBalances: true
-    });
-
+    const owners = await getHoldersForNftContract(chainId, nftContractAddress);
     for (let { ownerAddress, tokenBalances } of owners) {
       ownerAddress = getAddress(ownerAddress);
       if (!ownerBalances[ownerAddress]) {
@@ -70,13 +83,61 @@ export async function getHolders(chainId, nftContractAddresses, userAddress) {
     : ownerBalances;
 }
 
+export const getHoldings = memoize(_getHoldings, {
+  revalidateTags: (chainId, ownerAddress) => [`${chainId}-userAddress-${getAddress(ownerAddress)}`],
+  log: ["datacache", "verbose"]
+});
+
+async function _getHoldings(chainId, ownerAddress) {
+  const settings = {
+    apiKey: process.env.NEXT_ALCHEMY_API_KEY,
+    network: config[chainId].network
+  };
+
+  const alchemy = new Alchemy(settings);
+
+  let tokens = [];
+  let pageKey = null;
+
+  do {
+    const { ownedNfts, pageKey: newPageKey } = await alchemy.nft.getNftsForOwner(ownerAddress, {
+      pageKey
+    });
+    pageKey = newPageKey;
+    tokens = tokens.concat(ownedNfts);
+  } while (pageKey);
+
+  let possibleTokens = [];
+  for (const nft of tokens) {
+    if (nft.tokenId) {
+      possibleTokens.push({
+        tokenId: nft.tokenId,
+        tokenUri: nft.tokenUri,
+        nftContractAddress: nft.contract.address.toLowerCase(),
+        ownerAddress,
+        name: nft.contract.name,
+        symbol: nft.contract.symbol,
+        balance: nft.balance,
+        timeLastUpdated: nft.timeLastUpdated
+      });
+    }
+  }
+
+  const nftContracts = [...new Set(possibleTokens.map((token) => token.nftContractAddress))];
+  const tokenIds = [
+    ...new Set(possibleTokens.map((token) => `${token.nftContractAddress}-${token.tokenId}`))
+  ];
+
+  return { nftContracts, tokenIds };
+}
+
 export async function getSpendings(
-  fetchOptions,
   chainId,
   nftContractAddress,
   userAddress,
   fromTimestamp,
-  toTimestamp
+  toTimestamp,
+  options
 ) {
   nftContractAddress = nftContractAddress ? nftContractAddress.toLowerCase() : "";
 
@@ -268,6 +329,18 @@ export async function getSpendings(
   // while (!noMoreTokens) {
   // noMoreTokens = true;
 
+  const tags = [];
+  if (nftContractAddress?.length) {
+    tags.push(`${chainId}-nftContract-${getAddress(nftContractAddress)}`);
+  }
+  if (userAddress?.length) {
+    tags.push(`${chainId}-userAddress-${getAddress(userAddress)}`);
+  }
+  if (tags.length === 0) {
+    tags.push(`${chainId}-activity`);
+  }
+  const baseOptions = { populate: false, next: { tags } };
+  options = options ? { ...baseOptions, ...options } : baseOptions;
   const graphResult = await executeQuery(
     chainId,
     getSpendingsQuery,
@@ -281,7 +354,7 @@ export async function getSpendings(
       firstTokens,
       skipTokens
     },
-    fetchOptions
+    options
   );
 
   const { adOffers } = graphResult.data;

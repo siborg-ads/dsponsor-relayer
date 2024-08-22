@@ -14,11 +14,7 @@ export async function GET(request, context) {
     adOfferId: offerId,
     tokenId,
     adParameterId,
-    defaultAdParameterKey,
-    options: {
-      populate: false,
-      next: { revalidate: 15 * 60 } // 15 minutes
-    }
+    defaultAdParameterKey
   });
 
   try {
@@ -36,5 +32,3 @@ export async function GET(request, context) {
     });
   }
 }
-
-export const dynamic = "force-dynamic";

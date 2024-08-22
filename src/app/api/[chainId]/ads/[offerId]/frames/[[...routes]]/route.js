@@ -8,9 +8,11 @@ import DSponsorMarketplaceABI from "@/config/abis/DSponsorMarketplace.js";
 import { getRandomAdData, getValidatedAds } from "@/queries/ads";
 import { getEthQuote } from "@/queries/uniswap/quote";
 import { isValidUrl } from "@/utils";
+import { getAddress } from "ethers";
 import { Button, Frog, TextInput } from "frog";
 import { handle } from "frog/next";
 import { createSystem } from "frog/ui";
+import { revalidateTag } from "next/cache";
 
 const { Box, Heading, Text, VStack, Image, vars } = createSystem();
 
@@ -179,7 +181,8 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
   try {
     if (isValidUrl(image)) {
       const imageResponse = await fetch(image, {
-        method: "HEAD"
+        method: "HEAD",
+        cache: "force-cache"
       });
       contentType = imageResponse.headers.get("Content-Type");
     }
@@ -297,17 +300,23 @@ app.transaction("/api/:chainId/ads/:offerId/frames/:tokenId/txdata/:action", asy
         adDatas: []
       };
 
+      const nftContractAddress = getAddress(validatedAds[tokenId].nftContract.id);
+      revalidateTag(`${chainId}-nftContract-${nftContractAddress}`);
+      revalidateTag(`${chainId}-userAddress-${getAddress(frameData.address)}`);
+      revalidateTag(`${chainId}-adOffer-${offerId}`);
+      revalidateTag(`${chainId}-activity`);
+
       return c.contract({
         abi: DSponsorAdminABI,
         chainId: `eip155:${chainId}`,
         functionName: "mintAndSubmit",
         args: [mintParams],
-        to: config[chainId].smartContracts.DSPONSOR_ADMIN.address,
+        to: nftContractAddress,
         value
       });
     }
   } else if (action === actions.BUY && secondary) {
-    const { id: listingId, currency, buyoutPricePerToken } = secondary || {};
+    const { id: listingId, lister, currency, buyoutPricePerToken } = secondary || {};
 
     if (listingId && currency && buyoutPricePerToken) {
       const { amountInEthWithSlippage: value } = await getEthQuote(
@@ -325,17 +334,26 @@ app.transaction("/api/:chainId/ads/:offerId/frames/:tokenId/txdata/:action", asy
         referralInformation: ""
       };
 
+      const nftContractAddress = getAddress(
+        config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address
+      );
+      revalidateTag(`${chainId}-nftContract-${nftContractAddress}`);
+      revalidateTag(`${chainId}-userAddress-${getAddress(frameData.address)}`);
+      revalidateTag(`${chainId}-userAddress-${getAddress(lister)}`);
+      revalidateTag(`${chainId}-adOffer-${offerId}`);
+      revalidateTag(`${chainId}-activity`);
+
       return c.contract({
         abi: DSponsorMarketplaceABI,
         chainId: `eip155:${chainId}`,
         functionName: "buy",
         args: [buyParams],
-        to: config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address,
+        to: nftContractAddress,
         value
       });
     }
   } else if (action === actions.BID && secondary) {
-    const { id: listingId, currency, bidPriceStructure } = secondary || {};
+    const { id: listingId, lister, currency, bidPriceStructure } = secondary || {};
     const { minimalBidPerToken } = bidPriceStructure || {};
 
     if (listingId && currency && minimalBidPerToken) {
@@ -346,12 +364,21 @@ app.transaction("/api/:chainId/ads/:offerId/frames/:tokenId/txdata/:action", asy
       );
       const args = [listingId, minimalBidPerToken, frameData.address, "frame"];
 
+      const nftContractAddress = getAddress(
+        config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address
+      );
+      revalidateTag(`${chainId}-nftContract-${nftContractAddress}`);
+      revalidateTag(`${chainId}-userAddress-${getAddress(frameData.address)}`);
+      revalidateTag(`${chainId}-userAddress-${getAddress(lister)}`);
+      revalidateTag(`${chainId}-adOffer-${offerId}`);
+      revalidateTag(`${chainId}-activity`);
+
       return c.contract({
         abi: DSponsorMarketplaceABI,
         chainId: `eip155:${chainId}`,
         functionName: "bid",
         args,
-        to: config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address,
+        to: nftContractAddress,
         value
       });
     }
@@ -360,5 +387,3 @@ app.transaction("/api/:chainId/ads/:offerId/frames/:tokenId/txdata/:action", asy
 
 export const GET = handle(app);
 export const POST = handle(app);
-
-export const dynamic = "force-dynamic";

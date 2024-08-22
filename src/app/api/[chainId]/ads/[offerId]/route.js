@@ -31,10 +31,7 @@ export async function GET(request, context) {
 
   return new Response(JSON.stringify(Object.assign(result), null, 4), {
     headers: {
-      "content-type": "application/json",
-      "CDN-Cache-Control": "public, s-maxage=600, stale-while-revalidate=60"
+      "content-type": "application/json"
     }
   });
 }
-
-export const revalidate = 900; // 15 minutes

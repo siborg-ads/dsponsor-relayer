@@ -22,14 +22,7 @@ export default async function ClickableLogosGridIframePage(req) {
   const response = await getValidatedAds({
     chainId,
     adOfferId: offerId,
-    adParameterIds,
-    options: {
-      populate: false,
-      next: {
-        tags: ["test"]
-        // revalidate: 15 * 60 // 15 minutes
-      }
-    }
+    adParameterIds
   });
 
   if (!response) {

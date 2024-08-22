@@ -1,16 +1,23 @@
 import config from "@/config";
 import { priceFormattedForAllValuesObject } from "@/utils/string";
 import { Transaction, ethers, getAddress, isAddress } from "ethers";
+import { memoize } from "nextjs-better-unstable-cache";
+
 import Quoter from "@uniswap/v3-periphery/artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json";
 
-export const getEthQuote = async (
+export const getEthQuote = memoize(_getEthQuote, {
+  duration: 5 * 60, // 5 minutes
+  log: ["datacache", "verbose"]
+});
+
+async function _getEthQuote(
   chainId,
   tokenOutAddr,
   amountOut,
   slippagePerCent = 0.3,
   shield3Check = false,
   recipient
-) => {
+) {
   const uniswapV3QuoterAddr = config?.[chainId]?.smartContracts?.UNISWAP_QUOTER?.address;
   const WNATIVE_ADDR = config?.[chainId]?.smartContracts?.WNATIVE?.address;
   const USDC_ADDR = config?.[chainId]?.smartContracts?.USDC?.address;
@@ -158,6 +165,7 @@ export const getEthQuote = async (
   const { amountUSDC: amountUSDCFormatted } = priceFormattedForAllValuesObject(6, { amountUSDC });
 
   return {
+    _lastUpdated: new Date().toISOString(),
     amountInEth: amountInEth.toString(),
     amountInEthWithSlippage: amountInEthWithSlippage.toString(),
     amountUSDC: amountUSDC.toString(),
@@ -166,4 +174,4 @@ export const getEthQuote = async (
     amountUSDCFormatted,
     shield3Decisions
   };
-};
+}

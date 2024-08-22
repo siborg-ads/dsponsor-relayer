@@ -1,3 +1,4 @@
+import { getAddress } from "ethers";
 import { executeQuery } from "@/queries/subgraph";
 
 const getOfferTokensFromNftContractQuery = /* GraphQL */ `
@@ -8,19 +9,35 @@ const getOfferTokensFromNftContractQuery = /* GraphQL */ `
   }
 `;
 
-export async function getOfferTokensFromNftContract(chainId, nftContract, tokenIds) {
+export async function getOfferTokensFromNftContract(chainId, nftContract, tokenIds, options) {
   const variables = {
     nftContract,
     tokenIds
   };
 
-  const graphResult = await executeQuery(chainId, getOfferTokensFromNftContractQuery, variables);
+  const baseOptions = {
+    populate: true,
+    next: { tags: [`${chainId}-nftContract-${getAddress(nftContract)}`] }
+  };
+  options = options ? { ...baseOptions, ...options } : baseOptions;
+
+  const graphResult = await executeQuery(
+    chainId,
+    getOfferTokensFromNftContractQuery,
+    variables,
+    options
+  );
 
   if (!graphResult || !graphResult.data || !graphResult.data.adOffers[0]) {
     return null;
   }
 
-  return graphResult.data.adOffers[0];
+  console.log(graphResult);
+
+  return {
+    _lastUpdate: new Date(Number(graphResult?.data?._meta?.block?.timestamp) * 1000).toJSON(),
+    ...graphResult.data.adOffers[0]
+  };
 }
 
 const getOfferTokensFromNftContractsQuery = /* GraphQL */ `
@@ -31,13 +48,25 @@ const getOfferTokensFromNftContractsQuery = /* GraphQL */ `
   }
 `;
 
-export async function getOfferTokensFromNftContracts(chainId, nftContracts, tokenIds) {
+export async function getOfferTokensFromNftContracts(chainId, nftContracts, tokenIds, options) {
   const variables = {
     nftContracts,
     tokenIds
   };
 
-  const graphResult = await executeQuery(chainId, getOfferTokensFromNftContractsQuery, variables);
+  const baseOptions = {
+    populate: false,
+    next: {
+      tags: nftContracts.map((nftContract) => `${chainId}-nftContract-${getAddress(nftContract)}`)
+    }
+  };
+  options = options ? { ...baseOptions, ...options } : baseOptions;
+  const graphResult = await executeQuery(
+    chainId,
+    getOfferTokensFromNftContractsQuery,
+    variables,
+    options
+  );
 
   if (!graphResult || !graphResult.data || !graphResult.data.adOffers) {
     return null;

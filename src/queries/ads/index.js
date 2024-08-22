@@ -63,6 +63,8 @@ export async function getValidatedAds({
     variables.tokenIds = tokenIds;
   }
 
+  const baseOptions = { populate: false, next: { tags: [`${chainId}-adOffer-${adOfferId}`] } };
+  options = options ? { ...baseOptions, ...options } : baseOptions;
   const graphResult = await executeQuery(chainId, query, variables, options);
 
   if (
@@ -213,6 +215,7 @@ export async function getValidatedAds({
 
   return Object.assign(
     {
+      _lastUpdate: new Date(Number(graphResult?.data?._meta?.block?.timestamp) * 1000).toJSON(),
       _tokenIds: tokenIds.sort((strA, strB) => {
         const a = BigInt(strA);
         const b = BigInt(strB);
@@ -225,8 +228,7 @@ export async function getValidatedAds({
         }
       }),
       _tokenData: tokenDatas,
-      _adParameterIds: adParameterIds,
-      _lastUpdate: new Date(Number(graphResult?.data?._meta?.block?.timestamp) * 1000).toJSON()
+      _adParameterIds: adParameterIds
     },
 
     result

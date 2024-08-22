@@ -192,6 +192,7 @@ export const TokenFragment = /* GraphQL */ `
       where: { status: CREATED }
     ) {
       id
+      lister
       quantity
       listingType
       startTime

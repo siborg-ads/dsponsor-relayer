@@ -23,16 +23,11 @@ export async function GET(request, context) {
     : null;
   const nftContractAddress = searchParams.get("nftContractAddress");
 
-  const fetchOptions = {
-    populate: false
-    // next: { revalidate }
-  };
-
   // const provider = new ethers.JsonRpcProvider(config[1].rpcURL); // ethereum RPC for ENS
 
   let nftContractAddresses = [];
   if (!nftContractAddress) {
-    const allOffers = await getAllOffers(fetchOptions, chainId);
+    const allOffers = await getAllOffers(chainId);
     nftContractAddresses = allOffers.map((offer) => offer.nftContract.id);
   } else {
     nftContractAddresses = nftContractAddress.split(",");
@@ -41,14 +36,7 @@ export async function GET(request, context) {
   const [holders, { lastBid, totalBids, spendings, protocolFees, protocolFeeCurrency }] =
     await Promise.all([
       getHolders(chainId, nftContractAddresses, userAddress),
-      getSpendings(
-        fetchOptions,
-        chainId,
-        nftContractAddress,
-        userAddress,
-        fromTimestamp,
-        toTimestamp
-      )
+      getSpendings(chainId, nftContractAddress, userAddress, fromTimestamp, toTimestamp)
     ]);
 
   const result = {};
@@ -209,8 +197,6 @@ export async function GET(request, context) {
     ? lastBidderEns
     : lastBid.bidderAddr.slice(0, 6) + "..." + lastBid.bidderAddr.slice(-4);
 
-  const lastUpdate = new Date().toJSON();
-
   const lastActivities = Object.values(protocolFees)
 
     .sort((a, b) => b.blockTimestamp - a.blockTimestamp)
@@ -223,7 +209,6 @@ export async function GET(request, context) {
 
   const response = JSON.stringify(
     {
-      lastUpdate,
       protocolFeeCurrency, // WETH
       totalBids,
       ...priceFormattedForAllValuesObject(6, {
@@ -247,10 +232,7 @@ export async function GET(request, context) {
 
   return new Response(response, {
     headers: {
-      "content-type": "application/json",
-      "CDN-Cache-Control": "public, s-maxage=600, stale-while-revalidate=60"
+      "content-type": "application/json"
     }
   });
 }
-
-export const revalidate = 900; // 15 minutes

@@ -17,6 +17,7 @@
     "frog": "^0.11.4",
     "hono": "^4.3.11",
     "next": "^15.0.0-rc.0",
+    "nextjs-better-unstable-cache": "^1.1.0",
     "numeral": "^2.0.6",
     "react": "^19.0.0-rc-6ebfd5b0-20240818",
     "react-dom": "^19.0.0-rc-6ebfd5b0-20240818",
