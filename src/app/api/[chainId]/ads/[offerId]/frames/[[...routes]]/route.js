@@ -100,7 +100,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
       image = _validatedAds[mintTokenId][imageURL].data;
 
       const action = actions.MINT;
-      const nftContractAddress = getAddress(config[chainId].smartContracts.DSPONSOR_ADMIN.address);
+      const contractAddress = getAddress(config[chainId].smartContracts.DSPONSOR_ADMIN.address);
       const { mint } = _validatedAds[mintTokenId]._buy || {};
       const { currency, mintPriceStructure } = mint[0] || {};
       const { totalAmount } = mintPriceStructure || {};
@@ -120,7 +120,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
 
       deriveState((previousState) => {
         previousState.txs[txId] = {
-          nftContractAddress,
+          contractAddress,
           action,
           params: { args: [mintParams] },
           totalAmount,
@@ -203,13 +203,13 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
           const args = listingType === "Direct" ? buyParams : bidParams;
           const totalAmount = listingType === "Direct" ? buyoutPricePerToken : minimalBidPerToken;
 
-          const nftContractAddress = getAddress(
+          const contractAddress = getAddress(
             config[chainId].smartContracts.DSPONSOR_MARKETPLACE.address
           );
 
           deriveState((previousState) => {
             previousState.txs[txId] = {
-              nftContractAddress,
+              contractAddress,
               action,
               params: { lister, args },
               totalAmount,
@@ -327,7 +327,7 @@ app.frame("/api/:chainId/ads/:offerId/frames/:tokenId/txres/:txId", async (c) =>
   });
 
   const {
-    nftContractAddress,
+    // contractAddress,
     // action,
     params: { lister }
     // totalAmount,
@@ -338,9 +338,6 @@ app.frame("/api/:chainId/ads/:offerId/frames/:tokenId/txres/:txId", async (c) =>
   const provider = new ethers.JsonRpcProvider(rpcURL);
   const { from } = (await provider.getTransaction(transactionId)) || {};
 
-  if (nftContractAddress) {
-    revalidateTag(`${chainId}-nftContract-${getAddress(nftContractAddress)}`);
-  }
   if (from) {
     revalidateTag(`${chainId}-userAddress-${getAddress(from)}`);
   }
@@ -378,41 +375,41 @@ app.transaction("/api/:chainId/ads/:offerId/frames/:tokenId/txdata/:txId", async
   const { previousState, address } = c;
 
   const {
-    nftContractAddress,
+    contractAddress,
     action,
     params: { args },
     // totalAmount,
     value
   } = previousState.txs[txId] || {};
 
-  if (action === actions.MINT && args && nftContractAddress) {
+  if (action === actions.MINT && args && contractAddress) {
     args[0].to = address;
     return c.contract({
       abi: DSponsorAdminABI,
       chainId: `eip155:${chainId}`,
       functionName: "mintAndSubmit",
       args,
-      to: nftContractAddress,
+      to: contractAddress,
       value
     });
-  } else if (action === actions.BUY && args && nftContractAddress) {
+  } else if (action === actions.BUY && args && contractAddress) {
     args[0].buyFor = address;
     return c.contract({
       abi: DSponsorMarketplaceABI,
       chainId: `eip155:${chainId}`,
       functionName: "buy",
       args,
-      to: nftContractAddress,
+      to: contractAddress,
       value
     });
-  } else if (action === actions.BID && args && nftContractAddress) {
+  } else if (action === actions.BID && args && contractAddress) {
     args[2] = address;
     return c.contract({
       abi: DSponsorMarketplaceABI,
       chainId: `eip155:${chainId}`,
       functionName: "bid",
       args,
-      to: nftContractAddress,
+      to: contractAddress,
       value
     });
   }
