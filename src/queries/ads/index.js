@@ -213,9 +213,6 @@ export async function getValidatedAds({
     }
   }
 
-  // eslint-disable-next-line no-unused-vars
-  const { tokens, ...restNftContract } = nftContract;
-
   return Object.assign(
     {
       _lastUpdate: new Date(Number(graphResult?.data?._meta?.block?.timestamp) * 1000).toJSON(),
@@ -230,7 +227,6 @@ export async function getValidatedAds({
           return 0;
         }
       }),
-      nftContract: restNftContract,
       _tokenData: tokenDatas,
       _adParameterIds: adParameterIds
     },

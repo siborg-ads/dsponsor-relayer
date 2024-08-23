@@ -23,7 +23,7 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
       bids &&
       ((bids[0] && bids[0].creationTimestamp && bids[0].totalBidAmount) || bids.length == 0);
     if (validPopulatedBids) {
-      bids = bids.sort((a, b) => b.creationTimestamp - a.creationTimestamp);
+      bids = bids.sort((a, b) => Number(b.creationTimestamp) - Number(a.creationTimestamp));
     }
 
     nftContract = token?.nftContract?.royalty ? token.nftContract : nftContract;

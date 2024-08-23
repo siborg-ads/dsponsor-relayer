@@ -2,14 +2,46 @@
 
 The Relayer App provides API endpoints and UI components for the [DSponsor ecosystem](https://dsponsor.com). It processes and transforms on-chain data indexed by the [DSponsor subgraph](https://github.com/dcast-media/dsponsor-subgraph) deployed on The Graph Network.
 
+- [DSponsor Relayer](#dsponsor-relayer)
+  - [Development setup](#development-setup)
+  - [Caching strategy](#caching-strategy)
+    - [Front end usage](#front-end-usage)
+  - [Integrations](#integrations)
+    - [Generic](#generic)
+      - [Get image for a specific token](#get-image-for-a-specific-token)
+      - [Get link for a specific token](#get-link-for-a-specific-token)
+    - [Clickable Logos Grid](#clickable-logos-grid)
+      - [Iframe](#iframe)
+      - [HTML table](#html-table)
+    - [Dynamic Banner](#dynamic-banner)
+      - [Dynamic Banner Iframe](#dynamic-banner-iframe)
+      - [Warpcast Frame](#warpcast-frame)
+        - [Warpcast Frame Parameters Details](#warpcast-frame-parameters-details)
+      - [Warpcast Frame Response](#warpcast-frame-response)
+      - [Image only](#image-only)
+  - [API endpoints](#api-endpoints)
+    - [Get a sponsor's ad spaces](#get-a-sponsors-ad-spaces)
+    - [Users activity](#users-activity)
+    - [Ad spaces data for an offer](#ad-spaces-data-for-an-offer)
+    - [Graph proxy](#graph-proxy)
+    - [Price quote](#price-quote)
+    - [Token metadata](#token-metadata)
+
 ## Development setup
 
-1. Create a `.env.local` file:
+1. Create and complete a `.env.local` file:
 
-```
-NEXT_ALCHEMY_API_KEY=<your-alchemy-api-key>
+```env
+# required
+NEXT_ALCHEMY_API_KEY=xxxxxxxx
+
+# from src/config, you may need it
 NEXT_DEV_URL=http://localhost:3000
-SUBGRAPH_ALCHEMY_KEY=xxxxxxxxxx
+SUBGRAPH_ALCHEMY_KEY=xxxxx
+THEGRAPH_API_KEY=xxxxxxxxxx
+
+# optionnal
+NEXT_CACHE_LOGS=datacache,verbose
 ```
 
 2. Install dependencies and run the project:
@@ -21,6 +53,30 @@ npm run dev # run next app locally
 
 3. Open [http://localhost:3000](http://localhost:3000) in your browser to test.
 
+## Caching strategy
+
+Responses from the Relayer are cached with on-demand revalidation using tags. To update the cache, you may need to send a POST request to the `/api/revalidate` route. Check the `Cache tags` information for each endpoint below to know which cache tags are used.
+
+```bash
+curl 'https://relayer.dsponsor.com/api/revalidate' --data-raw '{"tags": ["11155111-adOffer-1"] }'
+```
+
+### Front end usage
+
+Revalidation request for the following actions is required:
+
+|Action|Tags to revalidate|
+|-|-|
+|Create ad offer|[`${chainId}-userAddress-${creatorAddress}`,`${chainId}-adOffers`]|
+|Update ad offer information, Update mint price|[`${chainId}-nftContract-${offerNftContractAddr}`,`${chainId}-adOffer-${adOfferId}`]|
+|Airdrop token|[`${chainId}-nftContract-${offerNftContractAddr}`,`${chainId}-adOffer-${adOfferId}`, `${chainId}-userAddress-${ownerAddress}`]|
+|Mint token|[`${chainId}-nftContract-${offerNftContractAddr}`,`${chainId}-adOffer-${adOfferId}`, `${chainId}-userAddress-${ownerAddress}`,`${chainId}-activity`]|
+|Transfer token|[`${chainId}-nftContract-${offerNftContractAddr}`,`${chainId}-adOffer-${adOfferId}`,`${chainId}-userAddress-${prevOwnerAddress}`, `${chainId}-userAddress-${newOwnerAddress}`]|
+|Create, Cancel listing|[`${chainId}-nftContract-${offerNftContractAddr}`,`${chainId}-adOffer-${adOfferId}`, `${chainId}-userAddress-${listerAddress}`]|
+|Buy, Bid, Close listing|[`${chainId}-nftContract-${offerNftContractAddr}`,`${chainId}-adOffer-${adOfferId}`, `${chainId}-userAddress-${listerAddress}`,`${chainId}-userAddress-${buyerAddress}`,`${chainId}-activity`]|
+|Bid|[`${chainId}-nftContract-${offerNftContractAddr}`,`${chainId}-adOffer-${adOfferId}`, `${chainId}-userAddress-${listerAddress}`,`${chainId}-userAddress-${previousBidderAddress}`,`${chainId}-userAddress-${newBidderAddress}`,`${chainId}-activity`]|
+|Ad submission/validation|[`${chainId}-nftContract-${offerNftContractAddr}`,`${chainId}-adOffer-${adOfferId}`, `${chainId}-userAddress-${ownerAddress}`,`${chainId}-userAddress-${adminAddress}`,`${chainId}-userAddress-${validatorAddress}`]|
+
 ## Integrations
 
 App base URL: `https://relayer.dsponsor.com/[chainId]/integrations/[offerId]`
@@ -31,9 +87,9 @@ App base URL: `https://relayer.dsponsor.com/[chainId]/integrations/[offerId]`
 
 Purpose: Retrieve the image for an ad offer token.
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/[tokenId]/image`|`ratio`, `adParameterId` (default: `imageURL`)|
+|Method|Endpoint|Parameters|Cache tags|
+|--|--|--|--|
+|`GET`|`/[tokenId]/image`|`ratio`, `adParameterId` (default: `imageURL`)|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -42,7 +98,7 @@ Purpose: Retrieve the image for an ad offer token.
 </summary>
 
 ```html
-<img src="https://relayer.dsponsor.com/84532/integrations/2/0/image">
+<img src="https://relayer.dsponsor.com/11155111/integrations/35/0/image">
 ```
 
 </details>
@@ -51,9 +107,9 @@ Purpose: Retrieve the image for an ad offer token.
 
 Purpose: Retrieve the link for an ad offer token.
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/[tokenId]/link`|`adParameterId` (default: `linkURL`)|
+|Method|Endpoint|Parameters|Cache tags|
+|--|--|--|--|
+|`GET`|`/[tokenId]/link`|`adParameterId` (default: `linkURL`)|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -62,7 +118,7 @@ Purpose: Retrieve the link for an ad offer token.
 </summary>
 
 ```html
-<a href="https://relayer.dsponsor.com/84532/integrations/2/0/link">
+<a href="https://relayer.dsponsor.com/11155111/integrations/35/0/link">
 ```
 
 </details>
@@ -75,9 +131,9 @@ Purpose: Displays a grid of clickable logos, each linking to a URL. Each ad spac
 
 Use for: Web
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/ClickableLogosGrid/iFrame`|`bgColor` (default: `0d102d`), `ratio`, `previewTokenId`, `previewImage`, `previewLink`|
+|Method|Endpoint|Parameters|Cache tags|
+|--|--|--|--|
+|`GET`|`/ClickableLogosGrid/iFrame`|`bgColor` (default: `0d102d`), `ratio`, `previewTokenId`, `previewImage`, `previewLink`|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -87,7 +143,7 @@ Example
 </summary>
 
 ```html
- <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation" loading="lazy" src="https://relayer.dsponsor.com/84532/integrations/2/ClickableLogosGrid/iFrame?bgColor=ebe9e8&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/reserved.webp&previewLink=https://google.fr" style="width:100%; height:100%; overflow:hidden; border: none;"></iframe>
+ <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation" loading="lazy" src="https://relayer.dsponsor.com/11155111/integrations/35/ClickableLogosGrid/iFrame?bgColor=ebe9e8&ratio=1:1&previewTokenId=0&previewImage=https://relayer.dsponsor.com/reserved.webp&previewLink=https://google.fr" style="width:100%; height:100%; overflow:hidden; border: none;"></iframe>
 ```
 
 </details>
@@ -102,125 +158,61 @@ Use for: Newsletters, GitHub READMEs
 Example
 </summary>
 
-##### HTML code
+- HTML code
 
 ```html
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
   <tr>
     <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/0/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/0/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      <a href="https://relayer.dsponsor.com/11155111/integrations/35/0/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/integrations/35/0/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
     <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/1/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/1/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      <a href="https://relayer.dsponsor.com/11155111/integrations/35/1/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/integrations/35/1/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
     <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/2/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/2/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      <a href="https://relayer.dsponsor.com/11155111/integrations/35/2/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/integrations/35/2/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
     <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/3/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/3/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      <a href="https://relayer.dsponsor.com/11155111/integrations/35/3/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/integrations/35/3/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/4/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/4/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/5/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/5/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/6/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/6/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/7/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/7/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/8/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/8/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/9/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/9/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-  </tr>
+    </td>  
+  </tr> 
 </table>
 
 ```
 
-##### Result
+- Result
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
   <tr>
     <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/0/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/0/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      <a href="https://relayer.dsponsor.com/11155111/integrations/35/0/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/integrations/35/0/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
     <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/1/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/1/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      <a href="https://relayer.dsponsor.com/11155111/integrations/35/1/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/integrations/35/1/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
     <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/2/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/2/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      <a href="https://relayer.dsponsor.com/11155111/integrations/35/2/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/integrations/35/2/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
     </td>
     <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/3/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/3/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+      <a href="https://relayer.dsponsor.com/11155111/integrations/35/3/link" target="_blank" rel="noopener noreferrer">
+        <img src="https://relayer.dsponsor.com/11155111/integrations/35/3/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
       </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/4/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/4/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/5/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/5/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/6/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/6/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/7/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/7/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/8/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/8/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
-    <td width="20%" style="text-align: center; padding: 10px;">
-      <a href="https://relayer.dsponsor.com/84532/integrations/2/9/link" target="_blank" rel="noopener noreferrer">
-        <img src="https://relayer.dsponsor.com/84532/integrations/2/9/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
-      </a>
-    </td>
+    </td>  
   </tr>
 </table>
 
@@ -230,13 +222,13 @@ Example
 
 Purpose: Displays a single clickable image, randomly selected from all validated ad spaces of an offer.
 
-#### Iframe
+#### Dynamic Banner Iframe
 
 Use for: Web
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/DynamicBanner/iFrame`|`bgColor` (default: `0d102d`), `ratio`, `tokenIds` (default to all from the offer), `previewImage`, `previewLink`|
+|Method|Endpoint|Parameters|Cache Tags|
+|--|--|--|--|
+|`GET`|`/DynamicBanner/iFrame`|`bgColor` (default: `0d102d`), `ratio`, `tokenIds` (default to all from the offer), `previewImage`, `previewLink`|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -246,7 +238,7 @@ Example
 </summary>
 
 ```html
- <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation" loading="lazy" src="https://relayer.dsponsor.com/84532/integrations/2/DynamicBanner/iFrame?bgColor=0d102d&ratio=5:1&tokenIds=1,2,3,4,5,6" style="width:100%; height:100%; overflow:hidden; border: none;"></iframe>
+ <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation" loading="lazy" src="https://relayer.dsponsor.com/11155111/integrations/35/DynamicBanner/iFrame?bgColor=0d102d&ratio=5:1&tokenIds=1,2" style="width:100%; height:100%; overflow:hidden; border: none;"></iframe>
 ```
 
 </details>
@@ -255,19 +247,19 @@ Example
 
 Use for: a post published on Warpcast
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/DynamicBanner/farcasterFrame`|`items` (default: `sale,sponsor`), `ratio` (default: `1.91:1`), `tokenIds` (default to all from the offer), `tokenDataInput`, `tokenDatas`|
+|Method|Endpoint|Parameters|Cache Tags|
+|--|--|--|--|
+|`GET`|`/DynamicBanner/farcasterFrame`|`items` (default: `sale,sponsor`), `ratio` (default: `1.91:1`), `tokenIds` (default to all from the offer), `tokenDataInput`, `tokenDatas`|[`${chainId}-adOffer-${adOfferId}`]|
 
-###### Parameters Details
+##### Warpcast Frame Parameters Details
 
-* `items`:
-  * `sale`: the frame will include transaction button to initiate mint, buy or bid action
-  * `sponsor`: the frame will include validated ad data from the sponsor
-* `ratio`: `1.91:1` or `1:1`
-* `tokenIds`: restrict to a specific list of token ids
-* `tokenDataInput`: if provided, display a Text field (`tokenDataInput` value as placeholder) and allow token data look up from the user input
-* `tokenDatas`: restrict to a specific list of token ids from provided token data
+- `items`:
+  - `sale`: the frame will include transaction button to initiate mint, buy or bid action
+  - `sponsor`: the frame will include validated ad data from the sponsor
+- `ratio`: `1.91:1` or `1:1`
+- `tokenIds`: restrict to a specific list of token ids
+- `tokenDataInput`: if provided, display a Text field (`tokenDataInput` value as placeholder) and allow token data look up from the user input
+- `tokenDatas`: restrict to a specific list of token ids from provided token data
 
 <details>
 
@@ -278,7 +270,36 @@ Example
 
 `https://relayer.dsponsor.com/84532/integrations/1/DynamicBanner/farcasterFrame?items=sale&ratio=1:1&tokenDatas=bitcoin&tokenDataInput=look%20for%20another%20token...`
 
+#### Warpcast Frame Response
+
 ![frameEx](./public/frame-ex.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta property="fc:frame" content="vNext"/>
+      <meta property="fc:frame:image:aspect_ratio" content="1.91:1"/>
+      <meta property="fc:frame:image" content="https://relayer.dsponsor.com/api/84532/ads/1/frames/image?image=N4IgLghg5iBcIBMCWA3EAaEAHATgeywGc5RCwBPAGwFMTElCtKJy4QAzGgDww%252B4BEkOagGMwSPADs2IvJQCuAW2mYAFtSRRVYNgEYADPoCkvAO5IEYVXsMmAvphGqklBMOmxQuAsU8gnLm7UHl74RHSEOCJs2mBEsAD0CcLM5NQ4AHQIjFKEeJmyigkQKBAuEABGNAC0urUZWJIwmBCUOvDsOBCK1ACSis0geBUAVqJgAGJI7f5SkEgqIOaW1vAGxrzqmto2Gw7%252Bzq7ucADaALqYDACihCIQWNQIcGA48tR2%252BwFHwaehPhFRGJgOKERLJaipdJZHKSPIFPBFEplZhVai1eqNQatGadbp9Aa8YZjMRTGaySTzRbLKy7ExqDRaGbreyOQ5BDznS6EG53B5PWAvN52C4ga63e6PZ6vd6fNnHWAnUCQGDwZBoTDecJ%252BMhUWh%252BWSUfJsADE7DN5t4yEYqTYnGoPEwdq4gmEYgkHlmCmUvHYcwAykgAF56kAAZn0GQALAB2ABsugAnPoY-GkzHI1geLLAvK-lrSID4LF4kkUiwodksLl8hlCsVSuVUejdA0mrxsbauj1%252BoMieNSTI5mUqRYaWtbJsGTtx3tWTmfgqRWLeZKBdKPnPvhyldA2EgCRqwr5SBQaHQtozaYTRv3poOKcOzKPViBmbwDUb4KbzWbLQwmCwtrcD6AhCOM7qDl6iy%252BhSAbBmw4ZRnGibJshabRhmWaYJE0RFsCJbgpCmSVtW8KIg2KI1HULaYiA2ZbqcS7cuKfJSkKTE8hK-KCu8HEsauPF2EAA"/>
+      <meta property="og:image" content="https://relayer.dsponsor.com/api/84532/ads/1/frames/image?image=N4IgLghg5iBcIBMCWA3EAaEAHATgeywGc5RCwBPAGwFMTElCtKJy4QAzGgDww%252B4BEkOagGMwSPADs2IvJQCuAW2mYAFtSRRVYNgEYADPoCkvAO5IEYVXsMmAvphGqklBMOmxQuAsU8gnLm7UHl74RHSEOCJs2mBEsAD0CcLM5NQ4AHQIjFKEeJmyigkQKBAuEABGNAC0urUZWJIwmBCUOvDsOBCK1ACSis0geBUAVqJgAGJI7f5SkEgqIOaW1vAGxrzqmto2Gw7%252Bzq7ucADaALqYDACihCIQWNQIcGA48tR2%252BwFHwaehPhFRGJgOKERLJaipdJZHKSPIFPBFEplZhVai1eqNQatGadbp9Aa8YZjMRTGaySTzRbLKy7ExqDRaGbreyOQ5BDznS6EG53B5PWAvN52C4ga63e6PZ6vd6fNnHWAnUCQGDwZBoTDecJ%252BMhUWh%252BWSUfJsADE7DN5t4yEYqTYnGoPEwdq4gmEYgkHlmCmUvHYcwAykgAF56kAAZn0GQALAB2ABsugAnPoY-GkzHI1geLLAvK-lrSID4LF4kkUiwodksLl8hlCsVSuVUejdA0mrxsbauj1%252BoMieNSTI5mUqRYaWtbJsGTtx3tWTmfgqRWLeZKBdKPnPvhyldA2EgCRqwr5SBQaHQtozaYTRv3poOKcOzKPViBmbwDUb4KbzWbLQwmCwtrcD6AhCOM7qDl6iy%252BhSAbBmw4ZRnGibJshabRhmWaYJE0RFsCJbgpCmSVtW8KIg2KI1HULaYiA2ZbqcS7cuKfJSkKTE8hK-KCu8HEsauPF2EAA"/>
+      <meta property="og:title" content="Frog Frame"/>
+      <meta property="fc:frame:post_url" content="https://relayer.dsponsor.com/api/84532/ads/1/frames?initialPath=%252Fapi%252F84532%252Fads%252F1%252Fframes&amp;previousButtonValues=%2523A_%252C_t%252C_l"/>
+      <meta property="fc:frame:input:text" content="look for another token..."/>
+      <meta property="fc:frame:button:1" content="Lookup"/>
+      <meta property="fc:frame:button:1:action" content="post"/>
+      <meta property="fc:frame:button:1:target" content="https://relayer.dsponsor.com/api/84532/ads/1/frames?initialPath=%252Fapi%252F84532%252Fads%252F1%252Fframes&amp;previousButtonValues=%2523A_%252C_t%252C_l"/>
+      <meta property="fc:frame:button:2" content="Bid" data-value="_t"/>
+      <meta property="fc:frame:button:2:action" content="tx"/>
+      <meta property="fc:frame:button:2:target" content="https://relayer.dsponsor.com/api/84532/ads/1/frames/56960375584792109628315999883526364004747792730920852649053369508622489636429/txdata/Bid"/>
+      <meta property="fc:frame:button:2:post_url" content="https://relayer.dsponsor.com/api/84532/ads/1/frames/56960375584792109628315999883526364004747792730920852649053369508622489636429/txres?initialPath=%252Fapi%252F84532%252Fads%252F1%252Fframes&amp;previousButtonValues=%2523A_%252C_t%252C_l"/>
+      <meta property="fc:frame:button:3" content="Details" data-value="_l"/>
+      <meta property="fc:frame:button:3:action" content="link"/>
+      <meta property="fc:frame:button:3:target" content="https://app.dsponsor.com/base-sepolia/offer/1/56960375584792109628315999883526364004747792730920852649053369508622489636429?tokenData=bitcoin"/>
+      <meta property="frog:version" content="0.11.4"/>
+   </head>
+   <body></body>
+</html>
+```
 
 </details>
 
@@ -286,9 +307,9 @@ Example
 
 Use for: Newsletter, GitHub repo, ...
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/DynamicBanner/image`|`ratio`, `tokenIds` (default to all from the offer)|
+|Method|Endpoint|Parameters|Cache tags|
+|--|--|--|--|
+|`GET`|`/DynamicBanner/image`|`ratio`, `tokenIds` (default to all from the offer)|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -297,15 +318,15 @@ Example
 
 </summary>
 
-##### HTML code
+- HTML code
 
 ```html
-  <img src="https://relayer.dsponsor.com/11155111/integrations/1/DynamicBanner/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+  <img src="https://relayer.dsponsor.com/11155111/integrations/35/DynamicBanner/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
 ```
 
-##### Result
+- Result
 
-  <img src="https://relayer.dsponsor.com/11155111/integrations/1/DynamicBanner/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
+  <img src="https://relayer.dsponsor.com/11155111/integrations/35/DynamicBanner/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
 
 </details>
 
@@ -317,9 +338,9 @@ API base URL: `https://relayer.dsponsor.com/api/[chainId]`
 
 Purpose: Retrieve tokens from DSponsor ad offers owned by a specific wallet.
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/account/[userAddress]/tokens`| |
+|Method|Endpoint|Parameters|Cache tags|
+|--|--|--|--|
+|`GET`|`/account/[userAddress]/tokens`| |[`${chainId}-userAddress-${getAddress(ownerAddress)}`,`${chainId}-nftContract-${getAddress(nftContract)}`], for each `nftContractAddress` of tokens the user own|
 
 <details>
 
@@ -327,13 +348,13 @@ Purpose: Retrieve tokens from DSponsor ad offers owned by a specific wallet.
  Example
 </summary>
 
-#### Request
+- Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250E65d7C4CA7d39De766/tokens'
 ```
 
-#### Response
+- Response
 
 ```json
 [
@@ -623,9 +644,9 @@ curl 'https://relayer.dsponsor.com/api/11155111/account/0x9a7FAC267228f536A8f250
 
 Purpose: Retrieve all users activity
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/activity`| `fromTimestamp` (optionnal), `toTimestamp` (optionnal), `userAddress` (optionnal), `nftContractAddress` (optionnal)|
+|Method|Endpoint|Parameters|Cache tags|
+|--|--|--|--|
+|`GET`|`/activity`| `fromTimestamp` (optionnal), `toTimestamp` (optionnal), `userAddress` (optionnal), `nftContractAddress` (optionnal)|[`${chainId}-adOffers`,`${chainId}-userAddress-${getAddress(userAddress)}`,`${chainId}-nftContract-${getAddress(nftContract)}`], for each `nftContractAddress` of all offers|
 
 <details>
 
@@ -633,13 +654,13 @@ Purpose: Retrieve all users activity
  Example
 </summary>
 
-#### Request
+- Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/activity?fromTimestamp=1718356967&toTimestamp=1718469107&userAddress=0x8333c1B5131CC694c3A238E41e50cbc236e73DbC&nftContractAddress=0x51A533E5FBc542B0Df00c352D8A8A65Fff1727ac'
 ```
 
-#### Response
+- Response
 
 ```json
 {
@@ -814,9 +835,9 @@ curl 'https://relayer.dsponsor.com/api/11155111/activity?fromTimestamp=171835696
 
 Purpose: Retrieve data to display on sponsors' interfaces.
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/ads/[offerId]`| `tokenIds` (optionnal), `tokenData` (optionnal), `adParameterIds` (optionnal)|
+|Method|Endpoint|Parameters|Cache Tags|
+|--|--|--|--|
+|`GET`|`/ads/[offerId]`| `tokenIds` (optionnal), `tokenData` (optionnal), `adParameterIds` (optionnal)|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -824,13 +845,13 @@ Purpose: Retrieve data to display on sponsors' interfaces.
  Example
 </summary>
 
-#### Request
+- Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,staking&adParameterIds=imageURL,linkURL'
 ```
 
-#### Response
+- Response
 
 ```json
 {
@@ -1018,106 +1039,50 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
 
 </details>
 
-### Warpcast Frame Metadata
-
-Purpose: Retrieve valid metadata to display on a Warpcast post.
-
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET` or `POST`|`/ads/[offerId]/frames`|`items` (default: `sale,sponsor`), `ratio` (default: `1.91:1`), `tokenIds` (default to all from the offer), `tokenDataInput`, `tokenDatas`|
-
-#### Parameters Details
-
-* `items`:
-  * `sale`: the frame will include transaction button to initiate mint, buy or bid action
-  * `sponsor`: the frame will include validated ad data from the sponsor
-* `ratio`: `1.91:1` or `1:1`
-* `tokenIds`: restrict to a specific list of token ids
-* `tokenDataInput`: if provided, display a Text field and allow token data look up from the text input. Text field placeholder takes the `tokenDataInput`
-* `tokenDatas`: restrict to a specific list of token ids from provided token data
-
-<details>
-
-<summary>
-Example
-
-</summary>
-
-#### Request
-
-```bash
-curl https://relayer.dsponsor.com/api/84532/ads/1/frames?items=sale&ratio=1:1&tokenDatas=bitcoin&tokenDataInput=look%20for%20another%20token...
-```
-
-#### Response
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-   <head>
-      <meta property="fc:frame" content="vNext"/>
-      <meta property="fc:frame:image:aspect_ratio" content="1.91:1"/>
-      <meta property="fc:frame:image" content="https://relayer.dsponsor.com/api/84532/ads/1/frames/image?image=N4IgLghg5iBcIBMCWA3EAaEAHATgeywGc5RCwBPAGwFMTElCtKJy4QAzGgDww%252B4BEkOagGMwSPADs2IvJQCuAW2mYAFtSRRVYNgEYADPoCkvAO5IEYVXsMmAvphGqklBMOmxQuAsU8gnLm7UHl74RHSEOCJs2mBEsAD0CcLM5NQ4AHQIjFKEeJmyigkQKBAuEABGNAC0urUZWJIwmBCUOvDsOBCK1ACSis0geBUAVqJgAGJI7f5SkEgqIOaW1vAGxrzqmto2Gw7%252Bzq7ucADaALqYDACihCIQWNQIcGA48tR2%252BwFHwaehPhFRGJgOKERLJaipdJZHKSPIFPBFEplZhVai1eqNQatGadbp9Aa8YZjMRTGaySTzRbLKy7ExqDRaGbreyOQ5BDznS6EG53B5PWAvN52C4ga63e6PZ6vd6fNnHWAnUCQGDwZBoTDecJ%252BMhUWh%252BWSUfJsADE7DN5t4yEYqTYnGoPEwdq4gmEYgkHlmCmUvHYcwAykgAF56kAAZn0GQALAB2ABsugAnPoY-GkzHI1geLLAvK-lrSID4LF4kkUiwodksLl8hlCsVSuVUejdA0mrxsbauj1%252BoMieNSTI5mUqRYaWtbJsGTtx3tWTmfgqRWLeZKBdKPnPvhyldA2EgCRqwr5SBQaHQtozaYTRv3poOKcOzKPViBmbwDUb4KbzWbLQwmCwtrcD6AhCOM7qDl6iy%252BhSAbBmw4ZRnGibJshabRhmWaYJE0RFsCJbgpCmSVtW8KIg2KI1HULaYiA2ZbqcS7cuKfJSkKTE8hK-KCu8HEsauPF2EAA"/>
-      <meta property="og:image" content="https://relayer.dsponsor.com/api/84532/ads/1/frames/image?image=N4IgLghg5iBcIBMCWA3EAaEAHATgeywGc5RCwBPAGwFMTElCtKJy4QAzGgDww%252B4BEkOagGMwSPADs2IvJQCuAW2mYAFtSRRVYNgEYADPoCkvAO5IEYVXsMmAvphGqklBMOmxQuAsU8gnLm7UHl74RHSEOCJs2mBEsAD0CcLM5NQ4AHQIjFKEeJmyigkQKBAuEABGNAC0urUZWJIwmBCUOvDsOBCK1ACSis0geBUAVqJgAGJI7f5SkEgqIOaW1vAGxrzqmto2Gw7%252Bzq7ucADaALqYDACihCIQWNQIcGA48tR2%252BwFHwaehPhFRGJgOKERLJaipdJZHKSPIFPBFEplZhVai1eqNQatGadbp9Aa8YZjMRTGaySTzRbLKy7ExqDRaGbreyOQ5BDznS6EG53B5PWAvN52C4ga63e6PZ6vd6fNnHWAnUCQGDwZBoTDecJ%252BMhUWh%252BWSUfJsADE7DN5t4yEYqTYnGoPEwdq4gmEYgkHlmCmUvHYcwAykgAF56kAAZn0GQALAB2ABsugAnPoY-GkzHI1geLLAvK-lrSID4LF4kkUiwodksLl8hlCsVSuVUejdA0mrxsbauj1%252BoMieNSTI5mUqRYaWtbJsGTtx3tWTmfgqRWLeZKBdKPnPvhyldA2EgCRqwr5SBQaHQtozaYTRv3poOKcOzKPViBmbwDUb4KbzWbLQwmCwtrcD6AhCOM7qDl6iy%252BhSAbBmw4ZRnGibJshabRhmWaYJE0RFsCJbgpCmSVtW8KIg2KI1HULaYiA2ZbqcS7cuKfJSkKTE8hK-KCu8HEsauPF2EAA"/>
-      <meta property="og:title" content="Frog Frame"/>
-      <meta property="fc:frame:post_url" content="https://relayer.dsponsor.com/api/84532/ads/1/frames?initialPath=%252Fapi%252F84532%252Fads%252F1%252Fframes&amp;previousButtonValues=%2523A_%252C_t%252C_l"/>
-      <meta property="fc:frame:input:text" content="look for another token..."/>
-      <meta property="fc:frame:button:1" content="Lookup"/>
-      <meta property="fc:frame:button:1:action" content="post"/>
-      <meta property="fc:frame:button:1:target" content="https://relayer.dsponsor.com/api/84532/ads/1/frames?initialPath=%252Fapi%252F84532%252Fads%252F1%252Fframes&amp;previousButtonValues=%2523A_%252C_t%252C_l"/>
-      <meta property="fc:frame:button:2" content="Bid" data-value="_t"/>
-      <meta property="fc:frame:button:2:action" content="tx"/>
-      <meta property="fc:frame:button:2:target" content="https://relayer.dsponsor.com/api/84532/ads/1/frames/56960375584792109628315999883526364004747792730920852649053369508622489636429/txdata/Bid"/>
-      <meta property="fc:frame:button:2:post_url" content="https://relayer.dsponsor.com/api/84532/ads/1/frames/56960375584792109628315999883526364004747792730920852649053369508622489636429/txres?initialPath=%252Fapi%252F84532%252Fads%252F1%252Fframes&amp;previousButtonValues=%2523A_%252C_t%252C_l"/>
-      <meta property="fc:frame:button:3" content="Details" data-value="_l"/>
-      <meta property="fc:frame:button:3:action" content="link"/>
-      <meta property="fc:frame:button:3:target" content="https://app.dsponsor.com/base-sepolia/offer/1/56960375584792109628315999883526364004747792730920852649053369508622489636429?tokenData=bitcoin"/>
-      <meta property="frog:version" content="0.11.4"/>
-   </head>
-   <body></body>
-</html>
-```
-
-</details>
-
 ### Graph proxy
 
 Purpose: Relay any GraphQL request to the DSponsor subgraph.
 
-It also populate:
-
-* Metadata (if `adOffer --> metadataURL` is provided and valid)
-  * `offer.metadata`
-  * `token.metadata`
-* Mint information (if `price --> amount` & `price --> currency` are provided)
-  * `price.currencySymbol`
-  * `price.currencyDecimals`
-  * `price.currencyPriceUSDC`
-  * `price.currencyPriceUSDCFormatted`
-  * `price.minterAddress`
-  * `price.protocolFeeBps`
-  * `price.mintPriceStructure`
-  * `price.mintPriceStructureFormatted`
-  * `price.mintPriceStructureUsdcFormatted`
-* Secondary market information ( if `marketplaceListings --> reservePricePerToken`, `marketplaceListings --> buyoutPricePerToken`,  `marketplaceListings --> currency`, `marketplaceListings --> quantity`, `marketplaceListings --> bids --> totalBidAmount`, `nftContract --> royalty --> bps` are provided)
-  * `marketplaceListing.currencySymbol`
-  * `marketplaceListing.currencyDecimals`
-  * `marketplaceListing.currencyPriceUSDC`
-  * `marketplaceListing.currencyPriceUSDCFormatted`
-  * `marketplaceListing.marketplaceAddress`
-  * `marketplaceListing.protocolFeeBps`
-  * `marketplaceListing.minimalBidBps`
-  * `marketplaceListing.previousBidAmountBps`
-  * `marketplaceListing.bidPriceStructure`
-  * `marketplaceListing.bidPriceStructureFormatted`
-  * `marketplaceListing.bidPriceStructureUsdcFormatted`
-  * `marketplaceListing.buyPriceStructure`
-  * `marketplaceListing.buyPriceStructureFormatted`
-  * `marketplaceListing.buyPriceStructureUsdcFormatted`
-
 |Method|Endpoint|Parameters|
 |--|--|--|
-|`GET` or `POST`|`/graph`| `query` (required), `variables` (required)|
+|`GET` or `POST`|`/graph`| `query` (required), `variables` (required), `options` (optionnal)|
+
+The response will be automatically populated with a `_meta` object. `new Date(_meta.block.timestamp * 1000).toJSON()` gives you the last update date for your query.
+
+`options` can be used to:
+
+1. Provide Next.js cache instructions, including tags and revalidation (default: `options.next = { cache: "no-store" }`).
+
+2. Populate the response (default: `options.populate = true`):
+
+- Metadata (if `adOffer --> metadataURL` is provided and valid)
+  - `offer.metadata`
+  - `token.metadata`
+- Mint information (if `price --> amount` & `price --> currency` are provided)
+  - `price.currencySymbol`
+  - `price.currencyDecimals`
+  - `price.currencyPriceUSDC`
+  - `price.currencyPriceUSDCFormatted`
+  - `price.minterAddress`
+  - `price.protocolFeeBps`
+  - `price.mintPriceStructure`
+  - `price.mintPriceStructureFormatted`
+  - `price.mintPriceStructureUsdcFormatted`
+- Secondary market information ( if `marketplaceListings --> reservePricePerToken`, `marketplaceListings --> buyoutPricePerToken`,  `marketplaceListings --> currency`, `marketplaceListings --> quantity`, `marketplaceListings --> bids --> totalBidAmount`, `nftContract --> royalty --> bps` are provided)
+  - `marketplaceListing.currencySymbol`
+  - `marketplaceListing.currencyDecimals`
+  - `marketplaceListing.currencyPriceUSDC`
+  - `marketplaceListing.currencyPriceUSDCFormatted`
+  - `marketplaceListing.marketplaceAddress`
+  - `marketplaceListing.protocolFeeBps`
+  - `marketplaceListing.minimalBidBps`
+  - `marketplaceListing.previousBidAmountBps`
+  - `marketplaceListing.bidPriceStructure`
+  - `marketplaceListing.bidPriceStructureFormatted`
+  - `marketplaceListing.bidPriceStructureUsdcFormatted`
+  - `marketplaceListing.buyPriceStructure`
+  - `marketplaceListing.buyPriceStructureFormatted`
+  - `marketplaceListing.buyPriceStructureUsdcFormatted`
 
 You can use [Apollo's Sandbox](https://studio.apollographql.com/sandbox/explorer), with `https://relayer.dsponsor.com/api/11155111/graph` set as the endpoint for example.
 
@@ -1127,7 +1092,7 @@ You can use [Apollo's Sandbox](https://studio.apollographql.com/sandbox/explorer
  Example
 </summary>
 
-#### Request
+- Request
 
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/graph' \
@@ -1168,6 +1133,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                 creationTxHash                
                 bidder
                 status
+                totalBidAmount
                 paidBidAmount
                 refundProfit
               }
@@ -1187,13 +1153,18 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
     }",
     "variables": {
       "offerId": "1",
-      "tokenId": "11777442963095900354619381756649335357223894488042819701855156355147179312657"
+      "tokenId": "70622639689279718371527342103894932928233838121221666359043189029713682937432"
     },
-    "operationName": "OfferRequest"
+    "options": {
+     "populate": true,
+      "next": {
+        "tags": ["11155111-adOffer-1"]
+      }
+    }
   }'
 ```
 
-#### Response
+- Response
 
 ```json
 {
@@ -1201,7 +1172,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
     "adOffers": [
       {
         "id": "1",
-        "metadataURL": "https://bafkreicmn6gia3cplyt7tu56sfue6cpw5dm2dnwuz2zkj4dhqrg5bzwuua.ipfs.nftstorage.link/",
+        "metadataURL": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmV3RDQLXQa4DWkRz7NA7umjhdVf3gvpJH9NHyfzvooiv9",
         "nftContract": {
           "royalty": {
             "bps": "690",
@@ -1209,81 +1180,59 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
           },
           "prices": [
             {
-              "currency": "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8",
-              "amount": "30000000",
+              "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+              "amount": "9000000000000000",
               "enabled": true,
-              "currencySymbol": "USDC",
-              "currencyDecimals": "6",
-              "currencyPriceUSDC": "1000000",
-              "currencyPriceUSDCFormatted": "1",
-              "minterAddress": "0x22554D70702C60A5fa30297908005B6cE19eEf51",
+              "currencySymbol": "WETH",
+              "currencyDecimals": "18",
+              "currencyPriceUSDC": "294956040902",
+              "currencyPriceUSDCFormatted": "295K",
+              "minterAddress": "0x10E0447dDB66f1d33E6b10dB5099FBa231ceCE5C",
               "protocolFeeBps": "400",
               "mintPriceStructure": {
-                "creatorAmount": "30000000",
-                "protocolFeeAmount": "1200000",
-                "totalAmount": "31200000"
+                "creatorAmount": "9000000000000000",
+                "protocolFeeAmount": "360000000000000",
+                "totalAmount": "9360000000000000"
               },
               "mintPriceStructureFormatted": {
-                "creatorAmount": "30",
-                "protocolFeeAmount": "1.2",
-                "totalAmount": "31.2"
+                "creatorAmount": "0.009",
+                "protocolFeeAmount": "0.0₃4",
+                "totalAmount": "0.009"
               },
               "mintPriceStructureUsdcFormatted": {
-                "creatorAmount": "30",
-                "protocolFeeAmount": "1.2",
-                "totalAmount": "31.2"
+                "creatorAmount": "2.7K",
+                "protocolFeeAmount": "106.18",
+                "totalAmount": "2.8K"
               }
             }
           ],
           "tokens": [
             {
-              "tokenId": "11777442963095900354619381756649335357223894488042819701855156355147179312657",
+              "tokenId": "70622639689279718371527342103894932928233838121221666359043189029713682937432",
               "mint": {
-                "blockTimestamp": "1717182264",
-                "tokenData": "halving"
+                "blockTimestamp": "1722329256",
+                "tokenData": "test"
               },
               "prices": [],
               "marketplaceListings": [
                 {
-                  "id": "9",
+                  "id": "81",
                   "quantity": "1",
-                  "buyoutPricePerToken": "100000000000000000000",
-                  "reservePricePerToken": "15000000000000000",
+                  "buyoutPricePerToken": "900000000000000000",
+                  "reservePricePerToken": "6000000000000000",
                   "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
                   "bids": [
                     {
-                      "creationTimestamp": "1717589772",
-                      "creationTxHash": "0x66ad3d1f74d5cf42b499358070a0bcb9eefe7c7e59ed9ab7ca278a9ada0b5bcd",
-                      "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
-                      "status": "CANCELLED",
-                      "paidBidAmount": "15000000000000000",
-                      "refundProfit": "750000000000000",
-                      "amountsFormatted": {
-                        "paidBidAmount": "0.015",
-                        "refundProfit": "0.0₃7"
-                      }
-                    },
-                    {
-                      "creationTimestamp": "1717592064",
-                      "creationTxHash": "0x996bd910880da0c5e4c98188a2b41aaf1dcfbacfd2d5a7c1b3291fcaff829426",
-                      "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
-                      "status": "CANCELLED",
-                      "paidBidAmount": "16500000000000000",
-                      "refundProfit": "37500000000000",
-                      "amountsFormatted": {
-                        "paidBidAmount": "0.017",
-                        "refundProfit": "0.0₄4"
-                      }
-                    },
-                    {
-                      "creationTimestamp": "1717592220",
-                      "creationTxHash": "0xfd76497bc453d9b3cb1a675c0500ec521c1124c6a81c46f2c8676ab7e1ae784d",
+                      "creationTimestamp": "1724433480",
+                      "creationTxHash": "0x3d434342dc7c08a257364e8d2ac65b1fbeaee4218575d82efd737dfa76a13811",
                       "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
                       "status": "CREATED",
-                      "paidBidAmount": "17325000000000000",
+                      "totalBidAmount": "6000000000000000",
+                      "paidBidAmount": "6000000000000000",
                       "refundProfit": "0",
                       "amountsFormatted": {
-                        "paidBidAmount": "0.017",
+                        "totalBidAmount": "0.006",
+                        "paidBidAmount": "0.006",
                         "refundProfit": "0"
                       }
                     }
@@ -1299,104 +1248,110 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                   },
                   "currencySymbol": "WETH",
                   "currencyDecimals": "18",
-                  "currencyPriceUSDC": "117087691120",
-                  "currencyPriceUSDCFormatted": "117.1K",
-                  "marketplaceAddress": "0xd36097D256F31F1BF5aa597dA7C3E098d466aD13",
+                  "currencyPriceUSDC": "294956040902",
+                  "currencyPriceUSDCFormatted": "295K",
+                  "marketplaceAddress": "0x0B7f100940f4152D01B42A626ab73f7A62dd7cdC",
                   "protocolFeeBps": "400",
                   "minimalBidBps": "1000",
                   "previousBidAmountBps": "500",
                   "bidPriceStructure": {
-                    "previousBidAmount": "0",
-                    "previousPricePerToken": "0",
-                    "minimalBidPerToken": "15000000000000000",
-                    "minimalBuyoutPerToken": "100000000000000000000",
-                    "newBidPerToken": "15000000000000000",
-                    "totalBidAmount": "15000000000000000",
-                    "refundBonusPerToken": "0",
-                    "refundBonusAmount": "0",
-                    "refundAmountToPreviousBidder": "0",
-                    "newPricePerToken": "15000000000000000",
-                    "newAmount": "15000000000000000",
-                    "newRefundBonusPerToken": "750000000000000",
-                    "newRefundBonusAmount": "750000000000000",
-                    "protocolFeeAmount": "600000000000000",
-                    "royaltyAmount": "1035000000000000",
-                    "listerAmount": "13365000000000000"
+                    "previousBidAmount": "6000000000000000",
+                    "previousPricePerToken": "6000000000000000",
+                    "minimalBidPerToken": "6600000000000000",
+                    "minimalBuyoutPerToken": "900300000000000000",
+                    "newBidPerToken": "6600000000000000",
+                    "totalBidAmount": "6600000000000000",
+                    "refundBonusPerToken": "300000000000000",
+                    "refundBonusAmount": "300000000000000",
+                    "refundAmountToPreviousBidder": "6300000000000000",
+                    "newPricePerToken": "6300000000000000",
+                    "newAmount": "6300000000000000",
+                    "newRefundBonusPerToken": "315000000000000",
+                    "newRefundBonusAmount": "315000000000000",
+                    "newRefundAmount": "6615000000000000",
+                    "newProfitAmount": "15000000000000",
+                    "protocolFeeAmount": "252000000000000",
+                    "royaltyAmount": "434700000000000",
+                    "listerAmount": "5613300000000000"
                   },
                   "bidPriceStructureFormatted": {
-                    "previousBidAmount": "0",
-                    "previousPricePerToken": "0",
-                    "minimalBidPerToken": "0.015",
-                    "minimalBuyoutPerToken": "100",
-                    "newBidPerToken": "0.015",
-                    "totalBidAmount": "0.015",
-                    "refundBonusPerToken": "0",
-                    "refundBonusAmount": "0",
-                    "refundAmountToPreviousBidder": "0",
-                    "newPricePerToken": "0.015",
-                    "newAmount": "0.015",
-                    "newRefundBonusPerToken": "0.0₃7",
-                    "newRefundBonusAmount": "0.0₃7",
-                    "protocolFeeAmount": "0.0₃6",
-                    "royaltyAmount": "0.001",
-                    "listerAmount": "0.013"
+                    "previousBidAmount": "0.006",
+                    "previousPricePerToken": "0.006",
+                    "minimalBidPerToken": "0.007",
+                    "minimalBuyoutPerToken": "0.9",
+                    "newBidPerToken": "0.007",
+                    "totalBidAmount": "0.007",
+                    "refundBonusPerToken": "0.0₃3",
+                    "refundBonusAmount": "0.0₃3",
+                    "refundAmountToPreviousBidder": "0.006",
+                    "newPricePerToken": "0.006",
+                    "newAmount": "0.006",
+                    "newRefundBonusPerToken": "0.0₃3",
+                    "newRefundBonusAmount": "0.0₃3",
+                    "newRefundAmount": "0.007",
+                    "newProfitAmount": "0.0₄1",
+                    "protocolFeeAmount": "0.0₃2",
+                    "royaltyAmount": "0.0₃4",
+                    "listerAmount": "0.006"
                   },
                   "bidPriceStructureUsdcFormatted": {
-                    "previousBidAmount": "0",
-                    "previousPricePerToken": "0",
-                    "minimalBidPerToken": "1.8K",
-                    "minimalBuyoutPerToken": "11.7M",
-                    "newBidPerToken": "1.8K",
-                    "totalBidAmount": "1.8K",
-                    "refundBonusPerToken": "0",
-                    "refundBonusAmount": "0",
-                    "refundAmountToPreviousBidder": "0",
-                    "newPricePerToken": "1.8K",
-                    "newAmount": "1.8K",
-                    "newRefundBonusPerToken": "87.82",
-                    "newRefundBonusAmount": "87.82",
-                    "protocolFeeAmount": "70.25",
-                    "royaltyAmount": "121.19",
-                    "listerAmount": "1.6K"
+                    "previousBidAmount": "1.8K",
+                    "previousPricePerToken": "1.8K",
+                    "minimalBidPerToken": "1.9K",
+                    "minimalBuyoutPerToken": "265.5K",
+                    "newBidPerToken": "1.9K",
+                    "totalBidAmount": "1.9K",
+                    "refundBonusPerToken": "88.49",
+                    "refundBonusAmount": "88.49",
+                    "refundAmountToPreviousBidder": "1.9K",
+                    "newPricePerToken": "1.9K",
+                    "newAmount": "1.9K",
+                    "newRefundBonusPerToken": "92.91",
+                    "newRefundBonusAmount": "92.91",
+                    "newRefundAmount": "2K",
+                    "newProfitAmount": "4.42",
+                    "protocolFeeAmount": "74.33",
+                    "royaltyAmount": "128.22",
+                    "listerAmount": "1.7K"
                   },
                   "buyPriceStructure": {
-                    "buyoutPricePerToken": "100000000000000000000",
-                    "listerBuyAmount": "89100000000000000000",
-                    "royaltiesBuyAmount": "6900000000000000000",
-                    "protocolFeeBuyAmount": "4000000000000000000"
+                    "buyoutPricePerToken": "900000000000000000",
+                    "listerBuyAmount": "801900000000000000",
+                    "royaltiesBuyAmount": "62100000000000000",
+                    "protocolFeeBuyAmount": "36000000000000000"
                   },
                   "buyPriceStructureFormatted": {
-                    "buyoutPricePerToken": "100",
-                    "listerBuyAmount": "89.1",
-                    "royaltiesBuyAmount": "6.9",
-                    "protocolFeeBuyAmount": "4"
+                    "buyoutPricePerToken": "0.9",
+                    "listerBuyAmount": "0.8",
+                    "royaltiesBuyAmount": "0.062",
+                    "protocolFeeBuyAmount": "0.036"
                   },
                   "buyPriceStructureUsdcFormatted": {
-                    "buyoutPricePerToken": "11.7M",
-                    "listerBuyAmount": "10.4M",
-                    "royaltiesBuyAmount": "807.9K",
-                    "protocolFeeBuyAmount": "468.4K"
+                    "buyoutPricePerToken": "265.5K",
+                    "listerBuyAmount": "236.5K",
+                    "royaltiesBuyAmount": "18.3K",
+                    "protocolFeeBuyAmount": "10.6K"
                   }
                 }
               ],
               "metadata": {
-                "name": "#halving - Tokenized Ad Space",
-                "description": "Tokenized advertisement spaces link to the ticker 'halving' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'halving'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Ahalving",
-                "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
-                "external_link": "",
-                "valid_from": "2024-05-01T00:00:00Z",
-                "valid_to": "2024-10-31T23:59:59Z",
+                "name": "#test - SiBorg App",
+                "description": "Buying this ad space means you own a parcel on SiBorg app. It grants you the exclusive right to submit an ad to be displayed when any user searches for 'test' and benefits from SiBorg visibility. You are free to change the ad proposal at any time and free to resell it on the open market enabling you to invest in the future visibility of the platform.",
+                "image": "https://relayer.dsponsor.com/api/images?text=test",
+                "terms": "https://docs.google.com/document/d/12_uch6guEm4tPuWQ3CVJr7FmHRZczoJLkm5CJsuXyyM",
+                "external_link": "https://app.dsponsor.com/8453/offer/1",
+                "external_url": "https://app.dsponsor.com/8453/offer/1",
+                "valid_from": "2024-07-01T06:00:00Z",
+                "valid_to": "2025-06-30T21:00:00Z",
                 "categories": [
                   "Community",
                   "NFT",
                   "Crypto"
                 ],
                 "token_metadata": {
-                  "name": "#{tokenData} - Tokenized Ad Space",
-                  "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                  "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
-                  "external_url": "",
+                  "name": "#{tokenData} - SiBorg App",
+                  "description": "Buying this ad space means you own a parcel on SiBorg app. It grants you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}' and benefits from SiBorg visibility. You are free to change the ad proposal at any time and free to resell it on the open market enabling you to invest in the future visibility of the platform.",
+                  "image": "https://relayer.dsponsor.com/api/images?text={tokenData}",
                   "attributes": [
                     {
                       "trait_type": "Search Query",
@@ -1404,11 +1359,10 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                     }
                   ]
                 },
-                "external_url": "",
                 "attributes": [
                   {
                     "trait_type": "Search Query",
-                    "value": "halving"
+                    "value": "test"
                   }
                 ]
               }
@@ -1419,8 +1373,9 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
           "creator": {
             "name": "SiBorg",
             "description": "SiBorg application empowers podcasters by leveraging SocialFi.",
-            "image": "https://bafkreidonqrmvzm4544yv7lqeggp3t34r72glwszbh3qafjqmegvzvgiry.ipfs.nftstorage.link/",
+            "image": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmeVJy5wXJhcNy4dynGj31HLwqk8Z1s8UvbJMY8iAaxUar",
             "external_link": "https://siborg.io",
+            "external_url": "https://siborg.io",
             "categories": [
               "dApp",
               "social",
@@ -1429,23 +1384,23 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
             ]
           },
           "offer": {
-            "name": "Tokenized ad spaces in SiBorg App",
-            "description": "Tokenized advertisement spaces, each token is linked to a search term.\n\nBuying an ad space from the collection give you the exclusive right to submit an ad.\nSiBorg team still has the power to validate or reject ad assets. You are free to change the ad proposal at anytime and free to resell it on the open market.",
-            "image": "https://bafkreif4dihekhhd24itluilol4qab6zxhwlokkinbpnkqaprzf6jenqne.ipfs.nftstorage.link/",
-            "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
-            "external_link": "",
-            "valid_from": "2024-05-01T00:00:00Z",
-            "valid_to": "2024-10-31T23:59:59Z",
+            "name": "SiBorg Ads",
+            "description": "SiBorg is a podcast application for Twitter Spaces that leverages Web3 Social interactions. The SiBorg app is composed of parcels, each parcel linked to a query ticker that can be used in our search bar. SiBorg Ad Spaces owners can customize their ad space and benefit from the visibility associated with the platform.",
+            "image": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmdBodpqyrH6M8mYFrQNdokZMZArPfvY2cKoeHXKiSb4RQ",
+            "terms": "https://docs.google.com/document/d/12_uch6guEm4tPuWQ3CVJr7FmHRZczoJLkm5CJsuXyyM",
+            "external_link": "https://app.dsponsor.com/8453/offer/1",
+            "external_url": "https://app.dsponsor.com/8453/offer/1",
+            "valid_from": "2024-07-01T06:00:00Z",
+            "valid_to": "2025-06-30T21:00:00Z",
             "categories": [
               "Community",
               "NFT",
               "Crypto"
             ],
             "token_metadata": {
-              "name": "#{tokenData} - Tokenized Ad Space",
-              "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-              "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
-              "external_url": "",
+              "name": "#{tokenData} - SiBorg App",
+              "description": "Buying this ad space means you own a parcel on SiBorg app. It grants you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}' and benefits from SiBorg visibility. You are free to change the ad proposal at any time and free to resell it on the open market enabling you to invest in the future visibility of the platform.",
+              "image": "https://relayer.dsponsor.com/api/images?text={tokenData}",
               "attributes": [
                 {
                   "trait_type": "Search Query",
@@ -1456,7 +1411,12 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
           }
         }
       }
-    ]
+    ],
+    "_meta": {
+      "block": {
+        "timestamp": 1724442060
+      }
+    }
   }
 }
 ```
@@ -1471,9 +1431,9 @@ Purpose: When paying by credit card or through a frame, only native payments are
   
 2. Uses [Shield3](https://www.shield3.com/) to check security and compliance policies. It verifies if the recipient and token smart contract are not on the OFAC addresses list. It also checks if the transaction involves more than 1 ETH. Slippage threshold detection will be added later.
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/prices`|`token` (required), `amount` (required), `splippage` (optionnal), `recipient` (optionnal), `check` (optionnal)|
+|Method|Endpoint|Parameters|Cache tags|
+|--|--|--|--|
+|`GET`|`/prices`|`token` (required), `amount` (required), `splippage` (optionnal), `recipient` (optionnal), `check` (optionnal)|['cron'](revalidated every 5 minutes)|
 
 <details>
 
@@ -1481,13 +1441,9 @@ Purpose: When paying by credit card or through a frame, only native payments are
  Simple example: 0.00002 UNI, 0.3% slippage
 </summary>
 
-#### Request
-
 ```bash
 curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984&amount=20000000000000&slippage=0.3'
 ```
-
-#### Response
 
 ```json
 {
@@ -1497,36 +1453,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1
   "amountInEthFormatted": "0.0₃1",
   "amountInEthWithSlippageFormatted": "0.0₃1",
   "amountUSDCFormatted": "86.63",
-  "shield3Decisions": [
-    {
-      "icon": "check",
-      "label": "ALLOW",
-      "severity": 1,
-      "entryType": "decision"
-    },
-    {
-      "policyId": "802ca990-23cf-4436-be76-9fc0fa0ed7b0",
-      "name": "OFAC SDN block native and ERC20 transactions",
-      "description": "Block native transfers, ERC20 transfers, and ERC20 approvals to OFAC addresses",
-      "policyIcon": "block",
-      "icon": "check",
-      "label": "OFAC SANCTION",
-      "severity": 1,
-      "entryType": "reason",
-      "decision": "Allow"
-    },
-    {
-      "policyId": "f3e79f77-b531-4fef-9ac7-1f22f7b8a309",
-      "name": "Native value thresholds",
-      "description": "Block native value transactions over a certain threshold, and require MFA for transactions over a lower threshold",
-      "policyIcon": "bell",
-      "icon": "check",
-      "label": "TRANSACTION THRESHOLD",
-      "severity": 1,
-      "entryType": "reason",
-      "decision": "Allow"
-    }
-  ]
+  "shield3Decisions": []
 }
 ```
 
@@ -1538,13 +1465,9 @@ curl 'https://relayer.dsponsor.com/api/11155111/prices?token=0x1f9840a85d5aF5bf1
  Shield3 block decision - Native value thresold : 10 WETH (> 1 ETH)
 </summary>
 
-#### Request
-
 ```bash
 curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x4200000000000000000000000000000000000006&amount=10000000000000000000&slippage=0.3&check=shield3'
 ```
-
-#### Response
 
 ```json
 {
@@ -1589,13 +1512,9 @@ curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x420000000000000000000
  Shield3 block decision - Ronin Bridge Exploiter (0x098b716b8aaf21512996dc57eb0615e2383e2f96) is recipient
 </summary>
 
-#### Request
-
 ```bash
 curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x4200000000000000000000000000000000000006&amount=1000000000&slippage=0.3&recipient=0x098b716b8aaf21512996dc57eb0615e2383e2f96&check=shield3'
 ```
-
-#### Response
 
 ```json
 {
@@ -1638,9 +1557,9 @@ curl 'https://relayer.dsponsor.com/api/8453/prices?token=0x420000000000000000000
 
 Purpose: Retrieve token metadata according to the official ERC721 metadata standard.
 
-|Method|Endpoint|Parameters|
-|--|--|--|
-|`GET`|`/tokenMetadata/[nftcontract]/[tokenId]`||
+|Method|Endpoint|Parameters|Cache Tags|
+|--|--|--|--|
+|`GET`|`/tokenMetadata/[nftContractAddress]/[tokenId]`||[`${chainId}-nftContract-${nftContractAddress}`]|
 
 <details>
 
@@ -1648,33 +1567,33 @@ Purpose: Retrieve token metadata according to the official ERC721 metadata stand
  Example
 </summary>
 
-#### Request
+- Request
 
 ```bash
-curl 'https://relayer.dsponsor.com/api/11155111/tokenMetadata/0x51a533e5fbc542b0df00c352d8a8a65fff1727ac/109438364007015322736766724051813704643042782151430130119908516857056060615695'
+curl 'https://relayer.dsponsor.com/api/8453/tokenMetadata/0x141fec749536067fe4b9291fb00a8a398023c7c9/114978956394214466574350984893002737044955096044182110066771590950350869641321'
 ```
 
-#### Response
+- Response
 
 ```json
 {
-  "name": "#base - Tokenized Ad Space",
-  "description": "Tokenized advertisement spaces link to the ticker 'base' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'base'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-  "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Abase",
-  "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
-  "external_link": "",
-  "valid_from": "2024-05-01T00:00:00Z",
-  "valid_to": "2024-10-31T23:59:59Z",
+  "name": "#Borg - SiBorg App",
+  "description": "Buying this ad space means you own a parcel on SiBorg app. It grants you the exclusive right to submit an ad to be displayed when any user searches for 'Borg' and benefits from SiBorg visibility. You are free to change the ad proposal at any time and free to resell it on the secondary market enabling you to invest in the future visibility of the platform.",
+  "image": "https://relayer.dsponsor.com/api/images?text=Borg",
+  "terms": "https://docs.google.com/document/d/15um5c6mMoKc8V1rVyRJ7tcIxFDmtE8xe75mx-CdB84w",
+  "external_link": "https://app.dsponsor.com/8453/offer/1",
+  "external_url": "https://app.dsponsor.com/8453/offer/1",
+  "valid_from": "2024-08-01T06:00:00Z",
+  "valid_to": "2025-07-31T21:00:00Z",
   "categories": [
     "Community",
     "NFT",
     "Crypto"
   ],
   "token_metadata": {
-    "name": "#{tokenData} - Tokenized Ad Space",
-    "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-    "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
-    "external_url": "",
+    "name": "#{tokenData} - SiBorg App",
+    "description": "Buying this ad space means you own a parcel on SiBorg app. It grants you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}' and benefits from SiBorg visibility. You are free to change the ad proposal at any time and free to resell it on the secondary market enabling you to invest in the future visibility of the platform.",
+    "image": "https://relayer.dsponsor.com/api/images?text={tokenData}",
     "attributes": [
       {
         "trait_type": "Search Query",
@@ -1682,17 +1601,16 @@ curl 'https://relayer.dsponsor.com/api/11155111/tokenMetadata/0x51a533e5fbc542b0
       }
     ]
   },
-  "external_url": "",
   "attributes": [
     {
       "trait_type": "Search Query",
-      "value": "base"
+      "value": "Borg"
     }
   ]
 }
 ```
 
-Result on [Opensea](https://testnets.opensea.io/fr/assets/sepolia/0x51a533e5fbc542b0df00c352d8a8a65fff1727ac/109438364007015322736766724051813704643042782151430130119908516857056060615695):
+- Result on [Opensea](https://opensea.io/assets/base/0x141fec749536067fe4b9291fb00a8a398023c7c9/114978956394214466574350984893002737044955096044182110066771590950350869641321):
 
 ![opensea-dsponsor](./public/opensea-example.png)
 

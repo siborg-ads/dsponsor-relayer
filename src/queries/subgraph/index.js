@@ -51,6 +51,9 @@ async function _executeQuery(chainId, query, variables, options) {
 
   if (options?.next) {
     requestInit.next = options.next;
+    if (options.next.cache) {
+      requestInit.cache = options.next.cache;
+    }
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
