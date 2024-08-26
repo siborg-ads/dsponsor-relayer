@@ -53,7 +53,7 @@ export async function getOfferTokensFromNftContracts(chainId, nftContracts, toke
   };
 
   const baseOptions = {
-    populate: false,
+    populate: true,
     next: {
       tags: nftContracts.map((nftContract) => `${chainId}-nftContract-${getAddress(nftContract)}`)
     }
