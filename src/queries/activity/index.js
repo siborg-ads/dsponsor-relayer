@@ -164,17 +164,18 @@ export async function getActivity(
   let totalBidRefundUSDCAmount = BigInt("0");
   let totalProtocolRevenueUSDCAmount = BigInt("0");
 
-  resultArray = /* await Promise.all( */ resultArray.map(async (e) => {
-    // e.ens = await provider.lookupAddress(e.addr);
-    e.displayAddr = e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
-    if (e.balance > 0) nbHolders += 1;
-    totalSpentUSDCAmount += e.usdcAmounts.totalSpent;
-    totalBidRefundUSDCAmount += e.usdcAmounts.bidRefundReceived;
-    const negativeToZero = true;
-    e.usdcAmounts = priceFormattedForAllValuesObject(6, e.usdcAmounts, negativeToZero);
-    return e;
-  });
-  //  );
+  resultArray = await Promise.all(
+    resultArray.map(async (e) => {
+      // e.ens = await provider.lookupAddress(e.addr);
+      e.displayAddr = e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
+      if (e.balance > 0) nbHolders += 1;
+      totalSpentUSDCAmount += e.usdcAmounts.totalSpent;
+      totalBidRefundUSDCAmount += e.usdcAmounts.bidRefundReceived;
+      const negativeToZero = true;
+      e.usdcAmounts = priceFormattedForAllValuesObject(6, e.usdcAmounts, negativeToZero);
+      return e;
+    })
+  );
 
   lastBid.bidderAddr = lastBid.bidderAddr ? getAddress(lastBid.bidderAddr) : null;
   const lastBidderEns = lastBid.bidderAddr
