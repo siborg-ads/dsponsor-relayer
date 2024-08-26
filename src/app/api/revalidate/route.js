@@ -55,10 +55,10 @@ export async function POST(request) {
     }
   }
 
-  // TAG UPDATE
   if (allTags.length) {
     allTags = [...new Set(allTags)];
 
+    // TAG UPDATE
     for (let tag of allTags) {
       const [chainId, item, id] = tag.split("-");
 
@@ -69,11 +69,9 @@ export async function POST(request) {
 
       tagUpdate(tag);
     }
-  }
 
-  // ACTIVITY UPDATE
-  if (tags?.length) {
-    for (let tag of tags) {
+    // ACTIVITY UPDATE
+    for (let tag of allTags) {
       const [chainId, item, id] = tag.split("-");
 
       if (chainId && item && item === "activity") {
