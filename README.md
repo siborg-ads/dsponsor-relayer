@@ -1067,6 +1067,7 @@ The response will be automatically populated with a `_meta` object. `new Date(_m
   - `price.protocolFeeBps`
   - `price.mintPriceStructure`
   - `price.mintPriceStructureFormatted`
+  - `price.mintPriceStructureUsdc`
   - `price.mintPriceStructureUsdcFormatted`
 - Secondary market information ( if `marketplaceListings --> reservePricePerToken`, `marketplaceListings --> buyoutPricePerToken`,  `marketplaceListings --> currency`, `marketplaceListings --> quantity`, `marketplaceListings --> bids --> totalBidAmount`, `nftContract --> royalty --> bps` are provided)
   - `marketplaceListing.currencySymbol`
@@ -1079,9 +1080,11 @@ The response will be automatically populated with a `_meta` object. `new Date(_m
   - `marketplaceListing.previousBidAmountBps`
   - `marketplaceListing.bidPriceStructure`
   - `marketplaceListing.bidPriceStructureFormatted`
+  - `marketplaceListing.bidPriceStructureUsdc`
   - `marketplaceListing.bidPriceStructureUsdcFormatted`
   - `marketplaceListing.buyPriceStructure`
   - `marketplaceListing.buyPriceStructureFormatted`
+  - `marketplaceListing.buyPriceStructureUsdc`
   - `marketplaceListing.buyPriceStructureUsdcFormatted`
 
 You can use [Apollo's Sandbox](https://studio.apollographql.com/sandbox/explorer), with `https://relayer.dsponsor.com/api/11155111/graph` set as the endpoint for example.
@@ -1185,8 +1188,8 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
               "enabled": true,
               "currencySymbol": "WETH",
               "currencyDecimals": "18",
-              "currencyPriceUSDC": "294956040902",
-              "currencyPriceUSDCFormatted": "295K",
+              "currencyPriceUSDC": "564824700859",
+              "currencyPriceUSDCFormatted": "564.8K",
               "minterAddress": "0x10E0447dDB66f1d33E6b10dB5099FBa231ceCE5C",
               "protocolFeeBps": "400",
               "mintPriceStructure": {
@@ -1199,10 +1202,15 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                 "protocolFeeAmount": "0.0₃4",
                 "totalAmount": "0.009"
               },
+              "mintPriceStructureUsdc": {
+                "creatorAmount": "5083422307",
+                "protocolFeeAmount": "203336892",
+                "totalAmount": "5286759200"
+              },
               "mintPriceStructureUsdcFormatted": {
-                "creatorAmount": "2.7K",
-                "protocolFeeAmount": "106.18",
-                "totalAmount": "2.8K"
+                "creatorAmount": "5.1K",
+                "protocolFeeAmount": "203.34",
+                "totalAmount": "5.3K"
               }
             }
           ],
@@ -1223,17 +1231,31 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                   "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
                   "bids": [
                     {
-                      "creationTimestamp": "1724433480",
-                      "creationTxHash": "0x3d434342dc7c08a257364e8d2ac65b1fbeaee4218575d82efd737dfa76a13811",
-                      "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
+                      "creationTimestamp": "1724688444",
+                      "creationTxHash": "0xe61b9995f1fa39cc1f048e6b4df5eca3773e598f96d7cb1eb3cfc8c758c0b53e",
+                      "bidder": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766",
                       "status": "CREATED",
-                      "totalBidAmount": "6000000000000000",
-                      "paidBidAmount": "6000000000000000",
+                      "totalBidAmount": "6300000000000000",
+                      "paidBidAmount": "6600000000000000",
                       "refundProfit": "0",
                       "amountsFormatted": {
                         "totalBidAmount": "0.006",
-                        "paidBidAmount": "0.006",
+                        "paidBidAmount": "0.007",
                         "refundProfit": "0"
+                      }
+                    },
+                    {
+                      "creationTimestamp": "1724433480",
+                      "creationTxHash": "0x3d434342dc7c08a257364e8d2ac65b1fbeaee4218575d82efd737dfa76a13811",
+                      "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
+                      "status": "CANCELLED",
+                      "totalBidAmount": "6000000000000000",
+                      "paidBidAmount": "6000000000000000",
+                      "refundProfit": "300000000000000",
+                      "amountsFormatted": {
+                        "totalBidAmount": "0.006",
+                        "paidBidAmount": "0.006",
+                        "refundProfit": "0.0₃3"
                       }
                     }
                   ],
@@ -1248,31 +1270,31 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                   },
                   "currencySymbol": "WETH",
                   "currencyDecimals": "18",
-                  "currencyPriceUSDC": "294956040902",
-                  "currencyPriceUSDCFormatted": "295K",
+                  "currencyPriceUSDC": "564824700859",
+                  "currencyPriceUSDCFormatted": "564.8K",
                   "marketplaceAddress": "0x0B7f100940f4152D01B42A626ab73f7A62dd7cdC",
                   "protocolFeeBps": "400",
                   "minimalBidBps": "1000",
                   "previousBidAmountBps": "500",
                   "bidPriceStructure": {
-                    "previousBidAmount": "6000000000000000",
-                    "previousPricePerToken": "6000000000000000",
-                    "minimalBidPerToken": "6600000000000000",
-                    "minimalBuyoutPerToken": "900300000000000000",
-                    "newBidPerToken": "6600000000000000",
-                    "totalBidAmount": "6600000000000000",
-                    "refundBonusPerToken": "300000000000000",
-                    "refundBonusAmount": "300000000000000",
-                    "refundAmountToPreviousBidder": "6300000000000000",
-                    "newPricePerToken": "6300000000000000",
-                    "newAmount": "6300000000000000",
-                    "newRefundBonusPerToken": "315000000000000",
-                    "newRefundBonusAmount": "315000000000000",
-                    "newRefundAmount": "6615000000000000",
-                    "newProfitAmount": "15000000000000",
-                    "protocolFeeAmount": "252000000000000",
-                    "royaltyAmount": "434700000000000",
-                    "listerAmount": "5613300000000000"
+                    "previousBidAmount": "6300000000000000",
+                    "previousPricePerToken": "6300000000000000",
+                    "minimalBidPerToken": "6930000000000000",
+                    "minimalBuyoutPerToken": "900315000000000000",
+                    "newBidPerToken": "6930000000000000",
+                    "totalBidAmount": "6930000000000000",
+                    "refundBonusPerToken": "315000000000000",
+                    "refundBonusAmount": "315000000000000",
+                    "refundAmountToPreviousBidder": "6615000000000000",
+                    "newPricePerToken": "6615000000000000",
+                    "newAmount": "6615000000000000",
+                    "newRefundBonusPerToken": "330750000000000",
+                    "newRefundBonusAmount": "330750000000000",
+                    "newRefundAmount": "6945750000000000",
+                    "newProfitAmount": "15750000000000",
+                    "protocolFeeAmount": "264600000000000",
+                    "royaltyAmount": "456435000000000",
+                    "listerAmount": "5893965000000000"
                   },
                   "bidPriceStructureFormatted": {
                     "previousBidAmount": "0.006",
@@ -1283,42 +1305,68 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                     "totalBidAmount": "0.007",
                     "refundBonusPerToken": "0.0₃3",
                     "refundBonusAmount": "0.0₃3",
-                    "refundAmountToPreviousBidder": "0.006",
-                    "newPricePerToken": "0.006",
-                    "newAmount": "0.006",
+                    "refundAmountToPreviousBidder": "0.007",
+                    "newPricePerToken": "0.007",
+                    "newAmount": "0.007",
                     "newRefundBonusPerToken": "0.0₃3",
                     "newRefundBonusAmount": "0.0₃3",
                     "newRefundAmount": "0.007",
                     "newProfitAmount": "0.0₄1",
-                    "protocolFeeAmount": "0.0₃2",
+                    "protocolFeeAmount": "0.0₃3",
                     "royaltyAmount": "0.0₃4",
                     "listerAmount": "0.006"
                   },
+                  "bidPriceStructureUsdc": {
+                    "previousBidAmount": "3558395615",
+                    "previousPricePerToken": "3558395615",
+                    "minimalBidPerToken": "3914235176",
+                    "minimalBuyoutPerToken": "508520150553",
+                    "newBidPerToken": "3914235176",
+                    "totalBidAmount": "3914235176",
+                    "refundBonusPerToken": "177919780",
+                    "refundBonusAmount": "177919780",
+                    "refundAmountToPreviousBidder": "3736315396",
+                    "newPricePerToken": "3736315396",
+                    "newAmount": "3736315396",
+                    "newRefundBonusPerToken": "186815769",
+                    "newRefundBonusAmount": "186815769",
+                    "newRefundAmount": "3923131165",
+                    "newProfitAmount": "8895989",
+                    "protocolFeeAmount": "149452615",
+                    "royaltyAmount": "257805762",
+                    "listerAmount": "3329057017"
+                  },
                   "bidPriceStructureUsdcFormatted": {
-                    "previousBidAmount": "1.8K",
-                    "previousPricePerToken": "1.8K",
-                    "minimalBidPerToken": "1.9K",
-                    "minimalBuyoutPerToken": "265.5K",
-                    "newBidPerToken": "1.9K",
-                    "totalBidAmount": "1.9K",
-                    "refundBonusPerToken": "88.49",
-                    "refundBonusAmount": "88.49",
-                    "refundAmountToPreviousBidder": "1.9K",
-                    "newPricePerToken": "1.9K",
-                    "newAmount": "1.9K",
-                    "newRefundBonusPerToken": "92.91",
-                    "newRefundBonusAmount": "92.91",
-                    "newRefundAmount": "2K",
-                    "newProfitAmount": "4.42",
-                    "protocolFeeAmount": "74.33",
-                    "royaltyAmount": "128.22",
-                    "listerAmount": "1.7K"
+                    "previousBidAmount": "3.6K",
+                    "previousPricePerToken": "3.6K",
+                    "minimalBidPerToken": "3.9K",
+                    "minimalBuyoutPerToken": "508.5K",
+                    "newBidPerToken": "3.9K",
+                    "totalBidAmount": "3.9K",
+                    "refundBonusPerToken": "177.92",
+                    "refundBonusAmount": "177.92",
+                    "refundAmountToPreviousBidder": "3.7K",
+                    "newPricePerToken": "3.7K",
+                    "newAmount": "3.7K",
+                    "newRefundBonusPerToken": "186.82",
+                    "newRefundBonusAmount": "186.82",
+                    "newRefundAmount": "3.9K",
+                    "newProfitAmount": "8.9",
+                    "protocolFeeAmount": "149.45",
+                    "royaltyAmount": "257.81",
+                    "listerAmount": "3.3K"
                   },
                   "buyPriceStructure": {
                     "buyoutPricePerToken": "900000000000000000",
                     "listerBuyAmount": "801900000000000000",
                     "royaltiesBuyAmount": "62100000000000000",
                     "protocolFeeBuyAmount": "36000000000000000"
+                  },
+                  "buyPriceStructureUsdc": {
+                    "buyoutPricePerToken": "508342230773",
+                    "listerBuyAmount": "452932927618",
+                    "royaltiesBuyAmount": "35075613923",
+                    "protocolFeeBuyAmount": "20333689230"
                   },
                   "buyPriceStructureFormatted": {
                     "buyoutPricePerToken": "0.9",
@@ -1327,10 +1375,10 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
                     "protocolFeeBuyAmount": "0.036"
                   },
                   "buyPriceStructureUsdcFormatted": {
-                    "buyoutPricePerToken": "265.5K",
-                    "listerBuyAmount": "236.5K",
-                    "royaltiesBuyAmount": "18.3K",
-                    "protocolFeeBuyAmount": "10.6K"
+                    "buyoutPricePerToken": "508.3K",
+                    "listerBuyAmount": "452.9K",
+                    "royaltiesBuyAmount": "35.1K",
+                    "protocolFeeBuyAmount": "20.3K"
                   }
                 }
               ],
@@ -1414,7 +1462,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
     ],
     "_meta": {
       "block": {
-        "timestamp": 1724442060
+        "timestamp": 1724950344
       }
     }
   }

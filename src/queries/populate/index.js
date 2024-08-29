@@ -6,7 +6,7 @@ import {
   isObject,
   isValidUrl,
   priceFormattedForAllValuesObject,
-  priceUsdcFormattedForAllValuesObject
+  priceUsdcForAllValuesObject
 } from "@/utils";
 
 async function populateMarketplaceListing(chainId, listing, nftContract) {
@@ -121,7 +121,7 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
         bidPriceStructure
       );
 
-      const bidPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
+      const bidPriceStructureUsdc = await priceUsdcForAllValuesObject(
         chainId,
         bidPriceStructure,
         currency
@@ -131,7 +131,7 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
         bidPriceStructureUsdc
       );
 
-      const buyPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
+      const buyPriceStructureUsdc = await priceUsdcForAllValuesObject(
         chainId,
         buyPriceStructure,
         currency
@@ -181,7 +181,7 @@ async function populateMintPrice(chainId, price) {
         mintPriceStructure
       );
 
-      const mintPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
+      const mintPriceStructureUsdc = await priceUsdcForAllValuesObject(
         chainId,
         mintPriceStructure,
         currency
