@@ -121,24 +121,35 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
         bidPriceStructure
       );
 
-      const bidPriceStructureUsdcFormatted = await priceUsdcFormattedForAllValuesObject(
+      const bidPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
         chainId,
         bidPriceStructure,
         currency
       );
+      const bidPriceStructureUsdcFormatted = priceFormattedForAllValuesObject(
+        6,
+        bidPriceStructureUsdc
+      );
 
-      const buyPriceStructureUsdcFormatted = await priceUsdcFormattedForAllValuesObject(
+      const buyPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
         chainId,
         buyPriceStructure,
         currency
+      );
+
+      const buyPriceStructureUsdcFormatted = priceFormattedForAllValuesObject(
+        6,
+        buyPriceStructureUsdc
       );
 
       listing = {
         ...listing,
         bidPriceStructure,
         bidPriceStructureFormatted,
+        bidPriceStructureUsdc,
         bidPriceStructureUsdcFormatted,
         buyPriceStructure,
+        buyPriceStructureUsdc,
         buyPriceStructureFormatted,
         buyPriceStructureUsdcFormatted
       };
@@ -170,10 +181,15 @@ async function populateMintPrice(chainId, price) {
         mintPriceStructure
       );
 
-      const mintPriceStructureUsdcFormatted = await priceUsdcFormattedForAllValuesObject(
+      const mintPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
         chainId,
         mintPriceStructure,
         currency
+      );
+
+      const mintPriceStructureUsdcFormatted = priceFormattedForAllValuesObject(
+        6,
+        mintPriceStructureUsdc
       );
 
       price = {
@@ -186,6 +202,7 @@ async function populateMintPrice(chainId, price) {
         protocolFeeBps: BigInt(feeBps).toString(),
         mintPriceStructure,
         mintPriceStructureFormatted,
+        mintPriceStructureUsdc,
         mintPriceStructureUsdcFormatted
       };
     }

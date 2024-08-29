@@ -1,6 +1,5 @@
 import config from "@/config";
 import { getEthQuote } from "@/queries/uniswap/quote";
-import { priceFormattedForAllValuesObject } from "@/utils/string";
 import { ethers, getAddress, parseUnits } from "ethers";
 import ERC20 from "@uniswap/v3-periphery/artifacts/contracts/interfaces/IERC20Metadata.sol/IERC20Metadata.json";
 
@@ -88,5 +87,7 @@ export const priceUsdcFormattedForAllValuesObject = async (chainId, obj, currenc
     }
   }
 
-  return priceFormattedForAllValuesObject(6, res);
+  return res;
+
+  // return priceFormattedForAllValuesObject(6, res);
 };

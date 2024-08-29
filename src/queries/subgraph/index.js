@@ -3,6 +3,10 @@ import config from "@/config";
 import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
 
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 export async function executeQuery(chainId, query, variables, options) {
   return options?.cacheTags?.length && options?.cacheTags !== "no-store"
     ? cache(
