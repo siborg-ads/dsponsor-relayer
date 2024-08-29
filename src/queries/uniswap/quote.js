@@ -27,9 +27,9 @@ async function _getEthQuote(
     getAddress(config?.[chainId]?.smartContracts[key]?.address)
   );
 
-  let amountInEth = "0";
-  let amountInEthWithSlippage = "0";
-  let amountUSDC = "0";
+  let amountInEth = "9999999999999999999999";
+  let amountInEthWithSlippage = "9999999999999999999999";
+  let amountUSDC = "9999999999999999";
   let shield3Decisions = [];
 
   try {
