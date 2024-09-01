@@ -267,33 +267,23 @@ async function populateAdOffer(adOffer) {
         cache: "force-cache"
       });
       adOffer.metadata = await metadataRequest.json();
-
-      if (nftContract?.tokens?.length) {
-        for (let i = 0; i < nftContract.tokens.length; i++) {
-          const offerMetadata = adOffer.metadata?.offer;
-          const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
-          const tokenData = nftContract.tokens[i].mint?.tokenData;
-          adOffer.nftContract.tokens[i].metadata = tokenMetadataReplace(
-            offerMetadata,
-            tokenMetadata,
-            tokenData
-          );
-        }
-      }
     } catch (e) {
       console.error(`Error fetching metadata for ${metadataURL}`);
     }
   }
 
-  /*
-  if (!adOffer.metadata) {
-    adOffer.metadata = {
-      name: "Untitled",
-      description: "No description",
-      image: "https://via.placeholder.com/500x500?text=Unknown"
-    };
+  if (nftContract?.tokens?.length) {
+    for (let i = 0; i < nftContract.tokens.length; i++) {
+      const offerMetadata = adOffer.metadata?.offer;
+      const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
+      const tokenData = nftContract.tokens[i].mint?.tokenData;
+      adOffer.nftContract.tokens[i].metadata = tokenMetadataReplace(
+        offerMetadata,
+        tokenMetadata,
+        tokenData
+      );
+    }
   }
-  */
 }
 
 export async function populateSubgraphResult(chainId, queryResult) {
