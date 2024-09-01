@@ -210,7 +210,7 @@ async function populateMintPrice(chainId, price) {
   return price;
 }
 
-async function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
+function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
   const res = {
     name: "Untitled token",
     description: "No description for this token",
@@ -251,7 +251,7 @@ async function populateTokens(token) {
     const tokenMetadata = token.nftContract.adOffers[0]?.metadata?.offer?.token_metadata;
     const tokenData = token?.mint?.tokenData;
 
-    token.metadata = await tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData);
+    token.metadata = tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData);
   }
 }
 
@@ -273,7 +273,7 @@ async function populateAdOffer(adOffer) {
           const offerMetadata = adOffer.metadata?.offer;
           const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
           const tokenData = nftContract.tokens[i].mint?.tokenData;
-          adOffer.nftContract.tokens[i].metadata = await tokenMetadataReplace(
+          adOffer.nftContract.tokens[i].metadata = tokenMetadataReplace(
             offerMetadata,
             tokenMetadata,
             tokenData

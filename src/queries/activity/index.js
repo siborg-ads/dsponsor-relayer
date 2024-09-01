@@ -10,13 +10,14 @@ export async function getActivity(
   fromTimestamp,
   toTimestamp,
   userAddress,
-  nftContractAddress
+  nftContractAddress,
+  options
 ) {
   // const provider = new ethers.JsonRpcProvider(config[1].rpcURL); // ethereum RPC for ENS
 
   let nftContractAddresses = [];
   if (!nftContractAddress) {
-    const allOffers = await getAllOffers(chainId);
+    const allOffers = await getAllOffers(chainId, options);
     nftContractAddresses = allOffers.map((offer) => offer.nftContract.id);
   } else {
     nftContractAddresses = nftContractAddress.split(",");

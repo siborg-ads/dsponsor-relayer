@@ -75,7 +75,7 @@ export async function POST(request) {
       const [chainId, item, id] = tag.split("-");
 
       if (chainId && item && item === "activity") {
-        activityUpdate(tag, getActivity(chainId, null, null, null, null));
+        activityUpdate(tag, getActivity(chainId, null, null, null, null, { populate: true }));
       }
 
       if (chainId && item && id && item === "adOffer") {
