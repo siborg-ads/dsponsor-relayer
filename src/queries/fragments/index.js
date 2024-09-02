@@ -211,6 +211,8 @@ export const TokenFragment = /* GraphQL */ `
     mint {
       tokenData
       blockTimestamp
+      totalPaid
+      currency
     }
     prices(where: { enabled: true }) {
       currency

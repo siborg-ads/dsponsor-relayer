@@ -158,6 +158,35 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
   return listing;
 }
 
+async function populateMint(chainId, mint) {
+  if (mint) {
+    const { currency, totalPaid } = mint || {};
+
+    if (totalPaid && currency) {
+      const { decimals, symbol, priceUSDC, priceUSDCFormatted } =
+        (await getCurrencyInfos(chainId, currency)) || {};
+
+      const mintTotalPaidFormatted = priceFormattedForAllValuesObject(decimals, { totalPaid });
+
+      const mintTotalPaidUsdc = await priceUsdcForAllValuesObject(chainId, { totalPaid }, currency);
+
+      const mintTotalPaidUsdcFormatted = priceFormattedForAllValuesObject(6, mintTotalPaidUsdc);
+
+      mint = {
+        ...mint,
+        currencySymbol: symbol,
+        currencyDecimals: decimals.toString(),
+        currencyPriceUSDC: priceUSDC,
+        currencyPriceUSDCFormatted: priceUSDCFormatted,
+        mintTotalPaidFormatted,
+        mintTotalPaidUsdc,
+        mintTotalPaidUsdcFormatted
+      };
+    }
+  }
+  return mint;
+}
+
 async function populateMintPrice(chainId, price) {
   if (price) {
     const { currency, amount } = price || {};
@@ -295,6 +324,11 @@ export async function populateSubgraphResult(chainId, queryResult) {
     if (isObject(current.token)) {
       await populateTokens(current.token);
     }
+
+    if (isObject(current.mint)) {
+      current.mint = await populateMint(chainId, current.mint);
+    }
+
     if (isObject(current.price)) {
       current.price = await populateMintPrice(chainId, current.price);
     }
