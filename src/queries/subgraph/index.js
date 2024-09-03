@@ -1,4 +1,4 @@
-import { memoize } from "nextjs-better-unstable-cache";
+// import { memoize } from "nextjs-better-unstable-cache";
 import config from "@/config";
 import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
@@ -7,6 +7,7 @@ BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
+/*
 export async function executeQuery(chainId, query, variables, options) {
   return options?.next?.tags?.length
     ? memoize(_executeQuery, {
@@ -15,8 +16,9 @@ export async function executeQuery(chainId, query, variables, options) {
       })(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
 }
+*/
 
-async function _executeQuery(chainId, query, variables, options) {
+export async function executeQuery(chainId, query, variables, options) {
   const url = config ? config[chainId]?.subgraphURL : null;
 
   if (!url) {
