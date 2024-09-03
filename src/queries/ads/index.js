@@ -22,11 +22,6 @@ export const getValidatedAdsForTokensQuery = /* GraphQL */ `
 
 const getValidatedAdsForOfferQuery = /* GraphQL */ `
   query getValidatedAds($adOfferId: String) {
-    _meta {
-      block {
-        timestamp
-      }
-    }
     adOffers(where: { id: $adOfferId }) {
       ...AdOfferFragment
     }
@@ -68,6 +63,8 @@ export async function getValidatedAds({
     variables.tokenIds = tokenIds;
   }
 
+  const baseOptions = { populate: false, next: { tags: [`${chainId}-adOffer-${adOfferId}`] } };
+  options = options ? { ...baseOptions, ...options } : baseOptions;
   const graphResult = await executeQuery(chainId, query, variables, options);
 
   if (
@@ -218,6 +215,7 @@ export async function getValidatedAds({
 
   return Object.assign(
     {
+      _lastUpdate: new Date(Number(graphResult?.data?._meta?.block?.timestamp) * 1000).toJSON(),
       _tokenIds: tokenIds.sort((strA, strB) => {
         const a = BigInt(strA);
         const b = BigInt(strB);
@@ -230,8 +228,7 @@ export async function getValidatedAds({
         }
       }),
       _tokenData: tokenDatas,
-      _adParameterIds: adParameterIds,
-      _lastUpdate: new Date(Number(graphResult?.data?._meta?.block?.timestamp) * 1000).toJSON()
+      _adParameterIds: adParameterIds
     },
 
     result
@@ -250,7 +247,7 @@ export async function getDefaultImg({
   const ratioStr = ratio ? `&ratio=${ratio}` : "";
 
   if (type === "reserved") {
-    return `${baseURL}/api/defaultImg?text=Reserved token&textColor=FFFFFF${ratioStr}`;
+    return `${baseURL}/api/defaultImg?text=Reserved ad space&textColor=FFFFFF${ratioStr}`;
     /*
     if (ratio === "1.91:1") {
       return `${baseURL}/reserved-1.91-1.png`;

@@ -1,10 +1,223 @@
 import { Alchemy } from "alchemy-sdk";
-import { parseUnits, getAddress } from "ethers";
+import { formatUnits, parseUnits, getAddress } from "ethers";
 import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
 import { getCurrencyInfos, priceFormattedForAllValuesObject } from "@/utils";
+import { memoize } from "nextjs-better-unstable-cache";
 
-export async function getAllOffers(fetchOptions, chainId) {
+export async function getActivity(
+  chainId,
+  fromTimestamp,
+  toTimestamp,
+  userAddress,
+  nftContractAddress,
+  options
+) {
+  // const provider = new ethers.JsonRpcProvider(config[1].rpcURL); // ethereum RPC for ENS
+
+  let nftContractAddresses = [];
+  if (!nftContractAddress) {
+    const allOffers = await getAllOffers(chainId, options);
+    nftContractAddresses = allOffers.map((offer) => offer.nftContract.id);
+  } else {
+    nftContractAddresses = nftContractAddress.split(",");
+  }
+
+  const [holders, { lastBid, totalBids, spendings, protocolFees, protocolFeeCurrency }] =
+    await Promise.all([
+      getHolders(chainId, nftContractAddresses, userAddress),
+      getSpendings(chainId, nftContractAddress, userAddress, fromTimestamp, toTimestamp)
+    ]);
+
+  const result = {};
+
+  const setupResultAddr = (addr) => {
+    if (!result[addr]) {
+      result[addr] = {
+        addr,
+        balance: 0,
+        //
+        nbBids: 0,
+        nbRefunds: 0,
+        nbProtocolFeeBuys: 0,
+        nbProtocolFeeSells: 0,
+        nbProtocolFeeReferrals: 0,
+        usdcAmounts: {
+          // total USDC
+          totalSpent: BigInt("0"),
+          totalReceived: BigInt("0"),
+          bidSpent: BigInt("0"),
+          bidRefundReceived: BigInt("0"),
+          totalProtocolFee: BigInt("0")
+        }
+      };
+    }
+  };
+
+  for (const userAddr of Object.keys(holders)) {
+    const addr = getAddress(userAddr);
+    setupResultAddr(addr);
+    result[addr].balance = holders[userAddr];
+  }
+
+  for (const userAddr of Object.keys(spendings)) {
+    const addr = getAddress(userAddr);
+    setupResultAddr(addr);
+    result[addr] = Object.assign(result[addr], spendings[userAddr]);
+  }
+
+  const smartContractsAddresses = Object.keys(config[chainId].smartContracts).map((k) =>
+    getAddress(config[chainId].smartContracts[k].address)
+  );
+
+  let resultArray = Object.keys(result)
+    .map((key) => result[key])
+    .filter((e) => {
+      const isSCAddr = smartContractsAddresses.includes(e.addr);
+      const isExcludedRankAddress = [
+        "0x9a7FAC267228f536A8f250E65d7C4CA7d39De766",
+        "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf"
+      ].includes(e.addr);
+      const filterByUser = userAddress ? e.addr == userAddress : true;
+
+      return !isSCAddr && !isExcludedRankAddress && filterByUser;
+    });
+
+  resultArray = resultArray
+    .sort((a, b) => b.balance - a.balance)
+    .map((e, i) => ({ ...e, holdersRank: i + 1 }));
+
+  resultArray = resultArray
+    .sort((a, b) => {
+      if (a.usdcAmounts.totalSpent > b.usdcAmounts.totalSpent) {
+        return -1;
+      }
+      if (a.usdcAmounts.totalSpent < b.usdcAmounts.totalSpent) {
+        return 1;
+      }
+      return 0;
+    })
+    .map((e, i) => ({ ...e, spendersRank: i + 1 }));
+
+  resultArray = resultArray
+    .sort((a, b) => {
+      if (a.usdcAmounts.bidRefundReceived > b.usdcAmounts.bidRefundReceived) {
+        return -1;
+      }
+      if (a.usdcAmounts.bidRefundReceived < b.usdcAmounts.bidRefundReceived) {
+        return 1;
+      }
+      return 0;
+    })
+    .map((e, i) => ({ ...e, bidRefundsRank: i + 1 }));
+
+  const valueToPoints = (value, currency) => {
+    // WETH ; decimals = 18 ; we want 1 WETH = 1000 points
+
+    const points =
+      value && currency == protocolFeeCurrency.address
+        ? Number(formatUnits(value.toString(), 13))
+        : 0;
+
+    return points > 1 ? Number(points.toFixed(0)) : points;
+  };
+
+  resultArray = resultArray
+    .sort((a, b) => {
+      const aAmount =
+        a?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
+      const bAmount =
+        b?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
+
+      if (aAmount > bAmount) {
+        return -1;
+      }
+      if (aAmount < bAmount) {
+        return 1;
+      }
+      return 0;
+    })
+    .map((e, i) => {
+      const totalProtocolFee =
+        e?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
+      const points = valueToPoints(totalProtocolFee, protocolFeeCurrency.address);
+
+      return { points, ...e, totalProtocolFeeRank: i + 1 };
+    });
+  /*
+  Above includes WETH only, 
+    PREVIOUS VERSION : include all currencies, total can change at anytime according to coin prices
+  .sort((a, b) => {
+      if (a.usdcAmounts.totalProtocolFee > b.usdcAmounts.totalProtocolFee) {
+        return -1;
+      }
+      if (a.usdcAmounts.totalProtocolFee < b.usdcAmounts.totalProtocolFee) {
+        return 1;
+      }
+      return 0;
+    })
+      .map((e, i) => ({ ...e, totalProtocolFeeRank: i + 1 })
+    */
+
+  let nbHolders = 0;
+  let nbRevenueCalls = 0;
+  let totalSpentUSDCAmount = BigInt("0");
+  let totalBidRefundUSDCAmount = BigInt("0");
+  let totalProtocolRevenueUSDCAmount = BigInt("0");
+
+  resultArray = await Promise.all(
+    resultArray.map(async (e) => {
+      // e.ens = await provider.lookupAddress(e.addr);
+      e.displayAddr = e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
+      if (e.balance > 0) nbHolders += 1;
+      totalSpentUSDCAmount += e.usdcAmounts.totalSpent;
+      totalBidRefundUSDCAmount += e.usdcAmounts.bidRefundReceived;
+      const negativeToZero = true;
+      e.usdcAmounts = priceFormattedForAllValuesObject(6, e.usdcAmounts, negativeToZero);
+      return e;
+    })
+  );
+
+  lastBid.bidderAddr = lastBid.bidderAddr ? getAddress(lastBid.bidderAddr) : null;
+  const lastBidderEns = lastBid.bidderAddr
+    ? // ? await provider.lookupAddress(lastBid.bidderAddr)
+      lastBid.bidderAddr
+    : null;
+  const lastBidderDisplayAddr = lastBidderEns
+    ? lastBidderEns
+    : lastBid.bidderAddr.slice(0, 6) + "..." + lastBid.bidderAddr.slice(-4);
+
+  const lastActivities = Object.values(protocolFees)
+
+    .sort((a, b) => b.blockTimestamp - a.blockTimestamp)
+    .map((e) => {
+      nbRevenueCalls += 1;
+      totalProtocolRevenueUSDCAmount += e.usdcAmount;
+      e.points = valueToPoints(e.fee, e.currency);
+      return { ...e, date: new Date(e.blockTimestamp * 1000) };
+    });
+
+  return {
+    protocolFeeCurrency, // WETH
+    totalBids,
+    ...priceFormattedForAllValuesObject(6, {
+      totalProtocolRevenueUSDCAmount,
+      totalSpentUSDCAmount,
+      totalBidRefundUSDCAmount
+    }),
+    nbRevenueCalls,
+    nbHolders,
+    lastBid: {
+      ...lastBid,
+      lastBidderDisplayAddr,
+      date: new Date(lastBid.blockTimestamp * 1000)
+    },
+    lastActivities,
+    rankings: resultArray
+  };
+}
+
+export async function getAllOffers(chainId, options) {
   let skip = 0;
   let offers = [];
   // let hasMore = true;
@@ -21,7 +234,9 @@ export async function getAllOffers(fetchOptions, chainId) {
       }
     }
   `;
-  const graphResult = await executeQuery(chainId, getAllOffersQuery, { skip }, fetchOptions);
+  const baseOptions = { populate: false, next: { tags: [`${chainId}-adOffers`] } };
+  options = options ? { ...baseOptions, ...options } : baseOptions;
+  const graphResult = await executeQuery(chainId, getAllOffersQuery, { skip }, options);
 
   if (graphResult.data.adOffers.length > 0) {
     // hasMore = true;
@@ -36,20 +251,31 @@ export async function getAllOffers(fetchOptions, chainId) {
   return offers;
 }
 
-export async function getHolders(chainId, nftContractAddresses, userAddress) {
+export const getHoldersForNftContract = memoize(_getHoldersForNftContract, {
+  revalidateTags: (chainId, nftContractAddress) => [
+    `${chainId}-nftContract-${getAddress(nftContractAddress)}`
+  ],
+  log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
+});
+
+async function _getHoldersForNftContract(chainId, nftContractAddress) {
   const settings = {
     apiKey: process.env.NEXT_ALCHEMY_API_KEY,
     network: config[chainId].network
   };
-
   const alchemy = new Alchemy(settings);
+  const { owners } = await alchemy.nft.getOwnersForContract(nftContractAddress, {
+    withTokenBalances: true
+  });
 
+  return owners;
+}
+
+export async function getHolders(chainId, nftContractAddresses, userAddress) {
   const ownerBalances = {};
 
   for (const nftContractAddress of nftContractAddresses) {
-    const { owners } = await alchemy.nft.getOwnersForContract(nftContractAddress, {
-      withTokenBalances: true
-    });
+    const owners = await getHoldersForNftContract(chainId, nftContractAddress);
 
     for (let { ownerAddress, tokenBalances } of owners) {
       ownerAddress = getAddress(ownerAddress);
@@ -61,6 +287,7 @@ export async function getHolders(chainId, nftContractAddresses, userAddress) {
       }
     }
   }
+
   return userAddress
     ? {
         [getAddress(userAddress)]: ownerBalances[getAddress(userAddress)]
@@ -70,13 +297,61 @@ export async function getHolders(chainId, nftContractAddresses, userAddress) {
     : ownerBalances;
 }
 
+export const getHoldings = memoize(_getHoldings, {
+  revalidateTags: (chainId, ownerAddress) => [`${chainId}-userAddress-${getAddress(ownerAddress)}`],
+  log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
+});
+
+async function _getHoldings(chainId, ownerAddress) {
+  const settings = {
+    apiKey: process.env.NEXT_ALCHEMY_API_KEY,
+    network: config[chainId].network
+  };
+
+  const alchemy = new Alchemy(settings);
+
+  let tokens = [];
+  let pageKey = null;
+
+  do {
+    const { ownedNfts, pageKey: newPageKey } = await alchemy.nft.getNftsForOwner(ownerAddress, {
+      pageKey
+    });
+    pageKey = newPageKey;
+    tokens = tokens.concat(ownedNfts);
+  } while (pageKey);
+
+  let possibleTokens = [];
+  for (const nft of tokens) {
+    if (nft.tokenId) {
+      possibleTokens.push({
+        tokenId: nft.tokenId,
+        tokenUri: nft.tokenUri,
+        nftContractAddress: nft.contract.address.toLowerCase(),
+        ownerAddress,
+        name: nft.contract.name,
+        symbol: nft.contract.symbol,
+        balance: nft.balance,
+        timeLastUpdated: nft.timeLastUpdated
+      });
+    }
+  }
+
+  const nftContracts = [...new Set(possibleTokens.map((token) => token.nftContractAddress))];
+  const tokenIds = [
+    ...new Set(possibleTokens.map((token) => `${token.nftContractAddress}-${token.tokenId}`))
+  ];
+
+  return { nftContracts, tokenIds };
+}
+
 export async function getSpendings(
-  fetchOptions,
   chainId,
   nftContractAddress,
   userAddress,
   fromTimestamp,
-  toTimestamp
+  toTimestamp,
+  options
 ) {
   nftContractAddress = nftContractAddress ? nftContractAddress.toLowerCase() : "";
 
@@ -268,6 +543,18 @@ export async function getSpendings(
   // while (!noMoreTokens) {
   // noMoreTokens = true;
 
+  const tags = [];
+  if (nftContractAddress?.length) {
+    tags.push(`${chainId}-nftContract-${getAddress(nftContractAddress)}`);
+  }
+  if (userAddress?.length) {
+    tags.push(`${chainId}-userAddress-${getAddress(userAddress)}`);
+  }
+  if (tags.length === 0) {
+    tags.push(`${chainId}-activity`);
+  }
+  const baseOptions = { populate: false, next: { tags } };
+  options = options ? { ...baseOptions, ...options } : baseOptions;
   const graphResult = await executeQuery(
     chainId,
     getSpendingsQuery,
@@ -281,7 +568,7 @@ export async function getSpendings(
       firstTokens,
       skipTokens
     },
-    fetchOptions
+    options
   );
 
   const { adOffers } = graphResult.data;

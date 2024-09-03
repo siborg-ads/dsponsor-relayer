@@ -16,24 +16,11 @@ export async function GET(request, context) {
     adOfferId: offerId,
     tokenId,
     adParameterId,
-    defaultAdParameterKey,
-    options: {
-      populate: false,
-      next: { revalidate: 15 * 60 } // 15 minutes
-    }
+    defaultAdParameterKey
   });
 
   try {
     if (isValidUrl(imgUrl)) {
-      /*
-
-      const res = await fetch(imgUrl, { cache: "force-cache" });
-      const blob = await res.blob();
-
-      const headers = new Headers();
-      headers.set("Content-Type", "image/*");
-      return new NextResponse(blob, { status: 200, statusText: "OK", headers });
-      */
       return NextResponse.redirect(imgUrl, 307);
     } else {
       return new Response("Invalid image URL", {
@@ -47,5 +34,3 @@ export async function GET(request, context) {
     });
   }
 }
-
-export const dynamic = "force-dynamic";

@@ -22,11 +22,7 @@ export default async function ClickableLogosGridIframePage(req) {
   const response = await getValidatedAds({
     chainId,
     adOfferId: offerId,
-    adParameterIds,
-    options: {
-      populate: false,
-      next: { revalidate: 15 * 60 } // 15 minutes
-    }
+    adParameterIds
   });
 
   if (!response) {
@@ -90,9 +86,10 @@ export default async function ClickableLogosGridIframePage(req) {
   return (
     <html>
       <head />
-      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "#0d102d" }}>
+      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "#ffff" }}>
         <AdsGrid
           ads={ads}
+          bgColor={bgColor}
           chainId={chainId}
           colSizes={colSizes?.length ? colSizes.split(",") : undefined}
           ratio={ratio}

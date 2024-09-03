@@ -3,7 +3,9 @@ import { getOfferTokensFromNftContract } from "@/queries/offers";
 export async function GET(request, context) {
   const { chainId, nftContract, tokenId } = context.params;
 
-  const result = await getOfferTokensFromNftContract(chainId, nftContract, [tokenId]);
+  const { _lastUpdate, ...result } = await getOfferTokensFromNftContract(chainId, nftContract, [
+    tokenId
+  ]);
 
   const tokenMetadata = result?.nftContract?.tokens?.[0]?.metadata
     ? result.nftContract.tokens[0].metadata
@@ -21,12 +23,9 @@ export async function GET(request, context) {
     });
   }
 
-  return new Response(JSON.stringify(Object.assign(tokenMetadata, null, 4)), {
+  return new Response(JSON.stringify(Object.assign({ _lastUpdate, ...tokenMetadata }, null, 4)), {
     headers: {
-      "content-type": "application/json",
-      "CDN-Cache-Control": "public, s-maxage=600, stale-while-revalidate=60"
+      "content-type": "application/json"
     }
   });
 }
-
-export const revalidate = 900; // 15 minutes

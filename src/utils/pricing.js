@@ -9,9 +9,11 @@ export const getCurrencyInfos = async (chainId, currency) => {
   let decimals = memoize[currency]?.decimals || undefined;
   let symbol = memoize[currency]?.symbol || undefined;
 
+  /*
   const supportedCurrencies = Object.keys(config?.[chainId]?.smartContracts).map((key) =>
     getAddress(config?.[chainId]?.smartContracts[key]?.address)
   );
+  */
 
   if (
     memoize[currency] &&
@@ -32,25 +34,27 @@ export const getCurrencyInfos = async (chainId, currency) => {
       decimals = smartContracts[currencyKey].decimals;
       symbol = smartContracts[currencyKey].symbol;
     } else {
+      /*
       if (!supportedCurrencies.includes(getAddress(currency))) {
         //console.log("Currency not supported", chainId, currency);
         decimals = BigInt("18");
         symbol = "";
       } else {
-        try {
-          const rpcURL = config?.[chainId]?.rpcURL;
-          const provider = new ethers.JsonRpcProvider(rpcURL);
-          const signer = ethers.Wallet.createRandom().connect(provider);
-          const ERC20Contract = new ethers.Contract(currency, ERC20.abi, signer);
+        */
+      try {
+        const rpcURL = config?.[chainId]?.rpcURL;
+        const provider = new ethers.JsonRpcProvider(rpcURL);
+        const signer = ethers.Wallet.createRandom().connect(provider);
+        const ERC20Contract = new ethers.Contract(currency, ERC20.abi, signer);
 
-          decimals = await ERC20Contract.decimals.call();
-          symbol = await ERC20Contract.symbol();
-        } catch (e) {
-          console.error("Error getting decimals and symbol", chainId, currency);
-          decimals = BigInt("18");
-          symbol = "";
-        }
+        decimals = await ERC20Contract.decimals.call();
+        symbol = await ERC20Contract.symbol();
+      } catch (e) {
+        console.error("Error getting decimals and symbol", chainId, currency);
+        decimals = BigInt("18");
+        symbol = "";
       }
+      // }
     }
   }
 
@@ -73,7 +77,7 @@ export const getCurrencyInfos = async (chainId, currency) => {
   return memoize[currency];
 };
 
-export const priceUsdcFormattedForAllValuesObject = async (chainId, obj, currency) => {
+export const priceUsdcForAllValuesObject = async (chainId, obj, currency) => {
   const { decimals, priceUSDC } = await getCurrencyInfos(chainId, currency);
 
   const res = {};
@@ -88,6 +92,4 @@ export const priceUsdcFormattedForAllValuesObject = async (chainId, obj, currenc
   }
 
   return res;
-
-  // return priceFormattedForAllValuesObject(6, res);
 };

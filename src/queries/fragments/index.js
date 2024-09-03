@@ -192,6 +192,7 @@ export const TokenFragment = /* GraphQL */ `
       where: { status: CREATED }
     ) {
       id
+      lister
       quantity
       listingType
       startTime
@@ -210,6 +211,8 @@ export const TokenFragment = /* GraphQL */ `
     mint {
       tokenData
       blockTimestamp
+      totalPaid
+      currency
     }
     prices(where: { enabled: true }) {
       currency

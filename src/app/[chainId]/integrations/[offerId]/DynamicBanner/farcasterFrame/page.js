@@ -5,7 +5,7 @@ export async function generateMetadata({ params, searchParams }) {
   const { chainId, offerId } = params;
   const { items, ratio, tokenIds, tokenDataInput, tokenDatas } = searchParams;
 
-  let queryParams = `?time=${Date.now()}`;
+  let queryParams = `?chainId=${chainId}`;
 
   if (items) {
     queryParams += `&items=${items}`;

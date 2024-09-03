@@ -19,11 +19,7 @@ export async function GET(request, context) {
       chainId,
       adOfferId: offerId,
       tokenIds: tokenIds?.split(","),
-      adParameterIds,
-      options: {
-        populate: false,
-        next: { revalidate: 15 * 60 } // 15 minutes
-      }
+      adParameterIds
     })) || {};
 
   if (randomAd) {
@@ -46,5 +42,3 @@ export async function GET(request, context) {
     });
   }
 }
-
-export const dynamic = "force-dynamic";

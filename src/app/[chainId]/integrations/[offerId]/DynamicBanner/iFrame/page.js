@@ -37,11 +37,7 @@ export default async function DynamicBannerIframePage(req) {
         chainId,
         adOfferId: offerId,
         tokenIds: tokenIds?.split(","),
-        adParameterIds,
-        options: {
-          populate: false,
-          next: { revalidate: 15 * 60 } // 15 minutes
-        }
+        adParameterIds
       })) || {};
     const { _lastUpdate } = _validatedAds || {};
     lastUpdate = _lastUpdate;
@@ -75,7 +71,7 @@ export default async function DynamicBannerIframePage(req) {
   return (
     <html>
       <head />
-      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "#0d102d" }}>
+      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "#fff" }}>
         <AdsGrid
           ads={[ad]}
           chainId={chainId}

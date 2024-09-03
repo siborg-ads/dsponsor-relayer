@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  logging: {
+    fetches: {
+      fullUrl: true,
+      hmrRefreshes: true
+    }
+  },
   images: {
     formats: ["image/webp"],
     domains: ["ipfs.io", "6f375d41f2a33f1f08f6042a65d49ec9.ipfscdn.io"],
@@ -29,6 +35,7 @@ const nextConfig = {
           }
         ]
       },
+
       {
         source: "/:chainId/ad/:offerId/:tokenId/image",
         headers: [

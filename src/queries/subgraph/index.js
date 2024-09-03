@@ -1,4 +1,4 @@
-import { unstable_cache as cache } from "next/cache";
+import { memoize } from "nextjs-better-unstable-cache";
 import config from "@/config";
 import { populateSubgraphResult } from "@/queries/populate";
 import fragments from "@/queries/fragments";
@@ -8,16 +8,11 @@ BigInt.prototype.toJSON = function () {
 };
 
 export async function executeQuery(chainId, query, variables, options) {
-  return options?.cacheTags?.length && options?.cacheTags !== "no-store"
-    ? cache(
-        async (chainId, query, variables, options) => {
-          return _executeQuery(chainId, query, variables, options);
-        },
-        ["graph"],
-        {
-          tags: options.cacheTags.map((cacheTag) => `${chainId}-${cacheTag}`)
-        }
-      )(chainId, query, variables, options)
+  return options?.next?.tags?.length
+    ? memoize(_executeQuery, {
+        revalidateTags: (chainId, query, variables, options) => options.next.tags,
+        log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
+      })(chainId, query, variables, options)
     : _executeQuery(chainId, query, variables, options);
 }
 
@@ -33,6 +28,22 @@ async function _executeQuery(chainId, query, variables, options) {
     ${query}
   `;
 
+  // Find the closing curly brace of the query and insert the _meta block before it
+  const lastCurlyBraceIndex = query.lastIndexOf("}");
+  // Define the _meta block with timestamp
+
+  const metaBlock = `
+    _meta {
+        block {
+          timestamp
+        }
+    }
+  `;
+
+  if (query.includes("query IntrospectionQuery") === false && lastCurlyBraceIndex !== -1) {
+    query = query.slice(0, lastCurlyBraceIndex) + metaBlock + query.slice(lastCurlyBraceIndex);
+  }
+
   const requestInit = {
     method: "POST",
     headers: {
@@ -42,17 +53,16 @@ async function _executeQuery(chainId, query, variables, options) {
     body: JSON.stringify({ query, variables })
   };
 
-  if (options?.cacheTags) {
-    console.log("cacheTags", options.cacheTags);
-    requestInit.cache = "force-cache";
+  if (options?.next) {
+    requestInit.next = options.next;
+    if (options.next.cache) {
+      requestInit.cache = options.next.cache;
+    }
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
 
-  // console.time("executeQuery");
   const request = await fetch(url, requestInit);
-  // console.timeEnd("executeQuery");
-
   const result = await request.json();
 
   const populate = typeof options?.populate === "undefined" ? true : options.populate;

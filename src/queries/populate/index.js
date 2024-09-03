@@ -6,7 +6,7 @@ import {
   isObject,
   isValidUrl,
   priceFormattedForAllValuesObject,
-  priceUsdcFormattedForAllValuesObject
+  priceUsdcForAllValuesObject
 } from "@/utils";
 
 async function populateMarketplaceListing(chainId, listing, nftContract) {
@@ -23,7 +23,7 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
       bids &&
       ((bids[0] && bids[0].creationTimestamp && bids[0].totalBidAmount) || bids.length == 0);
     if (validPopulatedBids) {
-      bids = bids.sort((a, b) => b.creationTimestamp - a.creationTimestamp);
+      bids = bids.sort((a, b) => Number(b.creationTimestamp) - Number(a.creationTimestamp));
     }
 
     nftContract = token?.nftContract?.royalty ? token.nftContract : nftContract;
@@ -121,7 +121,7 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
         bidPriceStructure
       );
 
-      const bidPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
+      const bidPriceStructureUsdc = await priceUsdcForAllValuesObject(
         chainId,
         bidPriceStructure,
         currency
@@ -131,7 +131,7 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
         bidPriceStructureUsdc
       );
 
-      const buyPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
+      const buyPriceStructureUsdc = await priceUsdcForAllValuesObject(
         chainId,
         buyPriceStructure,
         currency
@@ -158,6 +158,35 @@ async function populateMarketplaceListing(chainId, listing, nftContract) {
   return listing;
 }
 
+async function populateMint(chainId, mint) {
+  if (mint) {
+    const { currency, totalPaid } = mint || {};
+
+    if (totalPaid && currency) {
+      const { decimals, symbol, priceUSDC, priceUSDCFormatted } =
+        (await getCurrencyInfos(chainId, currency)) || {};
+
+      const mintTotalPaidFormatted = priceFormattedForAllValuesObject(decimals, { totalPaid });
+
+      const mintTotalPaidUsdc = await priceUsdcForAllValuesObject(chainId, { totalPaid }, currency);
+
+      const mintTotalPaidUsdcFormatted = priceFormattedForAllValuesObject(6, mintTotalPaidUsdc);
+
+      mint = {
+        ...mint,
+        currencySymbol: symbol,
+        currencyDecimals: decimals.toString(),
+        currencyPriceUSDC: priceUSDC,
+        currencyPriceUSDCFormatted: priceUSDCFormatted,
+        mintTotalPaidFormatted,
+        mintTotalPaidUsdc,
+        mintTotalPaidUsdcFormatted
+      };
+    }
+  }
+  return mint;
+}
+
 async function populateMintPrice(chainId, price) {
   if (price) {
     const { currency, amount } = price || {};
@@ -181,7 +210,7 @@ async function populateMintPrice(chainId, price) {
         mintPriceStructure
       );
 
-      const mintPriceStructureUsdc = await priceUsdcFormattedForAllValuesObject(
+      const mintPriceStructureUsdc = await priceUsdcForAllValuesObject(
         chainId,
         mintPriceStructure,
         currency
@@ -210,7 +239,7 @@ async function populateMintPrice(chainId, price) {
   return price;
 }
 
-async function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
+function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
   const res = {
     name: "Untitled token",
     description: "No description for this token",
@@ -251,7 +280,7 @@ async function populateTokens(token) {
     const tokenMetadata = token.nftContract.adOffers[0]?.metadata?.offer?.token_metadata;
     const tokenData = token?.mint?.tokenData;
 
-    token.metadata = await tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData);
+    token.metadata = tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData);
   }
 }
 
@@ -267,33 +296,23 @@ async function populateAdOffer(adOffer) {
         cache: "force-cache"
       });
       adOffer.metadata = await metadataRequest.json();
-
-      if (nftContract?.tokens?.length) {
-        for (let i = 0; i < nftContract.tokens.length; i++) {
-          const offerMetadata = adOffer.metadata?.offer;
-          const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
-          const tokenData = nftContract.tokens[i].mint?.tokenData;
-          adOffer.nftContract.tokens[i].metadata = await tokenMetadataReplace(
-            offerMetadata,
-            tokenMetadata,
-            tokenData
-          );
-        }
-      }
     } catch (e) {
       console.error(`Error fetching metadata for ${metadataURL}`);
     }
   }
 
-  /*
-  if (!adOffer.metadata) {
-    adOffer.metadata = {
-      name: "Untitled",
-      description: "No description",
-      image: "https://via.placeholder.com/500x500?text=Unknown"
-    };
+  if (nftContract?.tokens?.length) {
+    for (let i = 0; i < nftContract.tokens.length; i++) {
+      const offerMetadata = adOffer.metadata?.offer;
+      const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
+      const tokenData = nftContract.tokens[i].mint?.tokenData;
+      adOffer.nftContract.tokens[i].metadata = tokenMetadataReplace(
+        offerMetadata,
+        tokenMetadata,
+        tokenData
+      );
+    }
   }
-  */
 }
 
 export async function populateSubgraphResult(chainId, queryResult) {
@@ -305,6 +324,11 @@ export async function populateSubgraphResult(chainId, queryResult) {
     if (isObject(current.token)) {
       await populateTokens(current.token);
     }
+
+    if (isObject(current.mint)) {
+      current.mint = await populateMint(chainId, current.mint);
+    }
+
     if (isObject(current.price)) {
       current.price = await populateMintPrice(chainId, current.price);
     }
