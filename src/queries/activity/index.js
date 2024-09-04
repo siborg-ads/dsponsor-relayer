@@ -173,7 +173,13 @@ export async function getActivity(
       totalSpentUSDCAmount += e.usdcAmounts.totalSpent;
       totalBidRefundUSDCAmount += e.usdcAmounts.bidRefundReceived;
       const negativeToZero = true;
-      e.usdcAmounts = priceFormattedForAllValuesObject(6, e.usdcAmounts, negativeToZero);
+      const prettyFormatted = false;
+      e.usdcAmounts = priceFormattedForAllValuesObject(
+        6,
+        e.usdcAmounts,
+        negativeToZero,
+        prettyFormatted
+      );
       return e;
     })
   );

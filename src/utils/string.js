@@ -13,7 +13,12 @@ export function stringToUint256(s) {
   return BigInt(keccak256(toUtf8Bytes(normalizeString(s)))).toString();
 }
 
-export const priceFormattedForAllValuesObject = (decimals = 18, obj, negativeToZero = false) => {
+export const priceFormattedForAllValuesObject = (
+  decimals = 18,
+  obj,
+  negativeToZero = false,
+  prettyFormatted = true
+) => {
   const res = {};
   const objKeys = Object.keys(obj);
 
@@ -30,32 +35,33 @@ export const priceFormattedForAllValuesObject = (decimals = 18, obj, negativeToZ
         }
 
         res[key] = formatted;
+        if (prettyFormatted) {
+          if (formattedNb < 0.001 && formattedNb > 0) {
+            const [, precision] = formatted.split(".");
+            const precisionSplit = precision.split("");
+            let firstNonZeroIndex = precisionSplit.findIndex((x) => x !== "0");
+            let nonZeroNb = Number(precisionSplit[firstNonZeroIndex]);
+            const nextNonZeroNb = nonZeroNb ? Number(precisionSplit[firstNonZeroIndex + 1]) : 0;
+            let lastNumber;
 
-        if (formattedNb < 0.001 && formattedNb > 0) {
-          const [, precision] = formatted.split(".");
-          const precisionSplit = precision.split("");
-          let firstNonZeroIndex = precisionSplit.findIndex((x) => x !== "0");
-          let nonZeroNb = Number(precisionSplit[firstNonZeroIndex]);
-          const nextNonZeroNb = nonZeroNb ? Number(precisionSplit[firstNonZeroIndex + 1]) : 0;
-          let lastNumber;
+            if (nonZeroNb === 9 && nextNonZeroNb > 5) {
+              firstNonZeroIndex -= 1;
+              lastNumber = 1;
+            } else {
+              lastNumber =
+                nextNonZeroNb > 5
+                  ? Number(precisionSplit[firstNonZeroIndex]) + 1
+                  : Number(precisionSplit[firstNonZeroIndex]);
+            }
 
-          if (nonZeroNb === 9 && nextNonZeroNb > 5) {
-            firstNonZeroIndex -= 1;
-            lastNumber = 1;
+            res[`${key}`] = `0.0${toSubscript(firstNonZeroIndex)}${lastNumber}`;
+          } else if (formattedNb >= 0.001 && formattedNb < 0.1) {
+            res[`${key}`] = numeral(formatted).format("0.[000]");
+          } else if (formattedNb >= 0.1 && formattedNb < 1000) {
+            res[`${key}`] = numeral(formatted).format("0.[00]");
           } else {
-            lastNumber =
-              nextNonZeroNb > 5
-                ? Number(precisionSplit[firstNonZeroIndex]) + 1
-                : Number(precisionSplit[firstNonZeroIndex]);
+            res[`${key}`] = numeral(formatted).format("0.[0]a").toLocaleUpperCase();
           }
-
-          res[`${key}`] = `0.0${toSubscript(firstNonZeroIndex)}${lastNumber}`;
-        } else if (formattedNb >= 0.001 && formattedNb < 0.1) {
-          res[`${key}`] = numeral(formatted).format("0.[000]");
-        } else if (formattedNb >= 0.1 && formattedNb < 1000) {
-          res[`${key}`] = numeral(formatted).format("0.[00]");
-        } else {
-          res[`${key}`] = numeral(formatted).format("0.[0]a").toLocaleUpperCase();
         }
       } catch (e) {
         //  console.error("error formatting ", formatted, e);
