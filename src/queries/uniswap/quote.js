@@ -49,10 +49,12 @@ async function _getEthQuote(
 
     const quoterContract = new ethers.Contract(uniswapV3QuoterAddr, Quoter.abi, signer);
 
+    const fee = Number(chainId) === 34443 ? 500 : 3000;
+
     const ethQuotePayload = {
       tokenIn: WNATIVE_ADDR,
       tokenOut: tokenOutAddr,
-      fee: 3000,
+      fee,
       amount: amountOut,
       sqrtPriceLimitX96: 0
     };
@@ -65,7 +67,7 @@ async function _getEthQuote(
     [amountUSDC] = await quoterContract.quoteExactInputSingle.staticCall({
       tokenIn: WNATIVE_ADDR,
       tokenOut: USDC_ADDR,
-      fee: 3000,
+      fee,
       amountIn: amountInEth,
       sqrtPriceLimitX96: 0
     });
@@ -133,7 +135,7 @@ async function _getEthQuote(
             // we use USDC to have low probability to have slippage issue
             tokenOut: tokenOutAddr == WNATIVE_ADDR ? tokenOutAddr : USDC_ADDR,
 
-            fee: 3000,
+            fee,
             recipient,
             amountOut: amountUSDC,
             amountInMaximum: amountInEthWithSlippage,

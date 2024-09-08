@@ -103,38 +103,36 @@ const config = {
     }
   },
 
-  // base-sepolia
-  84532: {
-    chainName: "base-sepolia",
-    network: Network.BASE_SEPOLIA,
+  // mode
+  34443: {
+    chainName: "mode",
+    network: "mode",
 
-    appURL: "https://app.testnet.dsponsor.com",
-    creditsURL: "https://app.dsponsor.com",
-    explorerURL: "https://sepolia.basescan.org/",
+    appURL: "https://testnet.dsponsor-app.siborg.io",
+    creditsURL: "https://testnet.dsponsor-app.siborg.io",
+    explorerURL: "https://explorer.mode.network",
     relayerURL: process.env.NEXT_DEV_URL
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
-    rpcURL: "https://sepolia.base.org",
-    shield3RpcURL:
-      "https://rpc.shield3.com/v3/base-sepolia/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
-    subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-base-sepolia/version/latest",
+    rpcURL: "https://mainnet.mode.network",
+    subgraphURL: "https://api.studio.thegraph.com/query/65744/dsponsor-mode/version/latest",
 
     smartContracts: {
       DSPONSOR_ADMIN: {
-        address: "0x5cF7F046818E5Dd71bd3E004f2040E0e3C59467D",
+        address: "0xdf42633BD40e8f46942e44a80F3A58d0Ec971f09",
         feeBps: "400"
       },
       DSPONSOR_MARKETPLACE: {
-        address: "0xdf42633BD40e8f46942e44a80F3A58d0Ec971f09",
+        address: "0xC6cCe35375883872826DdF3C30557F16Ec4DD94c",
         feeBps: "400",
         minimalBidBps: "1000",
         previousBidAmountBps: "500"
       },
       UNISWAP_QUOTER: {
-        address: "0xC5290058841028F1614F3A6F0F5816cAd0df5E27"
+        address: "0x5E6AEbab1AD525f5336Bd12E6847b851531F72ba"
       },
       UNISWAP_SWAP_ROUTER: {
-        address: "0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4"
+        address: "0x016e131C05fb007b5ab286A6D614A5dab99BD415"
       },
       NATIVE: {
         address: "0x0000000000000000000000000000000000000000",
@@ -147,9 +145,14 @@ const config = {
         symbol: "WETH"
       },
       USDC: {
-        address: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        address: "0xd988097fb8612cc24eeC14542bC03424c656005f",
         decimals: 6,
         symbol: "USDC"
+      },
+      MODE: {
+        address: "0xDfc7C877a950e49D2610114102175A06C2e3167a",
+        decimals: 18,
+        symbol: "MODE"
       },
       WETH: {
         address: "0x4200000000000000000000000000000000000006",
@@ -165,8 +168,8 @@ const config = {
     chainName: "sepolia",
     network: Network.ETH_SEPOLIA,
 
-    appURL: "https://app.testnet.dsponsor.com",
-    creditsURL: "https://app.testnet.dsponsor.com",
+    appURL: "https://testnet.dsponsor-app.siborg.io",
+    creditsURL: "https://testnet.dsponsor-app.siborg.io",
     explorerURL: "https://sepolia.etherscan.io",
     relayerURL: process.env.NEXT_DEV_URL
       ? process.env.NEXT_DEV_URL
