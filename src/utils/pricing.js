@@ -2,12 +2,36 @@ import config from "@/config";
 import { getEthQuote } from "@/queries/uniswap/quote";
 import { ethers, getAddress, parseUnits } from "ethers";
 import ERC20 from "@uniswap/v3-periphery/artifacts/contracts/interfaces/IERC20Metadata.sol/IERC20Metadata.json";
+import usdPrices from "@/data/usdPrices.json";
 
 const memoize = {};
+
+export async function fetchHistoricalPrice(coingeckoId, date) {
+  if (coingeckoId === "usd") return 1;
+  try {
+    const res = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${coingeckoId}/history?date=${date}&localization=false`,
+      {
+        headers: {
+          method: "GET",
+          "Content-Type": "application/json",
+          "x-cg-demo-api-key": process.env.COINGECKO_API_KEY,
+          next: { tags: [`pricing-${coingeckoId}-${date}`] }
+        }
+      }
+    );
+    const json = await res.json();
+    return json.market_data.current_price.usd;
+  } catch (e) {
+    console.error(`Coingecko error ${coingeckoId}-${date}`, e);
+    return 0;
+  }
+}
 
 export const getCurrencyInfos = async (chainId, currency) => {
   let decimals = memoize[currency]?.decimals || undefined;
   let symbol = memoize[currency]?.symbol || undefined;
+  let coingeckoId = memoize[currency]?.coingeckoId || undefined;
 
   /*
   const supportedCurrencies = Object.keys(config?.[chainId]?.smartContracts).map((key) =>
@@ -33,6 +57,7 @@ export const getCurrencyInfos = async (chainId, currency) => {
     if (currencyKey) {
       decimals = smartContracts[currencyKey].decimals;
       symbol = smartContracts[currencyKey].symbol;
+      coingeckoId = smartContracts[currencyKey].coingeckoId;
     } else {
       /*
       if (!supportedCurrencies.includes(getAddress(currency))) {
@@ -68,6 +93,7 @@ export const getCurrencyInfos = async (chainId, currency) => {
   );
 
   memoize[currency] = {
+    coingeckoId,
     decimals,
     symbol,
     priceUSDC: amountUSDC.toString(),
@@ -75,6 +101,32 @@ export const getCurrencyInfos = async (chainId, currency) => {
     lastFetchTimestamp: Date.now()
   };
   return memoize[currency];
+};
+
+export const getCurrencyInfosAtBlocktimestamp = async (chainId, currency, blockTimestamp) => {
+  const date = new Date(blockTimestamp * 1000);
+
+  const { symbol, decimals, coingeckoId } = await getCurrencyInfos(chainId, currency);
+  let priceUSD = 0;
+
+  if (coingeckoId) {
+    priceUSD =
+      usdPrices[coingeckoId]?.[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`];
+
+    if (!priceUSD)
+      priceUSD = await fetchHistoricalPrice(
+        coingeckoId,
+        `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+      );
+  }
+
+  return {
+    decimals,
+    symbol,
+    priceUSDC: parseFloat(priceUSD * 1000000).toFixed(0),
+    priceUSDCFormatted: priceUSD,
+    lastFetchTimestamp: date
+  };
 };
 
 export const priceUsdcForAllValuesObject = async (chainId, obj, currency) => {
