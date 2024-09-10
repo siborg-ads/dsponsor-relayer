@@ -106,7 +106,7 @@ const AdsGrid = ({
           {ads.map((ad, index) => (
             <div
               key={index}
-              className={`relative overflow-hidden rounded border border-blue-500 bg-[${bgColor}] text-black hover:border-[#9abffb] hover:bg-[#353f75]`}
+              className={`relative overflow-hidden rounded  bg-[${bgColor}] text-black`}
               style={{ width: `100%`, height: `100%` }}
             >
               <a
