@@ -5,7 +5,13 @@ import React, { useState, useEffect, useRef } from "react";
 import config from "@/config";
 import { getDefaultImg } from "@/queries/ads";
 
-const AdsGrid = ({ ads, bgColor, chainId, ratio, lastUpdate }) => {
+const AdsGrid = ({
+  ads,
+  bgColor,
+  chainId,
+  ratio
+  // lastUpdate
+}) => {
   ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
   ads = ads?.length ? ads : [];
   bgColor = bgColor ? `#${bgColor}` : "#0d102d";
@@ -122,11 +128,13 @@ const AdsGrid = ({ ads, bgColor, chainId, ratio, lastUpdate }) => {
           ))}
         </div>
         <div className="flex justify-end mt-2">
+          {/*
           <span className="pr-2 text-right text-[0.65em] text-purple-800 text-purple-800">
             <a href={config[chainId].creditsURL} target="_blank" rel="noreferrer">
               Last Update : {lastUpdate} - Powered by SiBorg Ads (DSponsor protocol)
             </a>
           </span>
+          */}
         </div>
       </div>
     </div>
