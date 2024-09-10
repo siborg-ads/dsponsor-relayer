@@ -17,10 +17,12 @@ export async function fetchHistoricalPrice(coingeckoId, date) {
           "Content-Type": "application/json",
           "x-cg-demo-api-key": process.env.COINGECKO_API_KEY,
           next: { tags: [`pricing-${coingeckoId}-${date}`] }
+          // cache: "force-cache"
         }
       }
     );
     const json = await res.json();
+
     return json.market_data.current_price.usd;
   } catch (e) {
     console.error(`Coingecko error ${coingeckoId}-${date}`, e);
@@ -113,11 +115,12 @@ export const getCurrencyInfosAtBlocktimestamp = async (chainId, currency, blockT
     priceUSD =
       usdPrices[coingeckoId]?.[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`];
 
-    if (!priceUSD)
+    if (!priceUSD) {
       priceUSD = await fetchHistoricalPrice(
         coingeckoId,
         `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
       );
+    }
   }
 
   return {
