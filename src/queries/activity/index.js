@@ -42,7 +42,7 @@ export async function getActivity(
         nbProtocolFeeBuys: 0,
         nbProtocolFeeSells: 0,
         nbProtocolFeeReferrals: 0,
-        nbProtocolFeePoints: 0
+        points: 0
         /*
         usdcAmounts: {
           // total USDC
@@ -97,16 +97,16 @@ export async function getActivity(
     .map((e, i) => {
       e.displayAddr = e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
       if (e.balance > 0) nbHolders += 1;
-      totalNbPoints += e.nbProtocolFeePoints;
+      totalNbPoints += e.points;
 
       return { ...e, holdersRank: i + 1 };
     });
 
   resultArray = resultArray
-    .sort((a, b) => b.nbProtocolFeePoints - a.nbProtocolFeePoints)
+    .sort((a, b) => b.points - a.points)
     .map((e, i) => ({
       ...e,
-      pointsShare: e.nbProtocolFeePoints / totalNbPoints,
+      pointsShare: e.points / totalNbPoints,
 
       totalProtocolFeeRank: i + 1
     }));
@@ -441,7 +441,7 @@ export async function getSpendings(
         nbProtocolFeeBuys: 0,
         nbProtocolFeeSells: 0,
         nbProtocolFeeReferrals: 0,
-        nbProtocolFeePoints: 0,
+        points: 0,
         /*
         usdcAmounts: {
           // total USDC
@@ -504,7 +504,7 @@ export async function getSpendings(
       for (const addr of [enabler, spender, refAddr]) {
         setupResult(addr, currency);
         result[addr]["currenciesAmounts"][currency].totalProtocolFee += BigInt(fee);
-        result[addr]["nbProtocolFeePoints"] += points;
+        result[addr]["points"] += points;
       }
 
       if (points > 0) {
