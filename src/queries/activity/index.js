@@ -107,7 +107,7 @@ export async function getActivity(
     .map((e, i) => ({
       ...e,
       pointsShare: e.points / totalNbPoints,
-
+      points: Math.round(e.points),
       totalProtocolFeeRank: i + 1
     }));
 
