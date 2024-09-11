@@ -57,8 +57,14 @@ export async function executeQuery(chainId, query, variables, options) {
 
   if (options?.next) {
     requestInit.next = options.next;
-    if (options.next.cache) {
-      requestInit.cache = options.next.cache;
+    if (
+      options?.next?.tags?.length ||
+      (options?.next?.revalidate && options?.next?.revalidate > 0)
+    ) {
+      requestInit.cache = "force-cache";
+      if (options?.cache) {
+        requestInit.cache = options.cache;
+      }
     }
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";

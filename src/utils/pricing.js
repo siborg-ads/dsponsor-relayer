@@ -17,7 +17,7 @@ export async function fetchHistoricalPrice(coingeckoId, date) {
           method: "GET",
           "Content-Type": "application/json",
           "x-cg-demo-api-key": process.env.COINGECKO_API_KEY,
-          // next: { tags: [`pricing-${coingeckoId}-${date}`] }
+          next: { tags: [`pricing-${coingeckoId}-${date}`] },
           cache: "force-cache"
         }
       }

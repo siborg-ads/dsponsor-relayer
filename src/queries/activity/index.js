@@ -567,7 +567,6 @@ export async function getSpendings(
     },
     options
   );
-
   const { adOffers } = graphResult.data;
 
   if (adOffers.length) {
