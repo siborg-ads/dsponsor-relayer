@@ -2,7 +2,7 @@ import { Alchemy } from "alchemy-sdk";
 import { formatUnits, parseUnits, getAddress } from "ethers";
 import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
-import { getCurrencyInfos, priceFormattedForAllValuesObject } from "@/utils";
+import { getCurrencyInfosAtBlocktimestamp } from "@/utils";
 import { memoize } from "nextjs-better-unstable-cache";
 
 export async function getActivity(
@@ -23,7 +23,7 @@ export async function getActivity(
     nftContractAddresses = nftContractAddress.split(",");
   }
 
-  const [holders, { lastBid, totalBids, spendings, protocolFees, protocolFeeCurrency }] =
+  const [holders, { totalBids, totalUsdRevenueFees, lastBid, spendings, protocolFees }] =
     await Promise.all([
       getHolders(chainId, nftContractAddresses, userAddress),
       getSpendings(chainId, nftContractAddress, userAddress, fromTimestamp, toTimestamp)
@@ -42,6 +42,8 @@ export async function getActivity(
         nbProtocolFeeBuys: 0,
         nbProtocolFeeSells: 0,
         nbProtocolFeeReferrals: 0,
+        points: 0
+        /*
         usdcAmounts: {
           // total USDC
           totalSpent: BigInt("0"),
@@ -50,6 +52,7 @@ export async function getActivity(
           bidRefundReceived: BigInt("0"),
           totalProtocolFee: BigInt("0")
         }
+        */
       };
     }
   };
@@ -75,18 +78,40 @@ export async function getActivity(
     .filter((e) => {
       const isSCAddr = smartContractsAddresses.includes(e.addr);
       const isExcludedRankAddress = [
-        "0x9a7FAC267228f536A8f250E65d7C4CA7d39De766",
-        "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf"
+        // "0x9a7FAC267228f536A8f250E65d7C4CA7d39De766",
+        // "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf"
       ].includes(e.addr);
       const filterByUser = userAddress ? e.addr == userAddress : true;
 
       return !isSCAddr && !isExcludedRankAddress && filterByUser;
     });
 
+  // let totalSpentUSDCAmount = BigInt("0");
+  // let totalBidRefundUSDCAmount = BigInt("0");
+  // let totalProtocolRevenueUSDCAmount = BigInt("0");
+  let nbHolders = 0;
+  let totalNbPoints = 0;
+
   resultArray = resultArray
     .sort((a, b) => b.balance - a.balance)
-    .map((e, i) => ({ ...e, holdersRank: i + 1 }));
+    .map((e, i) => {
+      e.displayAddr = e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
+      if (e.balance > 0) nbHolders += 1;
+      totalNbPoints += e.points;
 
+      return { ...e, holdersRank: i + 1 };
+    });
+
+  resultArray = resultArray
+    .sort((a, b) => b.points - a.points)
+    .map((e, i) => ({
+      ...e,
+      pointsShare: e.points / totalNbPoints,
+      points: Math.round(e.points),
+      totalProtocolFeeRank: i + 1
+    }));
+
+  /*
   resultArray = resultArray
     .sort((a, b) => {
       if (a.usdcAmounts.totalSpent > b.usdcAmounts.totalSpent) {
@@ -110,68 +135,14 @@ export async function getActivity(
       return 0;
     })
     .map((e, i) => ({ ...e, bidRefundsRank: i + 1 }));
-
-  const valueToPoints = (value, currency) => {
-    // WETH ; decimals = 18 ; we want 1 WETH = 1000 points
-
-    const points =
-      value && currency == protocolFeeCurrency.address
-        ? Number(formatUnits(value.toString(), 13))
-        : 0;
-
-    return points > 1 ? Number(points.toFixed(0)) : points;
-  };
-
-  resultArray = resultArray
-    .sort((a, b) => {
-      const aAmount =
-        a?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
-      const bAmount =
-        b?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
-
-      if (aAmount > bAmount) {
-        return -1;
-      }
-      if (aAmount < bAmount) {
-        return 1;
-      }
-      return 0;
-    })
-    .map((e, i) => {
-      const totalProtocolFee =
-        e?.currenciesAmounts?.[protocolFeeCurrency.address]?.totalProtocolFee || BigInt("0");
-      const points = valueToPoints(totalProtocolFee, protocolFeeCurrency.address);
-
-      return { points, ...e, totalProtocolFeeRank: i + 1 };
-    });
-  /*
-  Above includes WETH only, 
-    PREVIOUS VERSION : include all currencies, total can change at anytime according to coin prices
-  .sort((a, b) => {
-      if (a.usdcAmounts.totalProtocolFee > b.usdcAmounts.totalProtocolFee) {
-        return -1;
-      }
-      if (a.usdcAmounts.totalProtocolFee < b.usdcAmounts.totalProtocolFee) {
-        return 1;
-      }
-      return 0;
-    })
-      .map((e, i) => ({ ...e, totalProtocolFeeRank: i + 1 })
     */
 
-  let nbHolders = 0;
-  let nbRevenueCalls = 0;
-  let totalSpentUSDCAmount = BigInt("0");
-  let totalBidRefundUSDCAmount = BigInt("0");
-  let totalProtocolRevenueUSDCAmount = BigInt("0");
-
+  /*
   resultArray = await Promise.all(
     resultArray.map(async (e) => {
-      // e.ens = await provider.lookupAddress(e.addr);
-      e.displayAddr = e.addr.slice(0, 6) + "..." + e.addr.slice(-4);
-      if (e.balance > 0) nbHolders += 1;
+      // e.ens = await provider.lookupAddress(e.addr);           
       totalSpentUSDCAmount += e.usdcAmounts.totalSpent;
-      totalBidRefundUSDCAmount += e.usdcAmounts.bidRefundReceived;
+       totalBidRefundUSDCAmount += e.usdcAmounts.bidRefundReceived;
       const negativeToZero = true;
       const prettyFormatted = false;
       e.usdcAmounts = priceFormattedForAllValuesObject(
@@ -180,9 +151,11 @@ export async function getActivity(
         negativeToZero,
         prettyFormatted
       );
+      
       return e;
     })
   );
+  */
 
   lastBid.bidderAddr = lastBid.bidderAddr ? getAddress(lastBid.bidderAddr) : null;
   const lastBidderEns = lastBid.bidderAddr
@@ -193,26 +166,24 @@ export async function getActivity(
     ? lastBidderEns
     : lastBid.bidderAddr.slice(0, 6) + "..." + lastBid.bidderAddr.slice(-4);
 
-  const lastActivities = Object.values(protocolFees)
-
-    .sort((a, b) => b.blockTimestamp - a.blockTimestamp)
-    .map((e) => {
-      nbRevenueCalls += 1;
-      totalProtocolRevenueUSDCAmount += e.usdcAmount;
-      e.points = valueToPoints(e.fee, e.currency);
-      return { ...e, date: new Date(e.blockTimestamp * 1000) };
-    });
+  const lastActivities = Object.values(protocolFees).sort(
+    (a, b) => b.blockTimestamp - a.blockTimestamp
+  );
+  const nbRevenueCalls = lastActivities.length;
 
   return {
-    protocolFeeCurrency, // WETH
     totalBids,
+    /*
     ...priceFormattedForAllValuesObject(6, {
       totalProtocolRevenueUSDCAmount,
       totalSpentUSDCAmount,
       totalBidRefundUSDCAmount
     }),
-    nbRevenueCalls,
+    */
     nbHolders,
+    nbRevenueCalls,
+    totalUsdRevenueFees,
+    totalNbPoints,
     lastBid: {
       ...lastBid,
       lastBidderDisplayAddr,
@@ -462,8 +433,6 @@ export async function getSpendings(
   };
   let totalBids = 0;
 
-  const protocolFeeCurrency = config[chainId].smartContracts.WETH;
-
   const setupResult = (addr, currency) => {
     if (!result[addr]) {
       result[addr] = {
@@ -472,6 +441,8 @@ export async function getSpendings(
         nbProtocolFeeBuys: 0,
         nbProtocolFeeSells: 0,
         nbProtocolFeeReferrals: 0,
+        points: 0,
+        /*
         usdcAmounts: {
           // total USDC
           totalSpent: BigInt("0"),
@@ -480,6 +451,7 @@ export async function getSpendings(
           bidRefundReceived: BigInt("0"),
           totalProtocolFee: BigInt("0")
         },
+        */
         currenciesAmounts: {}
       };
     }
@@ -495,8 +467,12 @@ export async function getSpendings(
     }
   };
 
-  function processProtocolFee(protocolFeeObj, type) {
+  async function processProtocolFee(protocolFeeObj, type) {
     let {
+      offerId,
+      offerName,
+      tokenId,
+      tokenData,
       id,
       blockTimestamp,
       transactionHash,
@@ -507,37 +483,52 @@ export async function getSpendings(
       referralAddresses
     } = protocolFeeObj;
 
-    let refAddr = referralAddresses.length
-      ? referralAddresses[0]
-      : "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf";
+    if (!protocolFees[id]) {
+      let refAddr = referralAddresses.length
+        ? referralAddresses[0]
+        : "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf";
 
-    enabler = getAddress(enabler);
-    spender = getAddress(spender);
-    refAddr = getAddress(refAddr);
-    currency = getAddress(currency);
+      enabler = getAddress(enabler);
+      spender = getAddress(spender);
+      refAddr = getAddress(refAddr);
+      currency = getAddress(currency);
 
-    [enabler, spender, refAddr].forEach((addr) => {
-      setupResult(addr, currency);
-      result[addr]["currenciesAmounts"][currency].totalProtocolFee += BigInt(fee);
-    });
+      const { priceUSDC, decimals } = await getCurrencyInfosAtBlocktimestamp(
+        chainId,
+        currency,
+        blockTimestamp
+      );
+      const usdcAmount = (BigInt(priceUSDC) * BigInt(fee)) / parseUnits("1", decimals);
+      const points = parseFloat(formatUnits(usdcAmount, 6));
 
-    if (currency === protocolFeeCurrency.address) {
-      result[enabler].nbProtocolFeeSells += 1;
-      result[spender].nbProtocolFeeBuys += 1;
-      result[refAddr].nbProtocolFeeReferrals += 1;
+      for (const addr of [enabler, spender, refAddr]) {
+        setupResult(addr, currency);
+        result[addr]["currenciesAmounts"][currency].totalProtocolFee += BigInt(fee);
+        result[addr]["points"] += points;
+      }
+
+      if (points > 0) {
+        result[enabler].nbProtocolFeeSells += 1;
+        result[spender].nbProtocolFeeBuys += 1;
+        result[refAddr].nbProtocolFeeReferrals += 1;
+      }
+
+      protocolFees[id] = {
+        blockTimestamp,
+        transactionHash,
+        type,
+        currency,
+        fee,
+        enabler,
+        spender,
+        refAddr,
+        referralAddresses,
+        offerId,
+        offerName,
+        tokenId,
+        tokenData
+      };
     }
-
-    protocolFees[id] = {
-      blockTimestamp,
-      transactionHash,
-      type,
-      currency,
-      fee,
-      enabler,
-      spender,
-      refAddr,
-      referralAddresses
-    };
   }
 
   // @we disable the while loop for now - no need for pagination right now
@@ -584,6 +575,7 @@ export async function getSpendings(
 
     for (const {
       id: offerId,
+      name: offerName,
       nftContract: { id: contractAddress, tokens }
     } of adOffers) {
       if (tokens.length) {
@@ -598,7 +590,16 @@ export async function getSpendings(
             revenueTransactionMint.protocolFees.length
           ) {
             for (const protocolFeeObj of revenueTransactionMint.protocolFees) {
-              processProtocolFee(protocolFeeObj, "mint");
+              await processProtocolFee(
+                {
+                  offerId,
+                  offerName,
+                  tokenId,
+                  tokenData,
+                  ...protocolFeeObj
+                },
+                "mint"
+              );
             }
           }
 
@@ -606,7 +607,16 @@ export async function getSpendings(
             for (const { revenueTransaction } of directBuys) {
               if (revenueTransaction && revenueTransaction.protocolFees) {
                 for (const protocolFeeObj of revenueTransaction.protocolFees) {
-                  processProtocolFee(protocolFeeObj, "buy");
+                  await processProtocolFee(
+                    {
+                      offerId,
+                      offerName,
+                      tokenId,
+                      tokenData,
+                      ...protocolFeeObj
+                    },
+                    "buy"
+                  );
                 }
               }
             }
@@ -617,7 +627,16 @@ export async function getSpendings(
               completedBid.revenueTransaction.protocolFees
             ) {
               for (const protocolFeeObj of completedBid.revenueTransaction.protocolFees) {
-                processProtocolFee(protocolFeeObj, "auction");
+                await processProtocolFee(
+                  {
+                    offerId,
+                    offerName,
+                    tokenId,
+                    tokenData,
+                    ...protocolFeeObj
+                  },
+                  "auction"
+                );
               }
             }
 
@@ -657,6 +676,8 @@ export async function getSpendings(
                   result[bidder]["currenciesAmounts"][currency].bidSpent += BigInt(paidBidAmount);
                   result[bidder]["currenciesAmounts"][currency].totalSpent += BigInt(paidBidAmount);
                 }
+
+                //
               }
             }
           }
@@ -671,6 +692,7 @@ export async function getSpendings(
 
   ////////////////////////////////
 
+  /*
   for (const addr of Object.keys(result)) {
     for (const currency of Object.keys(result[addr]["currenciesAmounts"])) {
       const { symbol, decimals, priceUSDC } = await getCurrencyInfos(chainId, currency);
@@ -689,22 +711,29 @@ export async function getSpendings(
     }
     // delete result[addr]["currenciesAmounts"];
   }
+  */
 
+  let totalUsdRevenueFees = 0;
   for (const protocolFeeId of Object.keys(protocolFees)) {
-    const { currency, fee } = protocolFees[protocolFeeId];
-    const { symbol, decimals, priceUSDC } = await getCurrencyInfos(chainId, currency);
+    const { currency, fee, blockTimestamp } = protocolFees[protocolFeeId];
+    const { symbol, decimals, priceUSDC } = await getCurrencyInfosAtBlocktimestamp(
+      chainId,
+      currency,
+      blockTimestamp
+    );
+
     const usdcAmount = (BigInt(priceUSDC) * BigInt(fee)) / parseUnits("1", decimals);
+    const points = parseFloat(formatUnits(usdcAmount, 6));
+    totalUsdRevenueFees += points;
     protocolFees[protocolFeeId] = {
+      date: new Date(blockTimestamp * 1000),
       ...protocolFees[protocolFeeId],
       symbol,
       decimals,
-      usdcAmount,
-      formattedAmounts: {
-        ...priceFormattedForAllValuesObject(decimals, { fee }),
-        ...priceFormattedForAllValuesObject(6, { usdcAmount })
-      }
+      points,
+      usdcAmount
     };
   }
 
-  return { totalBids, lastBid, spendings: result, protocolFees, protocolFeeCurrency };
+  return { totalBids, totalUsdRevenueFees, lastBid, spendings: result, protocolFees };
 }

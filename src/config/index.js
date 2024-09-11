@@ -39,8 +39,7 @@ const config = {
       WETH: {
         address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         decimals: 18,
-        symbol: "WETH",
-        isProtocolFeeCurrency: true
+        symbol: "WETH"
       }
     }
   },
@@ -86,19 +85,21 @@ const config = {
       },
       WNATIVE: {
         address: "0x4200000000000000000000000000000000000006",
+        coingeckoId: "weth",
         decimals: 18,
         symbol: "WETH"
       },
       USDC: {
         address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        coingeckoId: "usd",
         decimals: 6,
         symbol: "USDC"
       },
       WETH: {
         address: "0x4200000000000000000000000000000000000006",
+        coingeckoId: "weth",
         decimals: 18,
-        symbol: "WETH",
-        isProtocolFeeCurrency: true
+        symbol: "WETH"
       }
     }
   },
@@ -141,11 +142,13 @@ const config = {
       },
       WNATIVE: {
         address: "0x4200000000000000000000000000000000000006",
+        coingeckoId: "weth",
         decimals: 18,
         symbol: "WETH"
       },
       USDC: {
         address: "0xd988097fb8612cc24eeC14542bC03424c656005f",
+        coingeckoId: "usd",
         decimals: 6,
         symbol: "USDC"
       },
@@ -156,9 +159,9 @@ const config = {
       },
       WETH: {
         address: "0x4200000000000000000000000000000000000006",
+        coingeckoId: "weth",
         decimals: 18,
-        symbol: "WETH",
-        isProtocolFeeCurrency: true
+        symbol: "WETH"
       }
     }
   },
@@ -203,24 +206,28 @@ const config = {
       },
       WNATIVE: {
         address: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+        coingeckoId: "weth",
         decimals: 18,
         symbol: "WETH"
       },
+      /*
       UNI: {
         address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
         decimals: 18,
         symbol: "UNI"
       },
+      */
       USDC: {
         address: "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+        coingeckoId: "usd",
         decimals: 6,
         symbol: "USDC"
       },
       WETH: {
         address: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+        coingeckoId: "weth",
         decimals: 18,
-        symbol: "WETH",
-        isProtocolFeeCurrency: true
+        symbol: "WETH"
       }
     }
   }

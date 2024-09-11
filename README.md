@@ -33,6 +33,7 @@ The Relayer App provides API endpoints and UI components for the [DSponsor ecosy
 ```env
 # required
 NEXT_ALCHEMY_API_KEY=xxxxxxxx
+COINGECKO_API_KEY=CG-xxxxxxxxxxxx
 
 # from src/config, you may need it
 NEXT_DEV_URL=http://localhost:3000
