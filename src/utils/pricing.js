@@ -2,8 +2,9 @@ import config from "@/config";
 import { getEthQuote } from "@/queries/uniswap/quote";
 import { ethers, getAddress, parseUnits } from "ethers";
 import ERC20 from "@uniswap/v3-periphery/artifacts/contracts/interfaces/IERC20Metadata.sol/IERC20Metadata.json";
-import usdPrices from "@/data/usdPrices.json";
+import usdPricesJSON from "@/data/usdPrices.json";
 
+const usdPrices = usdPricesJSON;
 const memoize = {};
 
 export async function fetchHistoricalPrice(coingeckoId, date) {
@@ -16,8 +17,8 @@ export async function fetchHistoricalPrice(coingeckoId, date) {
           method: "GET",
           "Content-Type": "application/json",
           "x-cg-demo-api-key": process.env.COINGECKO_API_KEY,
-          next: { tags: [`pricing-${coingeckoId}-${date}`] }
-          // cache: "force-cache"
+          // next: { tags: [`pricing-${coingeckoId}-${date}`] }
+          cache: "force-cache"
         }
       }
     );
@@ -120,6 +121,13 @@ export const getCurrencyInfosAtBlocktimestamp = async (chainId, currency, blockT
         coingeckoId,
         `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
       );
+
+      if (!usdPrices[coingeckoId]) {
+        usdPrices[coingeckoId] = {};
+      }
+
+      usdPrices[coingeckoId][`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`] =
+        priceUSD;
     }
   }
 

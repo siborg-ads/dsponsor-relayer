@@ -31,5 +31,3 @@ export async function GET(request, context) {
     }
   });
 }
-
-export const fetchCache = "default-cache";
