@@ -60,14 +60,18 @@ export async function POST(request) {
 
     // TAG UPDATE
     for (let tag of allTags) {
-      const [chainId, item, id] = tag.split("-");
+      try {
+        const [chainId, item, id] = tag.split("-");
 
-      if (chainId && item && id && item === "nftContract")
-        tag = `${chainId}-nftContract-${getAddress(id)}`;
-      if (chainId && item && id && item === "userAddress")
-        tag = `${chainId}-userAddress-${getAddress(id)}`;
+        if (chainId && item && id && item === "nftContract")
+          tag = `${chainId}-nftContract-${getAddress(id)}`;
+        if (chainId && item && id && item === "userAddress")
+          tag = `${chainId}-userAddress-${getAddress(id)}`;
 
-      tagUpdate(tag);
+        tagUpdate(tag);
+      } catch (e) {
+        //
+      }
     }
 
     // ACTIVITY UPDATE
@@ -87,7 +91,11 @@ export async function POST(request) {
       }
 
       if (chainId && item && id && item === "userAddress") {
-        activityUpdate(tag, getActivity(chainId, null, null, getAddress(id), null));
+        try {
+          activityUpdate(tag, getActivity(chainId, null, null, getAddress(id), null));
+        } catch (e) {
+          //;
+        }
       }
     }
   }
