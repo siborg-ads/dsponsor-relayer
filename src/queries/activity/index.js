@@ -1,5 +1,5 @@
 import { Alchemy } from "alchemy-sdk";
-import { formatUnits, parseUnits, getAddress } from "ethers";
+import { formatUnits, parseUnits, getAddress, isAddress } from "ethers";
 import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
 import { getCurrencyInfosAtBlocktimestamp } from "@/utils";
@@ -484,13 +484,12 @@ export async function getSpendings(
     } = protocolFeeObj;
 
     if (!protocolFees[id]) {
-      let refAddr = referralAddresses.length
-        ? referralAddresses[0]
-        : "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf";
+      let refAddr =
+        referralAddresses.length && isAddress(referralAddresses[0]) ? referralAddresses[0] : "";
 
       enabler = getAddress(enabler);
       spender = getAddress(spender);
-      refAddr = getAddress(refAddr);
+      refAddr = isAddress(refAddr) ? getAddress(refAddr) : "";
       currency = getAddress(currency);
 
       const { priceUSDC, decimals } = await getCurrencyInfosAtBlocktimestamp(
@@ -502,15 +501,17 @@ export async function getSpendings(
       const points = parseFloat(formatUnits(usdcAmount, 6));
 
       for (const addr of [enabler, spender, refAddr]) {
-        setupResult(addr, currency);
-        result[addr]["currenciesAmounts"][currency].totalProtocolFee += BigInt(fee);
-        result[addr]["points"] += points;
+        if (isAddress(addr)) {
+          setupResult(addr, currency);
+          result[addr]["currenciesAmounts"][currency].totalProtocolFee += BigInt(fee);
+          result[addr]["points"] += points;
+        }
       }
 
       if (points > 0) {
         result[enabler].nbProtocolFeeSells += 1;
         result[spender].nbProtocolFeeBuys += 1;
-        result[refAddr].nbProtocolFeeReferrals += 1;
+        if (isAddress(refAddr)) result[refAddr].nbProtocolFeeReferrals += 1;
       }
 
       protocolFees[id] = {
