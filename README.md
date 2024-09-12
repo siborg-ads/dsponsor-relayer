@@ -24,6 +24,7 @@ The Relayer App provides API endpoints and UI components for the [DSponsor ecosy
     - [Users activity](#users-activity)
     - [Ad spaces data for an offer](#ad-spaces-data-for-an-offer)
     - [Graph proxy](#graph-proxy)
+    - [Price quote](#price-quote)
     - [Token metadata](#token-metadata)
 
 ## Development setup
@@ -133,7 +134,7 @@ Use for: Web
 
 |Method|Endpoint|Parameters|Cache tags|
 |--|--|--|--|
-|`GET`|`/ClickableLogosGrid/iFrame`|`bgColor` (default: `0d102d`), `ratio`, `previewTokenId`, `previewImage`, `previewLink`|[`${chainId}-adOffer-${adOfferId}`]|
+|`GET`|`/ClickableLogosGrid/iFrame`|`bgColor` (default: `0d102d`), `includeAvailable` (default: `true`, ad tokens with no ads but available on the market displayed), `includeReserved` (default: `true`, ad tokens with no validated ads and unavailable on the market displayed), `ratio`, `previewTokenId`, `previewImage`, `previewLink`|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -228,7 +229,7 @@ Use for: Web
 
 |Method|Endpoint|Parameters|Cache Tags|
 |--|--|--|--|
-|`GET`|`/DynamicBanner/iFrame`|`bgColor` (default: `0d102d`), `ratio`, `tokenIds` (default to all from the offer), `previewImage`, `previewLink`|[`${chainId}-adOffer-${adOfferId}`]|
+|`GET`|`/DynamicBanner/iFrame`|`bgColor` (default: `0d102d`), `includeAvailable` (default: `true`, ad tokens with no ads but available on the market displayed), `includeReserved` (default: `true`, ad tokens with no validated ads and unavailable on the market displayed), `ratio`, `tokenIds` (default to all from the offer), `previewImage`, `previewLink`|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -657,175 +658,146 @@ Purpose: Retrieve all users activity
 - Request
 
 ```bash
-curl 'https://relayer.dsponsor.com/api/11155111/activity?fromTimestamp=1718356967&toTimestamp=1718469107&userAddress=0x8333c1B5131CC694c3A238E41e50cbc236e73DbC&nftContractAddress=0x51A533E5FBc542B0Df00c352D8A8A65Fff1727ac'
+curl 'https://relayer.dsponsor.com/api/11155111/activity?userAddress=0x747923D9eC6c94521aCccc6F3d065C3772f3fa6b'
 ```
 
 - Response
 
 ```json
 {
-    "lastUpdate": "2024-06-16T15:49:41.464Z",
-    "protocolFeeCurrency": {
-        "address": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
-        "decimals": 18,
-        "symbol": "WETH"
+  "totalBids": 1,
+  "nbHolders": 1,
+  "nbRevenueCalls": 4,
+  "totalUsdRevenueFees": 0.0061270000000000005,
+  "totalNbPoints": 0.0061270000000000005,
+  "lastBid": {
+    "blockTimestamp": "1719843684",
+    "bidderAddr": "0x747923D9eC6c94521aCccc6F3d065C3772f3fa6b",
+    "listingId": "0",
+    "listing": {
+      "tokenId": "64811535694367703682769931475725916177454416984783473390709242422588226989409",
+      "contractAddress": "0xe1fdb9bf84368032e352c4a8050fa0a4d7b2d6ae",
+      "offerId": "1",
+      "tokenData": "farcaster"
     },
-    "totalBids": 6,
-    "totalProtocolRevenueUSDCAmount": "1.96",
-    "totalSpentUSDCAmount": "49.07",
-    "totalBidRefundUSDCAmount": "1.14",
-    "nbRevenueCalls": 2,
-    "nbHolders": 1,
-    "lastBid": {
-        "blockTimestamp": "1718458056",
-        "bidderAddr": "0x8333c1b5131cc694c3a238e41e50cbc236e73dbc",
-        "listingId": "0",
-        "listing": {
-            "tokenId": "110771216890900307486995680796878979552050216338441285842533727414245120540081",
-            "contractAddress": "0x51a533e5fbc542b0df00c352d8a8a65fff1727ac",
-            "offerId": "1",
-            "tokenData": "airdrop",
-            "metadata": {
-                "name": "#airdrop - Tokenized Ad Space",
-                "description": "Tokenized advertisement spaces link to the ticker 'airdrop' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for 'airdrop'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0Aairdrop",
-                "terms": "https://bafybeie554c4fryghl6ao7jobfoji5d2qist3rq2j6lmminslu7u46d6si.ipfs.nftstorage.link/",
-                "external_link": "",
-                "valid_from": "2024-05-01T00:00:00Z",
-                "valid_to": "2024-10-31T23:59:59Z",
-                "categories": [
-                    "Community",
-                    "NFT",
-                    "Crypto"
-                ],
-                "token_metadata": {
-                    "name": "#{tokenData} - Tokenized Ad Space",
-                    "description": "Tokenized advertisement spaces link to the ticker '{tokenData}' (query term in the app)\n\nBuying this ad space give you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}'.\nSiBorg team still has the power to validate or reject ad assets.\nYou are free to change the ad proposal at anytime and free to resell it on the open market.",
-                    "image": "https://placehold.co/400x400?text=SiBorg%20Ad%20Space%0A{tokenData}",
-                    "external_url": "",
-                    "attributes": [
-                        {
-                            "trait_type": "Search Query",
-                            "value": "{tokenData}"
-                        }
-                    ]
-                },
-                "external_url": "",
-                "attributes": [
-                    {
-                        "trait_type": "Search Query",
-                        "value": "airdrop"
-                    }
-                ]
-            }
-        },
-        "lastBidderDisplayAddr": "0x8333c1b5131cc694c3a238e41e50cbc236e73dbc",
-        "date": "2024-06-15T13:27:36.000Z"
+    "lastBidderDisplayAddr": "0x747923D9eC6c94521aCccc6F3d065C3772f3fa6b",
+    "date": "2024-07-01T14:21:24.000Z"
+  },
+  "lastActivities": [
+    {
+      "date": "2024-08-26T16:47:48.000Z",
+      "blockTimestamp": "1724690868",
+      "transactionHash": "0xda49c125832984a777aeb7a5ccc03553df086462feeeeb044885e9559bf9d84c",
+      "type": "mint",
+      "currency": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+      "fee": "800",
+      "enabler": "0x747923D9eC6c94521aCccc6F3d065C3772f3fa6b",
+      "spender": "0x9a7FAC267228f536A8f250E65d7C4CA7d39De766",
+      "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
+      "referralAddresses": [
+        "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf"
+      ],
+      "offerId": "38",
+      "offerName": "CoinReport",
+      "tokenId": "0",
+      "tokenData": "",
+      "symbol": "WETH",
+      "decimals": 18,
+      "points": 0,
+      "usdcAmount": "0"
     },
-    "lastActivities": [
-        {
-            "blockTimestamp": "1718458056",
-            "transactionHash": "0x26263b34fe1a75d93008409f0217e0d29e62a8c2cda4e5e296d1c5915b5c384f",
-            "type": "auction",
-            "currency": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
-            "fee": "11610000000000",
-            "enabler": "0x628427629c3Ba817eCE0085DB11aF83c131D1F05",
-            "spender": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
-            "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
-            "referralAddresses": [
-                "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf"
-            ],
-            "symbol": "WETH",
-            "decimals": 18,
-            "usdcAmount": "1359388",
-            "formattedAmounts": {
-                "fee": "0.0₄1",
-                "usdcAmount": "1.36"
-            },
-            "points": 0.01161,
-            "date": "2024-06-15T13:27:36.000Z"
-        },
-        {
-            "blockTimestamp": "1718356968",
-            "transactionHash": "0xb39aa7b3b899841f913fd27874b427a7c6e04e46cdd69d53759a7b0b9ab1bd34",
-            "type": "auction",
-            "currency": "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
-            "fee": "599776",
-            "enabler": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
-            "spender": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
-            "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
-            "referralAddresses": [
-                "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf"
-            ],
-            "symbol": "USDC",
-            "decimals": 6,
-            "usdcAmount": "599776",
-            "formattedAmounts": {
-                "fee": "0.6",
-                "usdcAmount": "0.6"
-            },
-            "points": 0,
-            "date": "2024-06-14T09:22:48.000Z"
+    {
+      "date": "2024-07-10T15:59:12.000Z",
+      "blockTimestamp": "1720627152",
+      "transactionHash": "0x9362c83a59e8d700b1ffa92f3c7432b14de836dbe12ccbc8930e7dfce84804ea",
+      "type": "mint",
+      "currency": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+      "fee": "400000000000",
+      "enabler": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+      "spender": "0x747923D9eC6c94521aCccc6F3d065C3772f3fa6b",
+      "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
+      "referralAddresses": [
+        "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf"
+      ],
+      "offerId": "8",
+      "offerName": "Bob L'éponge v2",
+      "tokenId": "4",
+      "tokenData": "",
+      "symbol": "WETH",
+      "decimals": 18,
+      "points": 0.001225,
+      "usdcAmount": "1225"
+    },
+    {
+      "date": "2024-07-10T15:30:48.000Z",
+      "blockTimestamp": "1720625448",
+      "transactionHash": "0xa6f6d43cc29b8cae1b715118c79d00a511049bc484e47200540a9341e157e66e",
+      "type": "buy",
+      "currency": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+      "fee": "1200000000000",
+      "enabler": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+      "spender": "0x747923D9eC6c94521aCccc6F3d065C3772f3fa6b",
+      "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
+      "referralAddresses": [
+        "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf"
+      ],
+      "offerId": "1",
+      "offerName": "SiBorg Ads",
+      "tokenId": "110771216890900307486995680796878979552050216338441285842533727414245120540081",
+      "tokenData": "airdrop",
+      "symbol": "WETH",
+      "decimals": 18,
+      "points": 0.003677,
+      "usdcAmount": "3677"
+    },
+    {
+      "date": "2024-07-10T07:40:12.000Z",
+      "blockTimestamp": "1720597212",
+      "transactionHash": "0x6850b79f78ec2c42ba0d5153cae2ca98c395e3a95cade38b9c73d1c52c1e2519",
+      "type": "mint",
+      "currency": "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+      "fee": "400000000000",
+      "enabler": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
+      "spender": "0x747923D9eC6c94521aCccc6F3d065C3772f3fa6b",
+      "refAddr": "0x5b15Cbb40Ef056F74130F0e6A1e6FD183b14Cdaf",
+      "referralAddresses": [
+        "0x5b15cbb40ef056f74130f0e6a1e6fd183b14cdaf"
+      ],
+      "offerId": "8",
+      "offerName": "Bob L'éponge v2",
+      "tokenId": "1",
+      "tokenData": "",
+      "symbol": "WETH",
+      "decimals": 18,
+      "points": 0.001225,
+      "usdcAmount": "1225"
+    }
+  ],
+  "rankings": [
+    {
+      "addr": "0x747923D9eC6c94521aCccc6F3d065C3772f3fa6b",
+      "balance": 4,
+      "nbBids": 1,
+      "nbRefunds": 1,
+      "nbProtocolFeeBuys": 3,
+      "nbProtocolFeeSells": 0,
+      "nbProtocolFeeReferrals": 0,
+      "points": 0,
+      "currenciesAmounts": {
+        "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14": {
+          "totalSpent": "-150000000000000",
+          "totalReceived": "150000000000000",
+          "bidSpent": "-150000000000000",
+          "bidRefundReceived": "150000000000000",
+          "totalProtocolFee": "2000000000800"
         }
-    ],
-    "rankings": [
-        {
-            "points": 0.02322,
-            "addr": "0x8333c1B5131CC694c3A238E41e50cbc236e73DbC",
-            "balance": 1,
-            "nbBids": 6,
-            "nbRefunds": 2,
-            "nbProtocolFeeBuys": 2,
-            "nbProtocolFeeSells": 1,
-            "nbProtocolFeeReferrals": 0,
-            "usdcAmounts": {
-                "totalSpent": "49.07",
-                "totalReceived": "1.14",
-                "bidSpent": "49.07",
-                "bidRefundReceived": "1.14",
-                "totalProtocolFee": "3.92"
-            },
-            "currenciesAmounts": {
-                "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14": {
-                    "totalSpent": "290250000000000",
-                    "totalReceived": "9750000000000",
-                    "bidSpent": "290250000000000",
-                    "bidRefundReceived": "9750000000000",
-                    "totalProtocolFee": "23220000000000",
-                    "formatted": {
-                        "symbol": "WETH",
-                        "priceUSDC": "117.1K",
-                        "totalSpent": "0.0₃3",
-                        "totalReceived": "0.0₄1",
-                        "bidSpent": "0.0₃3",
-                        "bidRefundReceived": "0.0₄1",
-                        "totalProtocolFee": "0.0₄2"
-                    }
-                },
-                "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8": {
-                    "totalSpent": "15090000",
-                    "totalReceived": "0",
-                    "bidSpent": "15090000",
-                    "bidRefundReceived": "0",
-                    "totalProtocolFee": "1199552",
-                    "formatted": {
-                        "symbol": "USDC",
-                        "priceUSDC": "1",
-                        "totalSpent": "15.09",
-                        "totalReceived": "0",
-                        "bidSpent": "15.09",
-                        "bidRefundReceived": "0",
-                        "totalProtocolFee": "1.2"
-                    }
-                }
-            },
-            "holdersRank": 1,
-            "spendersRank": 1,
-            "bidRefundsRank": 1,
-            "totalProtocolFeeRank": 1,
-            "displayAddr": "0x8333...3DbC"
-        }
-    ]
+      },
+      "displayAddr": "0x7479...fa6b",
+      "holdersRank": 1,
+      "pointsShare": 1,
+      "totalProtocolFeeRank": 1
+    }
+  ]
 }
 ```
 
@@ -1479,306 +1451,6 @@ curl 'https://relayer.dsponsor.com/api/11155111/graph' \
     }
   }
 }
-```
-
-{
-  "data": {
-    "adOffers": [
-      {
-        "id": "1",
-        "metadataURL": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmV3RDQLXQa4DWkRz7NA7umjhdVf3gvpJH9NHyfzvooiv9",
-        "nftContract": {
-          "royalty": {
-            "bps": "690",
-            "receiver": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766"
-          },
-          "prices": [
-            {
-              "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-              "amount": "9000000000000000",
-              "enabled": true,
-              "currencySymbol": "WETH",
-              "currencyDecimals": "18",
-              "currencyPriceUSDC": "564824700859",
-              "currencyPriceUSDCFormatted": "564.8K",
-              "minterAddress": "0x10E0447dDB66f1d33E6b10dB5099FBa231ceCE5C",
-              "protocolFeeBps": "400",
-              "mintPriceStructure": {
-                "creatorAmount": "9000000000000000",
-                "protocolFeeAmount": "360000000000000",
-                "totalAmount": "9360000000000000"
-              },
-              "mintPriceStructureFormatted": {
-                "creatorAmount": "0.009",
-                "protocolFeeAmount": "0.0₃4",
-                "totalAmount": "0.009"
-              },
-              "mintPriceStructureUsdc": {
-                "creatorAmount": "5083422307",
-                "protocolFeeAmount": "203336892",
-                "totalAmount": "5286759200"
-              },
-              "mintPriceStructureUsdcFormatted": {
-                "creatorAmount": "5.1K",
-                "protocolFeeAmount": "203.34",
-                "totalAmount": "5.3K"
-              }
-            }
-          ],
-          "tokens": [
-            {
-              "tokenId": "70622639689279718371527342103894932928233838121221666359043189029713682937432",
-              "mint": {
-                "blockTimestamp": "1722329256",
-                "tokenData": "test"
-              },
-              "prices": [],
-              "marketplaceListings": [
-                {
-                  "id": "81",
-                  "quantity": "1",
-                  "buyoutPricePerToken": "900000000000000000",
-                  "reservePricePerToken": "6000000000000000",
-                  "currency": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-                  "bids": [
-                    {
-                      "creationTimestamp": "1724688444",
-                      "creationTxHash": "0xe61b9995f1fa39cc1f048e6b4df5eca3773e598f96d7cb1eb3cfc8c758c0b53e",
-                      "bidder": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766",
-                      "status": "CREATED",
-                      "totalBidAmount": "6300000000000000",
-                      "paidBidAmount": "6600000000000000",
-                      "refundProfit": "0",
-                      "amountsFormatted": {
-                        "totalBidAmount": "0.006",
-                        "paidBidAmount": "0.007",
-                        "refundProfit": "0"
-                      }
-                    },
-                    {
-                      "creationTimestamp": "1724433480",
-                      "creationTxHash": "0x3d434342dc7c08a257364e8d2ac65b1fbeaee4218575d82efd737dfa76a13811",
-                      "bidder": "0x64e8f7c2b4fd33f5e8470f3c6df04974f90fc2ca",
-                      "status": "CANCELLED",
-                      "totalBidAmount": "6000000000000000",
-                      "paidBidAmount": "6000000000000000",
-                      "refundProfit": "300000000000000",
-                      "amountsFormatted": {
-                        "totalBidAmount": "0.006",
-                        "paidBidAmount": "0.006",
-                        "refundProfit": "0.0₃3"
-                      }
-                    }
-                  ],
-                  "token": {
-                    "nftContract": {
-                      "royalty": {
-                        "bps": "690",
-                        "receiver": "0x9a7fac267228f536a8f250e65d7c4ca7d39de766"
-                      },
-                      "allowList": false
-                    }
-                  },
-                  "currencySymbol": "WETH",
-                  "currencyDecimals": "18",
-                  "currencyPriceUSDC": "564824700859",
-                  "currencyPriceUSDCFormatted": "564.8K",
-                  "marketplaceAddress": "0x0B7f100940f4152D01B42A626ab73f7A62dd7cdC",
-                  "protocolFeeBps": "400",
-                  "minimalBidBps": "1000",
-                  "previousBidAmountBps": "500",
-                  "bidPriceStructure": {
-                    "previousBidAmount": "6300000000000000",
-                    "previousPricePerToken": "6300000000000000",
-                    "minimalBidPerToken": "6930000000000000",
-                    "minimalBuyoutPerToken": "900315000000000000",
-                    "newBidPerToken": "6930000000000000",
-                    "totalBidAmount": "6930000000000000",
-                    "refundBonusPerToken": "315000000000000",
-                    "refundBonusAmount": "315000000000000",
-                    "refundAmountToPreviousBidder": "6615000000000000",
-                    "newPricePerToken": "6615000000000000",
-                    "newAmount": "6615000000000000",
-                    "newRefundBonusPerToken": "330750000000000",
-                    "newRefundBonusAmount": "330750000000000",
-                    "newRefundAmount": "6945750000000000",
-                    "newProfitAmount": "15750000000000",
-                    "protocolFeeAmount": "264600000000000",
-                    "royaltyAmount": "456435000000000",
-                    "listerAmount": "5893965000000000"
-                  },
-                  "bidPriceStructureFormatted": {
-                    "previousBidAmount": "0.006",
-                    "previousPricePerToken": "0.006",
-                    "minimalBidPerToken": "0.007",
-                    "minimalBuyoutPerToken": "0.9",
-                    "newBidPerToken": "0.007",
-                    "totalBidAmount": "0.007",
-                    "refundBonusPerToken": "0.0₃3",
-                    "refundBonusAmount": "0.0₃3",
-                    "refundAmountToPreviousBidder": "0.007",
-                    "newPricePerToken": "0.007",
-                    "newAmount": "0.007",
-                    "newRefundBonusPerToken": "0.0₃3",
-                    "newRefundBonusAmount": "0.0₃3",
-                    "newRefundAmount": "0.007",
-                    "newProfitAmount": "0.0₄1",
-                    "protocolFeeAmount": "0.0₃3",
-                    "royaltyAmount": "0.0₃4",
-                    "listerAmount": "0.006"
-                  },
-                  "bidPriceStructureUsdc": {
-                    "previousBidAmount": "3558395615",
-                    "previousPricePerToken": "3558395615",
-                    "minimalBidPerToken": "3914235176",
-                    "minimalBuyoutPerToken": "508520150553",
-                    "newBidPerToken": "3914235176",
-                    "totalBidAmount": "3914235176",
-                    "refundBonusPerToken": "177919780",
-                    "refundBonusAmount": "177919780",
-                    "refundAmountToPreviousBidder": "3736315396",
-                    "newPricePerToken": "3736315396",
-                    "newAmount": "3736315396",
-                    "newRefundBonusPerToken": "186815769",
-                    "newRefundBonusAmount": "186815769",
-                    "newRefundAmount": "3923131165",
-                    "newProfitAmount": "8895989",
-                    "protocolFeeAmount": "149452615",
-                    "royaltyAmount": "257805762",
-                    "listerAmount": "3329057017"
-                  },
-                  "bidPriceStructureUsdcFormatted": {
-                    "previousBidAmount": "3.6K",
-                    "previousPricePerToken": "3.6K",
-                    "minimalBidPerToken": "3.9K",
-                    "minimalBuyoutPerToken": "508.5K",
-                    "newBidPerToken": "3.9K",
-                    "totalBidAmount": "3.9K",
-                    "refundBonusPerToken": "177.92",
-                    "refundBonusAmount": "177.92",
-                    "refundAmountToPreviousBidder": "3.7K",
-                    "newPricePerToken": "3.7K",
-                    "newAmount": "3.7K",
-                    "newRefundBonusPerToken": "186.82",
-                    "newRefundBonusAmount": "186.82",
-                    "newRefundAmount": "3.9K",
-                    "newProfitAmount": "8.9",
-                    "protocolFeeAmount": "149.45",
-                    "royaltyAmount": "257.81",
-                    "listerAmount": "3.3K"
-                  },
-                  "buyPriceStructure": {
-                    "buyoutPricePerToken": "900000000000000000",
-                    "listerBuyAmount": "801900000000000000",
-                    "royaltiesBuyAmount": "62100000000000000",
-                    "protocolFeeBuyAmount": "36000000000000000"
-                  },
-                  "buyPriceStructureUsdc": {
-                    "buyoutPricePerToken": "508342230773",
-                    "listerBuyAmount": "452932927618",
-                    "royaltiesBuyAmount": "35075613923",
-                    "protocolFeeBuyAmount": "20333689230"
-                  },
-                  "buyPriceStructureFormatted": {
-                    "buyoutPricePerToken": "0.9",
-                    "listerBuyAmount": "0.8",
-                    "royaltiesBuyAmount": "0.062",
-                    "protocolFeeBuyAmount": "0.036"
-                  },
-                  "buyPriceStructureUsdcFormatted": {
-                    "buyoutPricePerToken": "508.3K",
-                    "listerBuyAmount": "452.9K",
-                    "royaltiesBuyAmount": "35.1K",
-                    "protocolFeeBuyAmount": "20.3K"
-                  }
-                }
-              ],
-              "metadata": {
-                "name": "#test - SiBorg App",
-                "description": "Buying this ad space means you own a parcel on SiBorg app. It grants you the exclusive right to submit an ad to be displayed when any user searches for 'test' and benefits from SiBorg visibility. You are free to change the ad proposal at any time and free to resell it on the open market enabling you to invest in the future visibility of the platform.",
-                "image": "https://relayer.dsponsor.com/api/images?text=test",
-                "terms": "https://docs.google.com/document/d/12_uch6guEm4tPuWQ3CVJr7FmHRZczoJLkm5CJsuXyyM",
-                "external_link": "https://app.dsponsor.com/8453/offer/1",
-                "external_url": "https://app.dsponsor.com/8453/offer/1",
-                "valid_from": "2024-07-01T06:00:00Z",
-                "valid_to": "2025-06-30T21:00:00Z",
-                "categories": [
-                  "Community",
-                  "NFT",
-                  "Crypto"
-                ],
-                "token_metadata": {
-                  "name": "#{tokenData} - SiBorg App",
-                  "description": "Buying this ad space means you own a parcel on SiBorg app. It grants you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}' and benefits from SiBorg visibility. You are free to change the ad proposal at any time and free to resell it on the open market enabling you to invest in the future visibility of the platform.",
-                  "image": "https://relayer.dsponsor.com/api/images?text={tokenData}",
-                  "attributes": [
-                    {
-                      "trait_type": "Search Query",
-                      "value": "{tokenData}"
-                    }
-                  ]
-                },
-                "attributes": [
-                  {
-                    "trait_type": "Search Query",
-                    "value": "test"
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "metadata": {
-          "creator": {
-            "name": "SiBorg",
-            "description": "SiBorg application empowers podcasters by leveraging SocialFi.",
-            "image": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmeVJy5wXJhcNy4dynGj31HLwqk8Z1s8UvbJMY8iAaxUar",
-            "external_link": "https://siborg.io",
-            "external_url": "https://siborg.io",
-            "categories": [
-              "dApp",
-              "social",
-              "media",
-              "education"
-            ]
-          },
-          "offer": {
-            "name": "SiBorg Ads",
-            "description": "SiBorg is a podcast application for Twitter Spaces that leverages Web3 Social interactions. The SiBorg app is composed of parcels, each parcel linked to a query ticker that can be used in our search bar. SiBorg Ad Spaces owners can customize their ad space and benefit from the visibility associated with the platform.",
-            "image": "https://orange-elegant-swallow-161.mypinata.cloud/ipfs/QmdBodpqyrH6M8mYFrQNdokZMZArPfvY2cKoeHXKiSb4RQ",
-            "terms": "https://docs.google.com/document/d/12_uch6guEm4tPuWQ3CVJr7FmHRZczoJLkm5CJsuXyyM",
-            "external_link": "https://app.dsponsor.com/8453/offer/1",
-            "external_url": "https://app.dsponsor.com/8453/offer/1",
-            "valid_from": "2024-07-01T06:00:00Z",
-            "valid_to": "2025-06-30T21:00:00Z",
-            "categories": [
-              "Community",
-              "NFT",
-              "Crypto"
-            ],
-            "token_metadata": {
-              "name": "#{tokenData} - SiBorg App",
-              "description": "Buying this ad space means you own a parcel on SiBorg app. It grants you the exclusive right to submit an ad to be displayed when any user searches for '{tokenData}' and benefits from SiBorg visibility. You are free to change the ad proposal at any time and free to resell it on the open market enabling you to invest in the future visibility of the platform.",
-              "image": "https://relayer.dsponsor.com/api/images?text={tokenData}",
-              "attributes": [
-                {
-                  "trait_type": "Search Query",
-                  "value": "{tokenData}"
-                }
-              ]
-            }
-          }
-        }
-      }
-    ],
-    "_meta": {
-      "block": {
-        "timestamp": 1724950344
-      }
-    }
-  }
-}
-
 ```
 
 </details>

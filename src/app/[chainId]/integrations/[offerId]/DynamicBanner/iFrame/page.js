@@ -13,7 +13,9 @@ export async function generateMetadata() {
 export default async function DynamicBannerIframePage(req) {
   const { chainId, offerId } = req.params;
   const { bgColor, colSizes, previewImage, previewLink, tokenIds } = req.searchParams;
-  let { ratio } = req.searchParams;
+  let { ratio, includeAvailable, includeReserved } = req.searchParams;
+  includeAvailable = includeAvailable === "false" ? false : true;
+  includeReserved = includeReserved === "false" ? false : true;
   const adParameterIds =
     ratio?.length && /^\d+:\d+$/.test(ratio)
       ? [`imageURL-${ratio}`, "linkURL"]
@@ -44,13 +46,19 @@ export default async function DynamicBannerIframePage(req) {
 
     if (randomAd) {
       const [imageKey, linkKey] = _adParameterIds;
-      ad = {
-        offerId,
-        records: {
-          imageURL: randomAd[imageKey].data,
-          linkURL: randomAd[linkKey].data
-        }
-      };
+      const isReserved = randomAd[imageKey].state === "UNAVAILABLE";
+      const isAvailable =
+        randomAd[imageKey].state === "BUY_MINT" || randomAd[imageKey].state === "BUY_MARKET";
+
+      if ((!isReserved || includeReserved) && (!isAvailable || includeAvailable)) {
+        ad = {
+          offerId,
+          records: {
+            imageURL: randomAd[imageKey].data,
+            linkURL: randomAd[linkKey].data
+          }
+        };
+      }
     }
 
     const [imageKey] = _adParameterIds;

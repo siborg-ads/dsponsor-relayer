@@ -37,6 +37,11 @@ const AdsGrid = ({
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  if (!ads.length) {
+    return <div></div>;
+  }
+
   const calculateLayout = () => {
     const [widthRatio, heightRatio] = ratio.split(":").map(Number);
 

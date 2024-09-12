@@ -13,7 +13,11 @@ export async function generateMetadata() {
 export default async function ClickableLogosGridIframePage(req) {
   const { chainId, offerId } = req.params;
   const { bgColor, colSizes, previewTokenId, previewImage, previewLink } = req.searchParams;
-  let { ratio } = req.searchParams;
+
+  let { ratio, includeAvailable, includeReserved } = req.searchParams;
+  includeAvailable = includeAvailable === "false" ? false : true;
+  includeReserved = includeReserved === "false" ? false : true;
+
   let adParameterIds =
     ratio?.length && /^\d+:\d+$/.test(ratio)
       ? [`imageURL-${ratio}`, "linkURL"]
@@ -61,27 +65,41 @@ export default async function ClickableLogosGridIframePage(req) {
   }
 
   const tokenIds = response._tokenIds;
-  const ads = tokenIds.map((tokenId) => {
-    if (previewImage && previewLink && previewTokenId === tokenId) {
-      return {
-        offerId,
-        tokenId,
-        records: {
-          linkURL: previewLink,
-          imageURL: previewImage
-        }
-      };
-    } else {
-      return {
-        offerId,
-        tokenId,
-        records: {
-          linkURL: response[tokenId][linkKey].data || null,
-          imageURL: response[tokenId][imageKey].data || null
-        }
-      };
-    }
-  });
+  const ads = tokenIds
+    .map((tokenId) => {
+      if (previewImage && previewLink && previewTokenId === tokenId) {
+        return {
+          offerId,
+          tokenId,
+          records: {
+            linkURL: previewLink,
+            imageURL: previewImage
+          }
+        };
+      } else {
+        return {
+          offerId,
+          tokenId,
+          records: {
+            linkURL: response[tokenId][linkKey].data || null,
+            imageURL: response[tokenId][imageKey].data || null
+          }
+        };
+      }
+    })
+    .filter((ad) => {
+      const isReserved = response[ad.tokenId][imageKey].state === "UNAVAILABLE";
+      const isAvailable =
+        response[ad.tokenId][imageKey].state === "BUY_MINT" ||
+        response[ad.tokenId][imageKey].state === "BUY_MARKET";
+
+      return (
+        ad.records.imageURL &&
+        ad.records.linkURL &&
+        (!isReserved || includeReserved) &&
+        (!isAvailable || includeAvailable)
+      );
+    });
 
   return (
     <html>
