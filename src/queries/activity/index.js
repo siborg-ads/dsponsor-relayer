@@ -347,7 +347,7 @@ export async function getSpendings(
               or: [
                 { enabler_contains: $userAddress }
                 { spender_contains: $userAddress }
-                { referralAdditionalInformation_contains: $userAddress }
+                { referralAddresses_contains: [$userAddress] }
               ]
             }
           ]
