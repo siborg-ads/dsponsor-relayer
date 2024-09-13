@@ -315,6 +315,36 @@ async function populateAdOffer(adOffer) {
   }
 }
 
+function populateCurrentProposal(currentProposal) {
+  if (currentProposal) {
+    const { adParameter, acceptedProposal, pendingProposal, rejectedProposal } = currentProposal;
+    if (adParameter?.id && adParameter.id.includes("linkURL")) {
+      if (acceptedProposal && acceptedProposal.data.startsWith("http") === false) {
+        currentProposal.acceptedProposal.data = `https://${acceptedProposal.data}`;
+      }
+      if (pendingProposal && pendingProposal.data.startsWith("http") === false) {
+        currentProposal.pendingProposal.data = `https://${pendingProposal.data}`;
+      }
+      if (rejectedProposal && rejectedProposal.data.startsWith("http") === false) {
+        currentProposal.rejectedProposal.data = `https://${rejectedProposal.data}`;
+      }
+    }
+  }
+}
+
+function populateAllProposals(allProposals) {
+  if (allProposals && allProposals.length) {
+    for (let i = 0; i < allProposals.length; i++) {
+      const { adParameter, data } = allProposals[i];
+      if (adParameter?.id && adParameter.id.includes("linkURL")) {
+        if (data && data.startsWith("http") === false) {
+          allProposals[i].data = `https://${data}`;
+        }
+      }
+    }
+  }
+}
+
 export async function populateSubgraphResult(chainId, queryResult) {
   // Recursive function to traverse the object
   async function traverse(current) {
@@ -344,6 +374,14 @@ export async function populateSubgraphResult(chainId, queryResult) {
       for (let key in current.adOffers) {
         await populateAdOffer(current.adOffers[key]);
       }
+    }
+    if (Array.isArray(current.currentProposals)) {
+      for (let i = 0; i < current.currentProposals.length; i++) {
+        populateCurrentProposal(current.currentProposals[i]);
+      }
+    }
+    if (Array.isArray(current.allProposals)) {
+      populateAllProposals(current.allProposals);
     }
     if (Array.isArray(current.tokens)) {
       for (let key in current.tokens) {
