@@ -90,7 +90,7 @@ Purpose: Retrieve the image for an ad offer token.
 
 |Method|Endpoint|Parameters|Cache tags|
 |--|--|--|--|
-|`GET`|`/[tokenId]/image`|`ratio`, `adParameterId` (default: `imageURL`)|[`${chainId}-adOffer-${adOfferId}`]|
+|`GET`|`/[tokenId]/image`|`ratio`, `includeAvailable` (default: `true`, return CTA image if no validated ads but token is available on the market), `includeReserved` (default: `true`, return informative image if no validated ads and unavailable on the market),`adParameterId` (default: `imageURL`)|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 
@@ -310,7 +310,7 @@ Use for: Newsletter, GitHub repo, ...
 
 |Method|Endpoint|Parameters|Cache tags|
 |--|--|--|--|
-|`GET`|`/DynamicBanner/image`|`ratio`, `tokenIds` (default to all from the offer)|[`${chainId}-adOffer-${adOfferId}`]|
+|`GET`|`/DynamicBanner/image`|`ratio`, `includeAvailable` (default: `true`, return CTA image if no validated ads but one available on the market), `includeReserved` (default: `true`, return informative image if no validated ads and unavailable on the market), `tokenIds` (default to all from the offer)|[`${chainId}-adOffer-${adOfferId}`]|
 
 <details>
 

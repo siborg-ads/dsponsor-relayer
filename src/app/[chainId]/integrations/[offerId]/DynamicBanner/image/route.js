@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ImageResponse } from "@vercel/og";
 import { getRandomAdData } from "@/queries/ads";
 import { isValidUrl } from "@/utils";
 
@@ -8,6 +9,8 @@ export async function GET(request, context) {
   const searchParams = requestUrl.searchParams;
   const tokenIds = searchParams.get("tokenIds");
   const ratio = searchParams.get("ratio");
+  let includeAvailable = searchParams.get("includeAvailable") === "false" ? false : true;
+  let includeReserved = searchParams.get("includeReserved") === "false" ? false : true;
 
   const adParameterIds =
     ratio?.length && /^\d+:\d+$/.test(ratio) ? [`imageURL-${ratio}`] : ["imageURL"];
@@ -24,21 +27,19 @@ export async function GET(request, context) {
 
   if (randomAd) {
     const [imageKey] = _adParameterIds;
-    imgUrl = randomAd[imageKey].data;
+
+    const isReserved = randomAd[imageKey].state === "UNAVAILABLE";
+    const isAvailable =
+      randomAd[imageKey].state === "BUY_MINT" || randomAd[imageKey].state === "BUY_MARKET";
+
+    if ((!isReserved || includeReserved) && (!isAvailable || includeAvailable)) {
+      imgUrl = randomAd[imageKey].data;
+    }
   }
 
-  try {
-    if (isValidUrl(imgUrl)) {
-      return NextResponse.redirect(imgUrl, 307);
-    } else {
-      return new Response("Invalid image URL", {
-        status: 400
-      });
-    }
-  } catch (e) {
-    console.error("Error fetching image", imgUrl);
-    return new Response("Error fetching image", {
-      status: 500
-    });
+  if (isValidUrl(imgUrl)) {
+    return NextResponse.redirect(imgUrl, 307);
+  } else {
+    return new ImageResponse(<div></div>, { width: 1, height: 1, status: 307 });
   }
 }
