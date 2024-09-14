@@ -1,10 +1,7 @@
-import { Network } from "alchemy-sdk";
-
 const config = {
   // ethereum (for ENS)
   1: {
     chainName: "ethereum",
-    network: Network.ETH,
     rpcURL: "https://ethereum-rpc.publicnode.com",
     shield3RpcURL:
       "https://rpc.shield3.com/v3/ethereum-mainnet/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
@@ -47,8 +44,6 @@ const config = {
   // base
   8453: {
     chainName: "base",
-    network: Network.BASE_MAINNET,
-
     appURL: "https://app.dsponsor.com",
     creditsURL: "https://app.dsponsor.com",
     explorerURL: "https://basescan.org",
@@ -106,8 +101,6 @@ const config = {
   // mode
   34443: {
     chainName: "mode",
-    network: "mode",
-
     appURL: "https://testnet.dsponsor-app.siborg.io",
     creditsURL: "https://testnet.dsponsor-app.siborg.io",
     explorerURL: "https://explorer.mode.network",
@@ -168,8 +161,6 @@ const config = {
   // sepolia
   11155111: {
     chainName: "sepolia",
-    network: Network.ETH_SEPOLIA,
-
     appURL: "https://testnet.dsponsor-app.siborg.io",
     creditsURL: "https://testnet.dsponsor-app.siborg.io",
     explorerURL: "https://sepolia.etherscan.io",

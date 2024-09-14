@@ -1,57 +1,7 @@
-import { Alchemy } from "alchemy-sdk";
 import { formatUnits, parseUnits, getAddress, isAddress } from "ethers";
 import config from "@/config";
 import { executeQuery } from "@/queries/subgraph";
 import { getCurrencyInfosAtBlocktimestamp } from "@/utils";
-import { memoize } from "nextjs-better-unstable-cache";
-
-export const getHoldings = memoize(_getHoldings, {
-  revalidateTags: (chainId, ownerAddress) => [`${chainId}-userAddress-${getAddress(ownerAddress)}`],
-  log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
-});
-
-async function _getHoldings(chainId, ownerAddress) {
-  const settings = {
-    apiKey: process.env.NEXT_ALCHEMY_API_KEY,
-    network: config[chainId].network
-  };
-
-  const alchemy = new Alchemy(settings);
-
-  let tokens = [];
-  let pageKey = null;
-
-  do {
-    const { ownedNfts, pageKey: newPageKey } = await alchemy.nft.getNftsForOwner(ownerAddress, {
-      pageKey
-    });
-    pageKey = newPageKey;
-    tokens = tokens.concat(ownedNfts);
-  } while (pageKey);
-
-  let possibleTokens = [];
-  for (const nft of tokens) {
-    if (nft.tokenId) {
-      possibleTokens.push({
-        tokenId: nft.tokenId,
-        tokenUri: nft.tokenUri,
-        nftContractAddress: nft.contract.address.toLowerCase(),
-        ownerAddress,
-        name: nft.contract.name,
-        symbol: nft.contract.symbol,
-        balance: nft.balance,
-        timeLastUpdated: nft.timeLastUpdated
-      });
-    }
-  }
-
-  const nftContracts = [...new Set(possibleTokens.map((token) => token.nftContractAddress))];
-  const tokenIds = [
-    ...new Set(possibleTokens.map((token) => `${token.nftContractAddress}-${token.tokenId}`))
-  ];
-
-  return { nftContracts, tokenIds };
-}
 
 export async function getAllOffers(chainId, options) {
   let skip = 0;
