@@ -170,7 +170,7 @@ const config = {
     rpcURL: "https://ethereum-sepolia-rpc.publicnode.com",
     shield3RpcURL:
       "https://rpc.shield3.com/v3/sepolia/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
-    subgraphURL: "https://api.studio.thegraph.com/proxy/65744/dsponsor-sepolia/version/latest",
+    subgraphURL: "https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/1.21.20.0",
 
     smartContracts: {
       DSPONSOR_ADMIN: {
