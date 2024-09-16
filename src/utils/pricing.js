@@ -75,8 +75,10 @@ export const getCurrencyInfos = async (chainId, currency) => {
         const signer = ethers.Wallet.createRandom().connect(provider);
         const ERC20Contract = new ethers.Contract(currency, ERC20.abi, signer);
 
+        console.time("decimals");
         decimals = await ERC20Contract.decimals.call();
         symbol = await ERC20Contract.symbol();
+        console.timeEnd("decimals");
       } catch (e) {
         console.error("Error getting decimals and symbol", chainId, currency);
         decimals = BigInt("18");
@@ -88,12 +90,14 @@ export const getCurrencyInfos = async (chainId, currency) => {
 
   const unit = parseInt(decimals.toString());
 
+  console.time("getEthQuote");
   const { amountUSDC, amountUSDCFormatted } = await getEthQuote(
     chainId,
     currency,
     parseUnits("1", unit).toString(), //   "1000000",
     0.3
   );
+  console.timeEnd("getEthQuote");
 
   memoize[currency] = {
     coingeckoId,
