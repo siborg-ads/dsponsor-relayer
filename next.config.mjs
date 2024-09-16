@@ -16,6 +16,7 @@ const nextConfig = {
     minimumCacheTTL: 0,
     disableStaticImages: true
   },
+
   async headers() {
     return [
       {

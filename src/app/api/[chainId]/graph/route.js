@@ -19,3 +19,4 @@ export async function POST(request, context) {
 }
 
 export const runtime = "edge";
+// export const fetchCache = "default-cache";
