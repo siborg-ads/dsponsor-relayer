@@ -79,7 +79,7 @@ export default async function DynamicBannerIframePage(req) {
   return (
     <html>
       <head />
-      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "#fff" }}>
+      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "transparent" }}>
         <AdsGrid
           ads={[ad]}
           chainId={chainId}

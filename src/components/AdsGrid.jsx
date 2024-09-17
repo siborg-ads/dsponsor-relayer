@@ -7,14 +7,12 @@ import { getDefaultImg } from "@/queries/ads";
 
 const AdsGrid = ({
   ads,
-  bgColor,
   chainId,
   ratio
   // lastUpdate
 }) => {
   ratio = ratio?.length && /^\d+:\d+$/.test(ratio) ? ratio : "1:1";
   ads = ads?.length ? ads : [];
-  bgColor = bgColor ? `#${bgColor}` : "#0d102d";
 
   const defaultImg = getDefaultImg({ chainId, type: "reserved", ratio });
   const gridContainerRef = useRef(null);
@@ -111,7 +109,7 @@ const AdsGrid = ({
           {ads.map((ad, index) => (
             <div
               key={index}
-              className={`relative overflow-hidden rounded  bg-[${bgColor}] text-black`}
+              className={`relative overflow-hidden rounded text-black`}
               style={{ width: `100%`, height: `100%` }}
             >
               <a

@@ -104,10 +104,9 @@ export default async function ClickableLogosGridIframePage(req) {
   return (
     <html>
       <head />
-      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "#ffff" }}>
+      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "transparent" }}>
         <AdsGrid
           ads={ads}
-          bgColor={bgColor}
           chainId={chainId}
           colSizes={colSizes?.length ? colSizes.split(",") : undefined}
           ratio={ratio}
