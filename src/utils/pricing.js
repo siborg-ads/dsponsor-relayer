@@ -76,9 +76,12 @@ export const getCurrencyInfos = async (chainId, currency) => {
         const ERC20Contract = new ethers.Contract(currency, ERC20.abi, signer);
 
         console.time("decimals");
-        decimals = await ERC20Contract.decimals.call();
-        symbol = await ERC20Contract.symbol();
+        [decimals, symbol] = await Promise.all([
+          ERC20Contract.decimals.call(),
+          ERC20Contract.symbol()
+        ]);
         console.timeEnd("decimals");
+        console.log({ [symbol]: { address: currency, decimals, symbol } });
       } catch (e) {
         console.error("Error getting decimals and symbol", chainId, currency);
         decimals = BigInt("18");

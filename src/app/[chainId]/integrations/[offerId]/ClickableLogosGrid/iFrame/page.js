@@ -101,10 +101,12 @@ export default async function ClickableLogosGridIframePage(req) {
       );
     });
 
+  const style = bgColor ? { backgroundColor: `#${bgColor}` } : { backgroundColor: "transparent" };
+
   return (
     <html>
       <head />
-      <body style={{ backgroundColor: bgColor ? `#${bgColor}` : "transparent" }}>
+      <body style={style}>
         <AdsGrid
           ads={ads}
           chainId={chainId}

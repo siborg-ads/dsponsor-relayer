@@ -200,13 +200,7 @@ const config = {
         decimals: 18,
         symbol: "WETH"
       },
-      /*
-      UNI: {
-        address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-        decimals: 18,
-        symbol: "UNI"
-      },
-      */
+
       USDC: {
         address: "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
         coingeckoId: "usd",
@@ -218,6 +212,32 @@ const config = {
         coingeckoId: "weth",
         decimals: 18,
         symbol: "WETH"
+      },
+
+      UNI: {
+        address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        decimals: 18,
+        symbol: "UNI"
+      },
+      METH: {
+        address: "0x4f7a67464b5976d7547c860109e4432d50afb38e",
+        decimals: 18,
+        symbol: "METH"
+      },
+      AAVE: {
+        address: "0x88541670e55cc00beefd87eb59edd1b7c511ac9a",
+        decimals: 18,
+        symbol: "AAVE"
+      },
+      USDT: {
+        address: "0xaa8e23fb1079ea71e0a56f48a2aa51851d8433d0",
+        decimals: 6n,
+        symbol: "USDT"
+      },
+      WBTC: {
+        address: "0x52eea312378ef46140ebe67de8a143ba2304fd7c",
+        decimals: 8n,
+        symbol: "WBTC"
       }
     }
   }
