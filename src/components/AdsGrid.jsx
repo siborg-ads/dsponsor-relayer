@@ -43,7 +43,7 @@ const AdsGrid = ({
   const calculateLayout = () => {
     const [widthRatio, heightRatio] = ratio.split(":").map(Number);
 
-    const padding = 30; // Added padding for clear layout margins
+    const padding = 0 // 30; // Added padding for clear layout margins
     const effectiveHeight = containerSize.height - padding;
     // Calculating the ideal number of columns based on aspect ratio and container width
     let columnWidth = Math.sqrt(
