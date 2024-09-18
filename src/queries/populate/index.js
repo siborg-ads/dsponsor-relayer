@@ -293,11 +293,12 @@ async function populateAdOffer(adOffer) {
         headers: {
           "content-type": "application/json"
         },
+        next: { tags: [`metadataURL-${metadataURL}`] },
         cache: "force-cache"
       });
       adOffer.metadata = await metadataRequest.json();
     } catch (e) {
-      console.error(`Error fetching metadata for ${metadataURL}`);
+      console.error(`Error fetching metadata for ${metadataURL}`, e);
     }
   }
 
