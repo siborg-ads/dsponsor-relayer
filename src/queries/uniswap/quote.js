@@ -2,6 +2,7 @@ import config from "@/config";
 import { priceFormattedForAllValuesObject } from "@/utils/string";
 import { Transaction, ethers, getAddress, isAddress } from "ethers";
 import { memoize } from "nextjs-better-unstable-cache";
+// import { unstable_cache } from "next/cache";
 
 import Quoter from "@uniswap/v3-periphery/artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json";
 
@@ -9,6 +10,14 @@ export const getEthQuote = memoize(_getEthQuote, {
   revalidateTags: ["cron"],
   log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
 });
+/*
+export const getEthQuote = unstable_cache(
+  async (chainId, tokenOutAddr, amountOut, slippagePerCent, shield3Check, recipient) =>
+    _getEthQuote(chainId, tokenOutAddr, amountOut, slippagePerCent, shield3Check, recipient),
+  ["cron"],
+  { tags: ["cron"] }
+);
+*/
 
 async function _getEthQuote(
   chainId,
@@ -18,6 +27,9 @@ async function _getEthQuote(
   shield3Check = false,
   recipient
 ) {
+  const timeTracking = Date.now().valueOf();
+  console.time(`getEthQuote-${timeTracking}`);
+
   const uniswapV3QuoterAddr = config?.[chainId]?.smartContracts?.UNISWAP_QUOTER?.address;
   const WNATIVE_ADDR = config?.[chainId]?.smartContracts?.WNATIVE?.address;
   const USDC_ADDR = config?.[chainId]?.smartContracts?.USDC?.address;
@@ -167,6 +179,8 @@ async function _getEthQuote(
   } = priceFormattedForAllValuesObject(18, { amountInEth, amountInEthWithSlippage });
 
   const { amountUSDC: amountUSDCFormatted } = priceFormattedForAllValuesObject(6, { amountUSDC });
+
+  console.timeEnd(`getEthQuote-${timeTracking}`);
 
   return {
     _lastUpdated: new Date().toISOString(),

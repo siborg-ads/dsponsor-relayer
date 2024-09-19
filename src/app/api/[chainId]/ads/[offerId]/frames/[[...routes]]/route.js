@@ -104,7 +104,11 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
       const { mint } = _validatedAds[mintTokenId]._buy || {};
       const { currency, mintPriceStructure } = mint[0] || {};
       const { totalAmount } = mintPriceStructure || {};
-      const quote = await getEthQuote(chainId, currency, totalAmount /* , slippagePerCent = 0.3 */);
+      const quote = await getEthQuote(
+        chainId,
+        getAddress(currency),
+        totalAmount /* , slippagePerCent = 0.3 */
+      );
       const { amountInEthWithSlippage: value } = quote;
 
       const mintParams = {
@@ -161,7 +165,7 @@ app.frame("/api/:chainId/ads/:offerId/frames", async (c) => {
           amountInEthFormatted,
           shield3Decisions,
           amountInEthWithSlippage: value
-        } = await getEthQuote(chainId, currency, amount, 0.3);
+        } = await getEthQuote(chainId, getAddress(currency), amount, 0.3);
 
         const action = listingType === "Direct" ? actions.BUY : actions.BID;
 

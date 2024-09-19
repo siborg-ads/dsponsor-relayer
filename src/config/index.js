@@ -231,12 +231,12 @@ const config = {
       },
       USDT: {
         address: "0xaa8e23fb1079ea71e0a56f48a2aa51851d8433d0",
-        decimals: 6n,
+        decimals: 6,
         symbol: "USDT"
       },
       WBTC: {
         address: "0x52eea312378ef46140ebe67de8a143ba2304fd7c",
-        decimals: 8n,
+        decimals: 8,
         symbol: "WBTC"
       }
     }

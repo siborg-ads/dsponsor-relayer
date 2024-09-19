@@ -62,13 +62,6 @@ export const getCurrencyInfos = async (chainId, currency) => {
       symbol = smartContracts[currencyKey].symbol;
       coingeckoId = smartContracts[currencyKey].coingeckoId;
     } else {
-      /*
-      if (!supportedCurrencies.includes(getAddress(currency))) {
-        //console.log("Currency not supported", chainId, currency);
-        decimals = BigInt("18");
-        symbol = "";
-      } else {
-        */
       try {
         const rpcURL = config?.[chainId]?.rpcURL;
         const provider = new ethers.JsonRpcProvider(rpcURL);
@@ -81,7 +74,6 @@ export const getCurrencyInfos = async (chainId, currency) => {
           ERC20Contract.symbol()
         ]);
         console.timeEnd("decimals");
-        console.log({ [symbol]: { address: currency, decimals, symbol } });
       } catch (e) {
         console.error("Error getting decimals and symbol", chainId, currency);
         decimals = BigInt("18");
@@ -93,14 +85,12 @@ export const getCurrencyInfos = async (chainId, currency) => {
 
   const unit = parseInt(decimals.toString());
 
-  console.time("getEthQuote");
   const { amountUSDC, amountUSDCFormatted } = await getEthQuote(
     chainId,
-    currency,
+    getAddress(currency),
     parseUnits("1", unit).toString(), //   "1000000",
     0.3
   );
-  console.timeEnd("getEthQuote");
 
   memoize[currency] = {
     coingeckoId,

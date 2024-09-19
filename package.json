@@ -19,8 +19,8 @@
     "next": "^15.0.0-rc.0",
     "nextjs-better-unstable-cache": "^1.1.0",
     "numeral": "^2.0.6",
-    "react": "^19.0.0-rc-6ebfd5b0-20240818",
-    "react-dom": "^19.0.0-rc-6ebfd5b0-20240818",
+    "react": "^19.0.0-rc-5dcb0097-20240918",
+    "react-dom": "^19.0.0-rc-5dcb0097-20240918",
     "sharp": "^0.33.4"
   },
   "devDependencies": {
