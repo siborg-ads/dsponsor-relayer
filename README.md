@@ -22,6 +22,7 @@ The Relayer App provides API endpoints and UI components for the [DSponsor ecosy
   - [API endpoints](#api-endpoints)
     - [Users activity](#users-activity)
     - [Ad spaces data for an offer](#ad-spaces-data-for-an-offer)
+    - [Ads data in CSV format](#ads-data-in-csv-format)
     - [Graph proxy](#graph-proxy)
     - [Price quote](#price-quote)
     - [Token metadata](#token-metadata)
@@ -633,7 +634,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
     },
     "imageURL-5:1": {
       "state": "BUY_MARKET",
-      "data": "http://localhost:3000/available-1-1.png"
+      "data": "http://relayer.dsponsor.com/available-1-1.png"
     },
     "linkURL": {
       "state": "BUY_MARKET",
@@ -675,7 +676,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
     },
     "imageURL-5:1": {
       "state": "BUY_MINT",
-      "data": "http://localhost:3000/available-1-1.png"
+      "data": "http://relayer.dsponsor.com/available-1-1.png"
     },
     "linkURL": {
       "state": "BUY_MINT",
@@ -691,7 +692,7 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
     },
     "imageURL-5:1": {
       "state": "UNAVAILABLE",
-      "data": "http://localhost:3000/reserved-1-1.png"
+      "data": "http://relayer.dsponsor.com/reserved-1-1.png"
     },
     "linkURL": {
       "state": "UNAVAILABLE",
@@ -699,6 +700,36 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
     }
   }
 }
+```
+
+</details>
+
+### Ads data in CSV format
+
+Purpose: Retrieve data to display on Substack, integrating with Datawrapper
+
+|Method|Endpoint|Parameters|Cache Tags|
+|--|--|--|--|
+|`GET`|`/ads/[offerId]/csv`| `tokenIds` (optionnal), `tokenData` (optionnal), `adParameterIds` (optionnal), `includeAvailable` (default : true), `includeReserved` (default: true)|[`${chainId}-adOffer-${adOfferId}`]|
+
+<details>
+
+<summary>
+ Example
+</summary>
+
+- Request
+
+```bash
+curl 'https://relayer.dsponsor.com/api/11155111/ads/1/csv'
+```
+
+- Response
+
+```csv
+url
+[![img](http://relayer.dsponsor.com/11155111/integrations/1/19282846417023109973927104303702190088093782184937122144233407839061296357653/image?adParameterId=imageURL-5:1&includeAvailable=true&includeReserved=true)](http://relayer.dsponsor.com/11155111/integrations/1/19282846417023109973927104303702190088093782184937122144233407839061296357653/link)
+[![img](http://relayer.dsponsor.com/11155111/integrations/1/19659553121249687425880686200724592839616780881788978697077138592067823684728/image?adParameterId=imageURL-5:1&includeAvailable=true&includeReserved=true)](http://relayer.dsponsor.com/11155111/integrations/1/19659553121249687425880686200724592839616780881788978697077138592067823684728/link)
 ```
 
 </details>
