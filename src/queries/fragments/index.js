@@ -203,7 +203,7 @@ export const TokenFragment = /* GraphQL */ `
       buyoutPricePerToken
       reservePricePerToken
       status
-      bids(orderBy: totalBidAmount, orderDirection: desc, first: 1) {
+      bids(first: 1000, orderBy: totalBidAmount, orderDirection: desc) {
         ...MarketplaceBidFragment
       }
     }
@@ -244,7 +244,7 @@ export const TokenFragment = /* GraphQL */ `
         creationTimestamp
       }
     }
-    allProposals(orderBy: creationTimestamp, orderDirection: desc) {
+    allProposals(first: 1000, orderBy: creationTimestamp, orderDirection: desc) {
       adParameter {
         id
       }
