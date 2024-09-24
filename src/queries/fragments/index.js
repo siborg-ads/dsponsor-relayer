@@ -9,6 +9,7 @@ export const BaseAdOfferFragment = /* GraphQL */ `
     admins
     creationTimestamp
     adParameters(where: { enable: true }) {
+      enable
       adParameter {
         id
         base
@@ -21,15 +22,20 @@ export const BaseAdOfferFragment = /* GraphQL */ `
 const BaseNftContractFragment = /* GraphQL */ `
   fragment BaseNftContractFragment on NftContract {
     id
+
     allowList
     maxSupply
+    owner {
+      newOwner
+    }
+    prices(where: { enabled: true }) {
+      enabled
+      currency
+      amount
+    }
     royalty {
       bps
       receiver
-    }
-    prices(where: { enabled: true }) {
-      currency
-      amount
     }
   }
 `;
@@ -241,6 +247,16 @@ export const TokenFragment = /* GraphQL */ `
         rejectReason
         creationTimestamp
       }
+    }
+    allProposals(orderBy: creationTimestamp, orderDirection: desc) {
+      adParameter {
+        id
+      }
+      status
+      data
+      rejectReason
+      creationTimestamp
+      lastUpdateTimestamp
     }
   }
 `;
