@@ -2,12 +2,14 @@ import { getAddress } from "ethers";
 import { revalidateTag } from "next/cache";
 import { waitUntil } from "@vercel/functions";
 import { getActivity, getAllOffers } from "@/queries/activity";
+import { getProfile } from "@/queries/account";
 
 export async function POST(request) {
   const { tags } = await request.json();
 
   let revalidated = [];
   let updatedActivity = [];
+  let updatedUser = [];
 
   const tagUpdate = (tag) => {
     revalidateTag(tag);
@@ -16,6 +18,10 @@ export async function POST(request) {
   const activityUpdate = (tag, f) => {
     waitUntil(f);
     updatedActivity.push(tag);
+  };
+  const userUpdate = (tag, f) => {
+    waitUntil(f);
+    updatedUser.push(tag);
   };
 
   const allOffers = {};
@@ -93,6 +99,7 @@ export async function POST(request) {
       if (chainId && item && id && item === "userAddress") {
         try {
           activityUpdate(tag, getActivity(chainId, null, null, getAddress(id), null));
+          userUpdate(tag, getProfile(chainId, getAddress(id)));
         } catch (e) {
           //;
         }
@@ -105,6 +112,8 @@ export async function POST(request) {
     revalidated,
     revalidatedNb: revalidated.length,
     updatedActivity,
-    updatedActivityNb: updatedActivity.length
+    updatedActivityNb: updatedActivity.length,
+    updatedUser,
+    updatedUserNb: updatedUser.length
   });
 }

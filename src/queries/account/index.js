@@ -34,6 +34,7 @@ export async function getProfile(chainId, userAddress) {
     populate: true,
     next: { tags }
   };
+
   return executeQuery(chainId, getOffersProfileQuery, { offerIds, userAddress }, options);
 }
 
