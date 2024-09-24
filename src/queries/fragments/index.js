@@ -191,6 +191,7 @@ export const TokenFragment = /* GraphQL */ `
   fragment TokenFragment on Token {
     tokenId
     setInAllowList
+    owner
     marketplaceListings(
       first: 1000
       orderBy: lastUpdateTimestamp
