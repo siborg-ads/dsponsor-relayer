@@ -56,10 +56,7 @@ async function getProfileOfferIds(chainId, userAddress) {
           }
         }
       }
-      marketplaceListings(
-        first: 1000
-        where: { and: [{ status: CREATED, bids_: { bidder: $userAddress } }] }
-      ) {
+      marketplaceListings(first: 1000, where: { and: [{ bids_: { bidder: $userAddress } }] }) {
         token {
           nftContract {
             adOffers {

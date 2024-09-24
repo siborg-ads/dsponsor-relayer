@@ -192,12 +192,7 @@ export const TokenFragment = /* GraphQL */ `
     tokenId
     setInAllowList
     owner
-    marketplaceListings(
-      first: 1000
-      orderBy: lastUpdateTimestamp
-      orderDirection: desc
-      where: { status: CREATED }
-    ) {
+    marketplaceListings(first: 1000, orderBy: lastUpdateTimestamp, orderDirection: desc) {
       id
       lister
       quantity
