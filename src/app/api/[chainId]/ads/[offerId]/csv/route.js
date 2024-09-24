@@ -1,4 +1,4 @@
-import { getValidatedAds } from "@/queries/ads";
+import { getRandomAdData } from "@/queries/ads";
 import config from "@/config";
 
 export async function GET(request, context) {
@@ -6,6 +6,9 @@ export async function GET(request, context) {
 
   const requestUrl = new URL(`${request.url}`);
   const searchParams = requestUrl.searchParams;
+
+  const type = searchParams.get("type") || "grid";
+
   const tokenIds = searchParams.get("tokenIds")?.length
     ? searchParams.get("tokenIds").split(",")
     : undefined;
@@ -14,55 +17,72 @@ export async function GET(request, context) {
     : undefined;
   const adParameterIds = searchParams.get("adParameterIds")?.length
     ? searchParams.get("adParameterIds").split(",")
-    : undefined;
+    : ["imageURL", "linkURL"];
   const includeAvailable = searchParams.get("includeAvailable") === "false" ? false : true;
   const includeReserved = searchParams.get("includeReserved") === "false" ? false : true;
 
-  const response = await getValidatedAds({
+  const unitLink = (tokenId) =>
+    `${config[chainId].relayerURL}/${chainId}/integrations/${offerId}/${tokenId}`;
+  const imgLink = (tokenId) => `${unitLink(tokenId)}/image?adParameterId=${imageKey}`;
+
+  let csv = "url\n";
+
+  const {
+    // randomAd,
+    _adParameterIds,
+    _tokenIds,
+    _randomTokenId,
+    _validatedAds
+  } = await getRandomAdData({
     chainId,
     adOfferId: offerId,
     tokenIds,
     tokenDatas,
-    adParameterIds,
+    adParameterIds
+    /*
     options: {
       populate: true
     }
+      */
   });
-  const [imageKey, linkKey] = response._adParameterIds;
+  const [imageKey, linkKey] = _adParameterIds;
 
-  const ads = response._tokenIds
-    .map((tokenId) => {
-      return {
-        offerId,
-        tokenId,
-        records: {
-          linkURL: response[tokenId][linkKey].data || null,
-          imageURL: response[tokenId][imageKey].data || null
-        }
-      };
-    })
-    .filter((ad) => {
-      const isReserved = response[ad.tokenId][imageKey].state === "UNAVAILABLE";
-      const isAvailable =
-        response[ad.tokenId][imageKey].state === "BUY_MINT" ||
-        response[ad.tokenId][imageKey].state === "BUY_MARKET";
+  if (type === "dynamic") {
+    const state = _validatedAds?.[_randomTokenId]?.[imageKey]?.state || null;
+    const isReserved = state === "UNAVAILABLE";
+    const isAvailable = state === "BUY_MINT" || state === "BUY_MARKET";
 
-      return (
-        ad.records.imageURL &&
-        ad.records.linkURL &&
-        (!isReserved || includeReserved) &&
-        (!isAvailable || includeAvailable)
-      );
-    });
+    if ((!isReserved || includeReserved) && (!isAvailable || includeAvailable)) {
+      csv += `[![img](${imgLink(_randomTokenId)})](${unitLink(_randomTokenId)}/link)\n`;
+    }
+  } else if (type === "grid") {
+    const ads = _tokenIds
+      .map((tokenId) => {
+        return {
+          offerId,
+          tokenId,
+          records: {
+            linkURL: _validatedAds?.[tokenId]?.[linkKey]?.data || null,
+            imageURL: _validatedAds?.[tokenId]?.[imageKey]?.data || null
+          }
+        };
+      })
+      .filter((ad) => {
+        const state = _validatedAds?.[ad.tokenId]?.[imageKey]?.state || null;
+        const isReserved = state === "UNAVAILABLE";
+        const isAvailable = state === "BUY_MINT" || state === "BUY_MARKET";
 
-  const unitLink = (tokenId) =>
-    `${config[chainId].relayerURL}/${chainId}/integrations/${offerId}/${tokenId}`;
-  const imgLink = (tokenId) =>
-    `${unitLink(tokenId)}/image?adParameterId=${imageKey}&includeAvailable=${includeAvailable}&includeReserved=${includeReserved}`;
+        return (
+          ad.records.imageURL &&
+          ad.records.linkURL &&
+          (!isReserved || includeReserved) &&
+          (!isAvailable || includeAvailable)
+        );
+      });
 
-  let csv = "url\n";
-  for (const { tokenId } of ads) {
-    csv += `[![img](${imgLink(tokenId)})](${unitLink(tokenId)}/link)\n`;
+    for (const { tokenId } of ads) {
+      csv += `[![img](${imgLink(tokenId)})](${unitLink(tokenId)}/link)\n`;
+    }
   }
 
   return new Response(csv, {

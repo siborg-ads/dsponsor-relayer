@@ -19,7 +19,7 @@ export async function GET(request, context) {
 
   try {
     if (isValidUrl(linkUrl)) {
-      return NextResponse.redirect(linkUrl, 307);
+      return NextResponse.redirect(linkUrl, 302);
     } else {
       return new Response("Invalid link URL", {
         status: 400

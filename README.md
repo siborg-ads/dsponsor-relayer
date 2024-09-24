@@ -19,6 +19,7 @@ The Relayer App provides API endpoints and UI components for the [DSponsor ecosy
         - [Warpcast Frame Parameters Details](#warpcast-frame-parameters-details)
       - [Warpcast Frame Response](#warpcast-frame-response)
       - [Image only](#image-only)
+    - [DataWrapper integration](#datawrapper-integration)
   - [API endpoints](#api-endpoints)
     - [Users activity](#users-activity)
     - [Ad spaces data for an offer](#ad-spaces-data-for-an-offer)
@@ -40,7 +41,11 @@ NEXT_DEV_URL=http://localhost:3000
 SUBGRAPH_ALCHEMY_KEY=xxxxx
 THEGRAPH_API_KEY=xxxxxxxxxx
 
-# optionnal
+# Datawrapper integration
+DATAWRAPPER_API_KEY=xxxxxxxxxxxxxxxxxx
+DATAWRAPPER_TEMPLATE_ID=xxxxx
+
+# optionnal debug
 NEXT_CACHE_LOGS=datacache,verbose
 ```
 
@@ -329,6 +334,47 @@ Example
   <img src="https://relayer.dsponsor.com/11155111/integrations/35/DynamicBanner/image" style="max-width: 100%; height: auto; display: block;" alt="No Ad">
 
 </details>
+
+### DataWrapper integration
+
+Purpose: Displays ads in a [DataWrapper](https://www.datawrapper.de/) table. It can be use to display ads on Substack (App & Web only) with [Datawrapper integration](https://support.substack.com/hc/en-us/articles/15722290158100-How-do-I-embed-Datawrapper-charts-in-a-Substack-post)
+
+|Method|Endpoint|Parameters|Cache Tags|
+|--|--|--|--|
+|`GET`|`/Datawrapper`| `type` (`grid` or `dynamic`), `adParameterIds` (optionnal), `includeAvailable` (default : true), `includeReserved` (default: true)|[`${chainId}-adOffer-${adOfferId}`]|
+
+`type` is set to `grid` by default, to get all ads in the DataWraper table. You can choose `dynamic` to get only one row, with a randomly selected ad.
+
+DataWrapper tables are created from a template (`DATAWRAPPER_TEMPLATE_ID` environment variable) and an account API key
+(`DATAWRAPPER_API_KEY` environment variable).  
+
+The route returns a JSON with a `publicUrl` link. Copy paste this link in a Substack post to have a Datawrapper table with the ads. **Note this integration won't work if the Substack post is sent by mail.**
+
+<details>
+
+<summary>
+ Example
+</summary>
+
+- Request
+
+```bash
+curl https://relayer.dsponsor.com/11155111/integrations/48/Datawrapper?type=grid&includeAvailable=false
+```
+
+- Response
+
+```json
+{
+  "title": "11155111-48-grid-imageURL-16:9,linkURL-false-true",
+  "publicId": "a1lvX",
+  "publicUrl": "https://datawrapper.dwcdn.net/a1lvX/1/",
+  "createdAt": "2024-09-24T10:41:32.000Z",
+  "lastModifiedAt": "2024-09-24T10:41:36.515Z"
+}}
+```
+
+![img](./public/datawrapper-ex.png)
 
 ## API endpoints
 
@@ -706,11 +752,13 @@ curl 'https://relayer.dsponsor.com/api/11155111/ads/1?tokenData=web3,twitter,sta
 
 ### Ads data in CSV format
 
-Purpose: Retrieve data to display on Substack, integrating with Datawrapper
+Purpose: Retrieve data in CSV format. It can be use to display ads on Substack (App & Web only) with Datawrapper integration.
 
 |Method|Endpoint|Parameters|Cache Tags|
 |--|--|--|--|
-|`GET`|`/ads/[offerId]/csv`| `tokenIds` (optionnal), `tokenData` (optionnal), `adParameterIds` (optionnal), `includeAvailable` (default : true), `includeReserved` (default: true)|[`${chainId}-adOffer-${adOfferId}`]|
+|`GET`|`/ads/[offerId]/csv`| `type` (`grid` or `dynamic`), `tokenIds` (optionnal), `tokenData` (optionnal), `adParameterIds` (optionnal), `includeAvailable` (default : true), `includeReserved` (default: true)|[`${chainId}-adOffer-${adOfferId}`]|
+
+`type` is set to `grid` by default, to get all ads in the CSV result. You can choose `dynamic` to get only one row, with a randomly selected ad.
 
 <details>
 

@@ -47,8 +47,8 @@ export async function GET(request, context) {
   }
 
   if (displayImage) {
-    return NextResponse.redirect(imgUrl, 307);
+    return NextResponse.redirect(imgUrl, 302);
   } else {
-    return new ImageResponse(<div></div>, { width: 1, height: 1, status: 307 });
+    return new ImageResponse(<div></div>, { width: 1, height: 1, status: 302 });
   }
 }
