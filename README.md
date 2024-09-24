@@ -17,7 +17,7 @@ The Relayer App provides API endpoints and UI components for the [DSponsor ecosy
       - [Dynamic Banner Iframe](#dynamic-banner-iframe)
       - [Warpcast Frame](#warpcast-frame)
         - [Warpcast Frame Parameters Details](#warpcast-frame-parameters-details)
-      - [Warpcast Frame Response](#warpcast-frame-response)
+        - [Warpcast Frame Response](#warpcast-frame-response)
       - [Image only](#image-only)
     - [DataWrapper integration](#datawrapper-integration)
   - [API endpoints](#api-endpoints)
@@ -275,7 +275,7 @@ Example
 
 `https://relayer.dsponsor.com/84532/integrations/1/DynamicBanner/farcasterFrame?items=sale&ratio=1:1&tokenDatas=bitcoin&tokenDataInput=look%20for%20another%20token...`
 
-#### Warpcast Frame Response
+##### Warpcast Frame Response
 
 ![frameEx](./public/frame-ex.png)
 
@@ -359,7 +359,7 @@ The route returns a JSON with a `publicUrl` link. Copy paste this link in a Subs
 - Request
 
 ```bash
-curl https://relayer.dsponsor.com/11155111/integrations/48/Datawrapper?type=grid&includeAvailable=false
+curl 'https://relayer.dsponsor.com/11155111/integrations/48/Datawrapper?type=grid&includeAvailable=false'
 ```
 
 - Response
