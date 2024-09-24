@@ -374,6 +374,8 @@ curl https://relayer.dsponsor.com/11155111/integrations/48/Datawrapper?type=grid
 }}
 ```
 
+</details>
+
 ![img](./public/datawrapper-ex.png)
 
 ## API endpoints
