@@ -108,7 +108,7 @@ const config = {
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
     rpcURL: "https://mainnet.mode.network",
-    subgraphURL: "https://api.studio.thegraph.com/query/65744/dsponsor-mode/version/latest",
+    subgraphURL: "https://api.studio.thegraph.com/query/65744/dsponsor-mode/1.20.0",
 
     smartContracts: {
       DSPONSOR_ADMIN: {
