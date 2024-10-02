@@ -109,7 +109,7 @@ const config = {
       : "https://relayer.dsponsor.com",
     rpcURL: "https://api.testnet.abs.xyz",
     subgraphURL:
-      "https://api.goldsky.com/api/public/project_cm1qqbk4dayqh01qz977dapkx/subgraphs/dsponsor-abstract-testnet/2.0.4/gn",
+      "https://api.goldsky.com/api/public/project_cm1qqbk4dayqh01qz977dapkx/subgraphs/dsponsor-abstract-testnet/2.0.5/gn",
 
     smartContracts: {
       DSPONSOR_ADMIN: {
