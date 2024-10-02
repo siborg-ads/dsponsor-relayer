@@ -98,6 +98,62 @@ const config = {
     }
   },
 
+  // abstract testnet
+  11124: {
+    chainName: "abstract-testnet",
+    appURL: "https://testnet.dsponsor-app.siborg.io",
+    creditsURL: "https://testnet.dsponsor-app.siborg.io",
+    explorerURL: "https://explorer.testnet.abs.xyz",
+    relayerURL: process.env.NEXT_DEV_URL
+      ? process.env.NEXT_DEV_URL
+      : "https://relayer.dsponsor.com",
+    rpcURL: "https://api.testnet.abs.xyz",
+    subgraphURL:
+      "https://api.goldsky.com/api/public/project_cm1qqbk4dayqh01qz977dapkx/subgraphs/dsponsor-abstract-testnet/2.0.4/gn",
+
+    smartContracts: {
+      DSPONSOR_ADMIN: {
+        address: "0x873eb8d6E65982ea1793BC1eA302ECDDe5874237",
+        feeBps: "400"
+      },
+      DSPONSOR_MARKETPLACE: {
+        address: "0x3e056f3512a7BE4234d02Fd8ED74c1682D525639",
+        feeBps: "400",
+        minimalBidBps: "1000",
+        previousBidAmountBps: "500"
+      },
+      UNISWAP_QUOTER: {
+        address: "0x0000000000000000000000000000000000000000"
+      },
+      UNISWAP_SWAP_ROUTER: {
+        address: "0x03DD2f8996A2fBA6a4f7b3A383C4c0Ff367Dd95c"
+      },
+      NATIVE: {
+        address: "0x0000000000000000000000000000000000000000",
+        decimals: 18,
+        symbol: "ETH"
+      },
+      WNATIVE: {
+        address: "0x4200000000000000000000000000000000000006",
+        coingeckoId: "weth",
+        decimals: 18,
+        symbol: "WETH"
+      },
+      USDC: {
+        address: "0xa70e901a190c5605a5137a1019c6514F5a626517",
+        coingeckoId: "usd",
+        decimals: 6,
+        symbol: "USDC"
+      },
+      WETH: {
+        address: "0x80392dF95f8ed7F2f6299Be35A1007f31D5Fc5b6",
+        coingeckoId: "weth",
+        decimals: 18,
+        symbol: "WETH"
+      }
+    }
+  },
+
   // mode
   34443: {
     chainName: "mode",

@@ -25,9 +25,7 @@ const BaseNftContractFragment = /* GraphQL */ `
 
     allowList
     maxSupply
-    owner {
-      newOwner
-    }
+    owner
     prices(where: { enabled: true }) {
       enabled
       currency
