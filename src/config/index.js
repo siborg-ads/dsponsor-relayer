@@ -142,7 +142,7 @@ const config = {
       USDC: {
         address: "0xa70e901a190c5605a5137a1019c6514F5a626517",
         coingeckoId: "usd",
-        decimals: 6,
+        decimals: 18,
         symbol: "USDC"
       },
       WETH: {
