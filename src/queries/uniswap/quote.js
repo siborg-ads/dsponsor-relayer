@@ -27,6 +27,10 @@ async function _getEthQuote(
   shield3Check = false,
   recipient
 ) {
+  if (isAddress(tokenOutAddr)) {
+    tokenOutAddr = getAddress(tokenOutAddr);
+  }
+
   const timeTracking = Date.now().valueOf();
   console.time(`getEthQuote-${timeTracking}`);
 
@@ -41,8 +45,10 @@ async function _getEthQuote(
   );
   */
 
-  let amountInEth = "9999999999999999999999";
-  let amountInEthWithSlippage = "9999999999999999999999";
+  let amountInEth =
+    tokenOutAddr == WNATIVE_ADDR ? BigInt(amountOut.toString()) : "9999999999999999999999";
+  let amountInEthWithSlippage =
+    tokenOutAddr == WNATIVE_ADDR ? BigInt(amountOut.toString()) : "9999999999999999999999";
   let amountUSDC = "9999999999999999";
   let shield3Decisions = [];
 
@@ -173,14 +179,13 @@ async function _getEthQuote(
     // console.error("Quote error", chainId, tokenOutAddr, amountOut, slippagePerCent);
   }
 
+  console.timeEnd(`getEthQuote-${timeTracking}`);
   const {
     amountInEth: amountInEthFormatted,
     amountInEthWithSlippage: amountInEthWithSlippageFormatted
   } = priceFormattedForAllValuesObject(18, { amountInEth, amountInEthWithSlippage });
 
   const { amountUSDC: amountUSDCFormatted } = priceFormattedForAllValuesObject(6, { amountUSDC });
-
-  console.timeEnd(`getEthQuote-${timeTracking}`);
 
   return {
     _lastUpdated: new Date().toISOString(),

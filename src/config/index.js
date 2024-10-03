@@ -134,7 +134,7 @@ const config = {
         symbol: "ETH"
       },
       WNATIVE: {
-        address: "0x4200000000000000000000000000000000000006",
+        address: "0x80392dF95f8ed7F2f6299Be35A1007f31D5Fc5b6",
         coingeckoId: "weth",
         decimals: 18,
         symbol: "WETH"
