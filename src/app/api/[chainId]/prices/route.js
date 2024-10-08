@@ -1,10 +1,8 @@
 import config from "@/config";
-import { getAddress } from "ethers";
 import { getEthQuote } from "@/queries/uniswap/quote";
 
 export async function GET(request, context) {
   const { chainId } = context.params;
-
   const requestUrl = new URL(`${request.url}`);
   const searchParams = requestUrl.searchParams;
   const token = searchParams.get("token");
@@ -19,7 +17,7 @@ export async function GET(request, context) {
 
   const result = await getEthQuote(
     chainId,
-    getAddress(tokenOutAddr),
+    tokenOutAddr,
     amountOut,
     slippagePerCent,
     shield3Check,
