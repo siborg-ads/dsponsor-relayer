@@ -187,8 +187,7 @@ export async function getValidatedAds({
         secondary: secondary ? secondary : null
       };
 
-      // Provide default data for each ad parameter, for each token /////////////////////////////////
-
+      // Provide default data for each ad parameter, for each token
       for (const adParameter of adParameters) {
         if (!result[_tokenId][adParameter.id]) {
           const state = result[_tokenId]._buy.mint?.length
@@ -210,6 +209,15 @@ export async function getValidatedAds({
           };
         }
       }
+
+      // Provide default linkURL if there's no linkURL
+      if (!result[_tokenId]["linkURL"]) {
+        adParameterIds.push("linkURL");
+        result[_tokenId]["linkURL"] = {
+          state: "CURRENT_ACCEPTED",
+          data: link
+        };
+      }
     }
   }
 
@@ -228,7 +236,7 @@ export async function getValidatedAds({
         }
       }),
       _tokenData: tokenDatas,
-      _adParameterIds: adParameterIds
+      _adParameterIds: [...new Set(adParameterIds)]
     },
 
     result
@@ -295,9 +303,6 @@ export async function getDefaultAdData(
     } else if (state === "UNAVAILABLE") {
       data = await getDefaultImg({ chainId, type: "reserved", ratio });
     }
-    // test
-    // const random = Math.floor(Math.random() * 1000);
-    // data = `https://www.placehold.it/500x${random}`;
   } else if (base === "linkURL") {
     data = buyInfos.link;
   }
