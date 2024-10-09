@@ -53,7 +53,7 @@ const config = {
     rpcURL: "https://mainnet.base.org",
     shield3RpcURL:
       "https://rpc.shield3.com/v3/base-mainnet/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
-    subgraphURL: `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/dsponsors-team--672881/dsponsor-subgraph/version/v1.20.0/api`,
+    subgraphURL: `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/dsponsors-team--672881/dsponsor-subgraph/version/2.0.5/api`,
 
     smartContracts: {
       DSPONSOR_ADMIN: {
@@ -164,7 +164,7 @@ const config = {
       ? process.env.NEXT_DEV_URL
       : "https://relayer.dsponsor.com",
     rpcURL: "https://mainnet.mode.network",
-    subgraphURL: "https://api.studio.thegraph.com/query/65744/dsponsor-mode/1.20.0",
+    subgraphURL: "https://api.studio.thegraph.com/query/65744/dsponsor-mode/2.0.5",
 
     smartContracts: {
       DSPONSOR_ADMIN: {
@@ -226,7 +226,7 @@ const config = {
     rpcURL: "https://ethereum-sepolia-rpc.publicnode.com",
     shield3RpcURL:
       "https://rpc.shield3.com/v3/sepolia/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
-    subgraphURL: "https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/1.21.20.0",
+    subgraphURL: "https://api.studio.thegraph.com/query/65744/dsponsor-sepolia/2.0.5",
 
     smartContracts: {
       DSPONSOR_ADMIN: {
