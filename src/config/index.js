@@ -113,20 +113,20 @@ const config = {
 
     smartContracts: {
       DSPONSOR_ADMIN: {
-        address: "0x873eb8d6E65982ea1793BC1eA302ECDDe5874237",
+        address: "0xBEA0a4E815e5A8b544712144DA3865a1aa69ECD9",
         feeBps: "400"
       },
       DSPONSOR_MARKETPLACE: {
-        address: "0x3e056f3512a7BE4234d02Fd8ED74c1682D525639",
+        address: "0x833721E8651682043CDFcD577Aa2DC5b3D28abC6",
         feeBps: "400",
         minimalBidBps: "1000",
         previousBidAmountBps: "500"
       },
       UNISWAP_QUOTER: {
-        address: "0x0000000000000000000000000000000000000000"
+        address: "0x1FFBf27EBa96342A9755c4974b5F28286c41201A"
       },
       UNISWAP_SWAP_ROUTER: {
-        address: "0x03DD2f8996A2fBA6a4f7b3A383C4c0Ff367Dd95c"
+        address: "0x5eA0064fE5bc2449472C7DfF9CB4bc5010095392"
       },
       NATIVE: {
         address: "0x0000000000000000000000000000000000000000",
@@ -134,19 +134,19 @@ const config = {
         symbol: "ETH"
       },
       WNATIVE: {
-        address: "0x80392dF95f8ed7F2f6299Be35A1007f31D5Fc5b6",
+        address: "0x740810c5CB6a562BC0F4F387dC7cFaDa9f3A7ebf",
         coingeckoId: "weth",
         decimals: 18,
         symbol: "WETH"
       },
       USDC: {
-        address: "0xa70e901a190c5605a5137a1019c6514F5a626517",
+        address: "0xf374801d73f8093833aE5D38b49C97270C34AE10",
         coingeckoId: "usd",
         decimals: 18,
         symbol: "USDC"
       },
       WETH: {
-        address: "0x80392dF95f8ed7F2f6299Be35A1007f31D5Fc5b6",
+        address: "0x740810c5CB6a562BC0F4F387dC7cFaDa9f3A7ebf",
         coingeckoId: "weth",
         decimals: 18,
         symbol: "WETH"
