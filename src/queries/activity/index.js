@@ -232,6 +232,9 @@ export async function getSpendings(
       ) {
         id
         metadataURL
+        metadata {
+          content
+        }
         name
         nftContract {
           id

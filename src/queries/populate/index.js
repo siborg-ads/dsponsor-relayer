@@ -285,9 +285,18 @@ async function populateTokens(token) {
 }
 
 async function populateAdOffer(adOffer) {
-  const { metadataURL, nftContract } = adOffer;
+  const { metadataURL, nftContract, metadata } = adOffer;
 
-  if (isValidUrl(metadataURL)) {
+  const initialMetadata = metadata ? metadata : {};
+
+  if (metadata?.content?.length) {
+    try {
+      const metadataContent = JSON.parse(metadata.content);
+      adOffer.metadata = Object.assign({}, initialMetadata, metadataContent);
+    } catch (e) {
+      // console.error(`Error parsing metadata for ${metadata.content}`, e);
+    }
+  } else if (isValidUrl(metadataURL)) {
     try {
       const metadataRequest = await fetch(metadataURL, {
         headers: {
@@ -296,7 +305,8 @@ async function populateAdOffer(adOffer) {
         next: { tags: [`metadataURL-${metadataURL}`] },
         cache: "force-cache"
       });
-      adOffer.metadata = await metadataRequest.json();
+      const metadataContent = await metadataRequest.json();
+      adOffer.metadata = Object.assign({}, initialMetadata, metadataContent);
     } catch (e) {
       console.error(`Error fetching metadata for ${metadataURL}`, e);
     }

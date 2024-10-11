@@ -3,6 +3,9 @@ export const BaseAdOfferFragment = /* GraphQL */ `
     id
     disable
     metadataURL
+    metadata {
+      content
+    }
     name
     initialCreator
     validators

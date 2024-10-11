@@ -801,7 +801,7 @@ The response will be automatically populated with a `_meta` object. `new Date(_m
 
 2. Populate the response (default: `options.populate = true`):
 
-- Metadata (if `adOffer --> metadataURL` is provided and valid)
+- Metadata (if `adOffer --> metadataURL` or  `adOffer --> metadata --> content` is provided and valid)
   - `offer.metadata`
   - `token.metadata`
 - Mint price information (if `price --> amount` & `price --> currency` are provided)
