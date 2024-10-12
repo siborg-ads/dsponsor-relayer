@@ -291,10 +291,12 @@ async function populateAdOffer(adOffer) {
 
   if (metadata?.content?.length) {
     try {
-      const metadataContent = JSON.parse(metadata.content);
+      const cleanedContent = metadata.content.replace(/\n/g, "\\n");
+
+      const metadataContent = JSON.parse(cleanedContent);
       adOffer.metadata = Object.assign({}, initialMetadata, metadataContent);
     } catch (e) {
-      // console.error(`Error parsing metadata for ${metadata.content}`, e);
+      console.error(`Error parsing metadata for ${metadata.content}`, e);
     }
   } else if (isValidUrl(metadataURL)) {
     try {
