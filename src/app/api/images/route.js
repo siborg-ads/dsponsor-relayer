@@ -44,4 +44,4 @@ export async function GET(req) {
   );
 }
 
-export const dynamic = "force-cache";
+// export const dynamic = "force-cache";
