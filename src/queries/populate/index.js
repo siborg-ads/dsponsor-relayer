@@ -239,7 +239,7 @@ async function populateMintPrice(chainId, price) {
   return price;
 }
 
-function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
+function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData, tokenId) {
   const res = {
     name: "Untitled token",
     description: "No description for this token",
@@ -250,18 +250,23 @@ function tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData) {
     Object.assign(res, offerMetadata);
   }
 
-  if (
-    tokenData &&
-    tokenMetadata &&
-    tokenMetadata.name &&
-    tokenMetadata.description &&
-    tokenMetadata.image
-  ) {
+  if (tokenId && typeof tokenMetadata === "object") {
     try {
-      const fetchTokenData = JSON.parse(
+      tokenMetadata = JSON.parse(JSON.stringify(tokenMetadata).replace(/\{tokenId\}/g, tokenId));
+
+      Object.assign(res, tokenMetadata);
+    } catch (e) {
+      console.error(`Error with token metadata ${tokenMetadata}`);
+    }
+  }
+
+  if (tokenData && typeof tokenMetadata === "object") {
+    try {
+      tokenMetadata = JSON.parse(
         JSON.stringify(tokenMetadata).replace(/\{tokenData\}/g, tokenData)
       );
-      Object.assign(res, fetchTokenData);
+
+      Object.assign(res, tokenMetadata);
     } catch (e) {
       console.error(`Error with token metadata ${tokenMetadata}`);
     }
@@ -279,8 +284,9 @@ async function populateTokens(token) {
     const offerMetadata = token.nftContract.adOffers[0]?.metadata?.offer;
     const tokenMetadata = token.nftContract.adOffers[0]?.metadata?.offer?.token_metadata;
     const tokenData = token?.mint?.tokenData;
+    const tokenId = token?.tokenId;
 
-    token.metadata = tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData);
+    token.metadata = tokenMetadataReplace(offerMetadata, tokenMetadata, tokenData, tokenId);
   }
 }
 
@@ -319,10 +325,12 @@ async function populateAdOffer(adOffer) {
       const offerMetadata = adOffer.metadata?.offer;
       const tokenMetadata = adOffer.metadata?.offer?.token_metadata;
       const tokenData = nftContract.tokens[i].mint?.tokenData;
+      const tokenId = nftContract.tokens[i]?.tokenId;
       adOffer.nftContract.tokens[i].metadata = tokenMetadataReplace(
         offerMetadata,
         tokenMetadata,
-        tokenData
+        tokenData,
+        tokenId
       );
     }
   }
