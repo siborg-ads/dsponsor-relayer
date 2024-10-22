@@ -2,7 +2,7 @@ import config from "@/config";
 import { getEthQuote } from "@/queries/uniswap/quote";
 
 export async function GET(request, context) {
-  const { chainId } = context.params;
+  const { chainId } = (await context.params);
   const requestUrl = new URL(`${request.url}`);
   const searchParams = requestUrl.searchParams;
   const token = searchParams.get("token");

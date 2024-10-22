@@ -1,7 +1,7 @@
 import { getOfferTokensFromNftContract } from "@/queries/offers";
 
 export async function GET(request, context) {
-  const { chainId, nftContract, tokenId } = context.params;
+  const { chainId, nftContract, tokenId } = (await context.params);
 
   const { _lastUpdate, ...result } = await getOfferTokensFromNftContract(chainId, nftContract, [
     tokenId

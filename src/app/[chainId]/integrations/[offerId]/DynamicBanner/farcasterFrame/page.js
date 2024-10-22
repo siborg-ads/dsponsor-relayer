@@ -1,7 +1,9 @@
 import { getFrameMetadata } from "frog/next";
 import config from "@/config";
 
-export async function generateMetadata({ params, searchParams }) {
+export async function generateMetadata(props) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { chainId, offerId } = params;
   const { items, ratio, tokenIds, tokenDataInput, tokenDatas } = searchParams;
 

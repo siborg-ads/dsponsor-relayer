@@ -11,9 +11,9 @@ export async function generateMetadata() {
 }
 
 export default async function DynamicBannerIframePage(req) {
-  const { chainId, offerId } = req.params;
-  const { bgColor, colSizes, previewImage, previewLink, tokenIds } = req.searchParams;
-  let { ratio, includeAvailable, includeReserved } = req.searchParams;
+  const { chainId, offerId } = (await req.params);
+  const { bgColor, colSizes, previewImage, previewLink, tokenIds } = (await req.searchParams);
+  let { ratio, includeAvailable, includeReserved } = (await req.searchParams);
   includeAvailable = includeAvailable === "false" ? false : true;
   includeReserved = includeReserved === "false" ? false : true;
   const adParameterIds =

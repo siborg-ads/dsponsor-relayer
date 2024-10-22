@@ -3,7 +3,7 @@ import { getAdDataForToken } from "@/queries/ads";
 import { isValidUrl } from "@/utils";
 
 export async function GET(request, context) {
-  const { offerId, tokenId, chainId } = context.params;
+  const { offerId, tokenId, chainId } = (await context.params);
   const requestUrl = new URL(`${request.url}`);
   const searchParams = requestUrl.searchParams;
   const adParameterId = searchParams.get("adParameterId");

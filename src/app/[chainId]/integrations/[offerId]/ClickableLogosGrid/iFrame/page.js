@@ -11,10 +11,10 @@ export async function generateMetadata() {
 }
 
 export default async function ClickableLogosGridIframePage(req) {
-  const { chainId, offerId } = req.params;
-  const { bgColor, colSizes, previewTokenId, previewImage, previewLink } = req.searchParams;
+  const { chainId, offerId } = (await req.params);
+  const { bgColor, colSizes, previewTokenId, previewImage, previewLink } = (await req.searchParams);
 
-  let { ratio, includeAvailable, includeReserved } = req.searchParams;
+  let { ratio, includeAvailable, includeReserved } = (await req.searchParams);
   includeAvailable = includeAvailable === "false" ? false : true;
   includeReserved = includeReserved === "false" ? false : true;
 

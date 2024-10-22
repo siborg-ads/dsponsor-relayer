@@ -6,7 +6,7 @@ BigInt.prototype.toJSON = function () {
 };
 
 export async function GET(request, context) {
-  const { chainId, address } = context.params;
+  const { chainId, address } = (await context.params);
 
   const response = await getProfile(chainId, getAddress(address));
 

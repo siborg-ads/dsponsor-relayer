@@ -1,7 +1,7 @@
 import { getValidatedAds } from "@/queries/ads";
 
 export async function GET(request, context) {
-  const { chainId, offerId } = context.params;
+  const { chainId, offerId } = (await context.params);
 
   const requestUrl = new URL(`${request.url}`);
   const searchParams = requestUrl.searchParams;

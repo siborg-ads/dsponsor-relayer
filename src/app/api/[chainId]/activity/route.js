@@ -6,7 +6,7 @@ BigInt.prototype.toJSON = function () {
 };
 
 export async function GET(request, context) {
-  const { chainId } = context.params;
+  const { chainId } = (await context.params);
 
   const requestUrl = new URL(`${request.url}`);
   const searchParams = requestUrl.searchParams;
