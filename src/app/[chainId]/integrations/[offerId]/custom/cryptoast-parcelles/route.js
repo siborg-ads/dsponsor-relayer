@@ -3,27 +3,16 @@ import { getValidatedAds } from "@/queries/ads";
 
 export async function GET(request, context) {
   const { chainId, offerId } = await context.params;
-
   const requestUrl = new URL(`${request.url}`);
   const searchParams = requestUrl.searchParams;
-  const tokenIds = searchParams.get("tokenIds")?.length
-    ? searchParams.get("tokenIds").split(",")
-    : undefined;
-  const tokenDatas = searchParams.get("tokenData")?.length
-    ? searchParams.get("tokenData").split(",")
-    : undefined;
-  const adParameterIds = searchParams.get("adParameterIds")?.length
-    ? searchParams.get("adParameterIds").split(",")
-    : undefined;
+  let includeAvailable = searchParams.get("includeAvailable") === "false" ? false : true;
+  let includeReserved = searchParams.get("includeReserved") === "false" ? false : true;
 
   const ads = await getValidatedAds({
     chainId,
     adOfferId: offerId,
-    tokenIds,
-    tokenDatas,
-    adParameterIds,
     options: {
-      populate: true
+      populate: false
     }
   });
 
@@ -225,7 +214,12 @@ export async function GET(request, context) {
               current++;
 
               const data = ads[current]["imageURL-1:1"];
-              const image = data.state === "CURRENT_ACCEPTED" ? data.data : null;
+              const image =
+                data.state === "CURRENT_ACCEPTED" ||
+                (includeReserved && data.state === "UNAVAILABLE") ||
+                (includeAvailable && (data.state === "BUY_MINT" || data.state === "BUY_MARKET"))
+                  ? data.data
+                  : null;
 
               return (
                 <div
