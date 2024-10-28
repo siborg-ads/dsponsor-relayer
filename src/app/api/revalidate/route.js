@@ -39,8 +39,10 @@ export async function POST(request) {
         allOffers[chainId] = allOffersForChainId;
 
         const [offer] = allOffersForChainId.filter((offer) => offer.id === id);
-        const nftContractAddress = offer.nftContract.id;
-        allTags.push(`${chainId}-nftContract-${nftContractAddress}`);
+        if (offer?.nftContract?.id) {
+          const nftContractAddress = offer.nftContract.id;
+          allTags.push(`${chainId}-nftContract-${nftContractAddress}`);
+        }
 
         allTags.push(`${chainId}-adOffers`);
       }
@@ -50,7 +52,7 @@ export async function POST(request) {
           ? allOffers[chainId]
           : await getAllOffers(chainId);
         allOffers[chainId] = allOffersForChainId;
-        const offers = allOffersForChainId.filter((offer) => offer.nftContract.id === id);
+        const offers = allOffersForChainId.filter((offer) => offer?.nftContract?.id === id);
 
         for (const offer of offers) {
           allTags.push(`${chainId}-adOffer-${offer.id}`);

@@ -178,10 +178,6 @@ export async function GET(request, context) {
   const width = 95;
   const height = 95;
 
-  //   const data = await fetch("https://relayer.dsponsor.com/api/11155111/ads/70");
-
-  //   const ads = await data.json();
-
   return new ImageResponse(
     (
       <div
