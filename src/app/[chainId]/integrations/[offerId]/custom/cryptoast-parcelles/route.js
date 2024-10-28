@@ -1,12 +1,32 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
+import { headers } from "next/headers";
 import { ImageResponse } from "next/og";
 import { getValidatedAds } from "@/queries/ads";
 
+export const runtime = "edge";
+
+function generateSimpleETag(data) {
+  const jsonString = JSON.stringify(data);
+  const encoder = new TextEncoder();
+  const dataBuffer = encoder.encode(jsonString);
+
+  let checksum = 0;
+  for (let i = 0; i < dataBuffer.length; i++) {
+    checksum = (checksum + dataBuffer[i]) % 65536;
+  }
+
+  return checksum.toString(16).padStart(4, "0");
+}
+
 export async function GET(request, context) {
   const { chainId, offerId } = await context.params;
-  const requestUrl = new URL(`${request.url}`);
-  const searchParams = requestUrl.searchParams;
+  const searchParams = request.nextUrl.searchParams;
   let includeAvailable = searchParams.get("includeAvailable") === "false" ? false : true;
   let includeReserved = searchParams.get("includeReserved") === "false" ? false : true;
+
+  const headersList = await headers();
+  const ifNoneMatch = headersList.get("If-None-Match");
 
   const ads = await getValidatedAds({
     chainId,
@@ -20,6 +40,12 @@ export async function GET(request, context) {
     return new Response("No offer found", {
       status: 401
     });
+  }
+
+  const etag = generateSimpleETag(ads);
+
+  if (ifNoneMatch === etag) {
+    return new Response(null, { status: 304 });
   }
 
   const lookupTable = [
@@ -210,12 +236,6 @@ export async function GET(request, context) {
               current++;
 
               const data = ads[current]["imageURL-1:1"];
-              const image =
-                data.state === "CURRENT_ACCEPTED" ||
-                (includeReserved && data.state === "UNAVAILABLE") ||
-                (includeAvailable && (data.state === "BUY_MINT" || data.state === "BUY_MARKET"))
-                  ? data.data
-                  : null;
 
               return (
                 <div
@@ -226,24 +246,71 @@ export async function GET(request, context) {
                     display: "flex"
                   }}
                 >
-                  {image ? (
+                  {data.state === "CURRENT_ACCEPTED" && data.data ? (
                     <img
-                      src={image}
+                      src={data.data}
                       style={{
                         width,
                         height,
                         objectFit: "cover"
                       }}
                     />
-                  ) : // <img
-                  //   src="https://picsum.photos/200"
-                  //   style={{
-                  //     width,
-                  //     height,
-                  //     objectFit: "cover",
-                  //   }}
-                  // />
-                  null}
+                  ) : includeReserved && data.state === "UNAVAILABLE" ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        height: "100%",
+                        width: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        backgroundImage: `linear-gradient(to bottom, #2A2833, #2A2833)`,
+                        fontSize: `54px`,
+                        letterSpacing: -2,
+                        fontWeight: 900,
+                        textAlign: "center"
+                      }}
+                    >
+                      <div
+                        style={{
+                          backgroundImage: `linear-gradient(90deg, #FFFFFF,#FFFFFF)`,
+                          backgroundClip: "text",
+                          "-webkit-background-clip": "text",
+                          color: "transparent"
+                        }}
+                      >
+                        {current.toString()}
+                      </div>
+                    </div>
+                  ) : includeAvailable &&
+                    (data.state === "BUY_MINT" || data.state === "BUY_MARKET") ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        height: "100%",
+                        width: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        backgroundImage: `linear-gradient(to bottom, green, green)`,
+                        fontSize: `54px`,
+                        letterSpacing: -2,
+                        fontWeight: 900,
+                        textAlign: "center"
+                      }}
+                    >
+                      <div
+                        style={{
+                          backgroundImage: `linear-gradient(90deg, #FFFFFF,#FFFFFF)`,
+                          backgroundClip: "text",
+                          "-webkit-background-clip": "text",
+                          color: "transparent"
+                        }}
+                      >
+                        {current.toString()}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               );
             } else {
@@ -264,7 +331,12 @@ export async function GET(request, context) {
     ),
     {
       width: 1980,
-      height: 1412
+      height: 1412,
+      headers: {
+        "Content-Type": "image/png",
+        ETag: etag,
+        "Cache-Control": "public, no-cache"
+      }
     }
   );
 }

@@ -63,7 +63,10 @@ export async function getValidatedAds({
     variables.tokenIds = tokenIds;
   }
 
-  const baseOptions = { populate: false, next: { tags: [`${chainId}-adOffer-${adOfferId}`] } };
+  const baseOptions = {
+    populate: false,
+    next: { tags: [`${chainId}-adOffer-${adOfferId}`] }
+  };
   options = options ? { ...baseOptions, ...options } : baseOptions;
   const graphResult = await executeQuery(chainId, query, variables, options);
 
