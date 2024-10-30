@@ -3,8 +3,164 @@
 import { headers } from "next/headers";
 import { ImageResponse } from "next/og";
 import { getValidatedAds } from "@/queries/ads";
+import { memoize } from "nextjs-better-unstable-cache";
 
 export const runtime = "edge";
+const width = 95;
+const height = 95;
+
+const LOOKUP_TABLE = [
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  true,
+  false,
+  true,
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  true,
+  false,
+  false,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  true,
+  false,
+  false,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  false,
+  false,
+  true,
+  false,
+  true,
+  false,
+  false,
+  true,
+  true,
+  true,
+  false,
+  false,
+  false,
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  true,
+  false,
+  false
+];
 
 function generateSimpleETag(data) {
   const jsonString = JSON.stringify(data);
@@ -19,192 +175,10 @@ function generateSimpleETag(data) {
   return checksum.toString(16).padStart(4, "0");
 }
 
-export async function GET(request, context) {
-  const { chainId, offerId } = await context.params;
-  const searchParams = request.nextUrl.searchParams;
-  let includeAvailable = searchParams.get("includeAvailable") === "false" ? false : true;
-  let includeReserved = searchParams.get("includeReserved") === "false" ? false : true;
-
-  const headersList = await headers();
-  const ifNoneMatch = headersList.get("If-None-Match");
-
-  const ads = await getValidatedAds({
-    chainId,
-    adOfferId: offerId,
-    options: {
-      populate: false
-    }
-  });
-
-  if (!ads) {
-    return new Response("No offer found", {
-      status: 401
-    });
-  }
-
-  const etag = generateSimpleETag(ads);
-
-  if (ifNoneMatch === etag) {
-    return new Response(null, { status: 304 });
-  }
-
-  const lookupTable = [
-    false,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    false,
-    false,
-    true,
-    true,
-    true,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    true,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    true,
-    false,
-    false,
-    true,
-    false,
-    true,
-    false,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    false,
-    true,
-    false,
-    false,
-    true,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    false,
-    true,
-    false,
-    false,
-    true,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    true,
-    false,
-    true,
-    true,
-    true,
-    false,
-    false,
-    true,
-    false,
-    true,
-    false,
-    false,
-    true,
-    true,
-    true,
-    false,
-    false,
-    false,
-    true,
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    true,
-    true,
-    false,
-    false
-  ];
+async function _GET(includeAvailable, includeReserved, ads) {
   let current = 0;
-  const width = 95;
-  const height = 95;
 
-  return new ImageResponse(
+  const stream = new ImageResponse(
     (
       <div
         style={{
@@ -232,7 +206,7 @@ export async function GET(request, context) {
           }}
         >
           {Array.from({ length: 150 }).map((_, index) => {
-            if (lookupTable[index]) {
+            if (LOOKUP_TABLE[index]) {
               current++;
 
               const data = ads[current]["imageURL-1:1"];
@@ -331,12 +305,72 @@ export async function GET(request, context) {
     ),
     {
       width: 1980,
-      height: 1412,
-      headers: {
-        "Content-Type": "image/png",
-        ETag: etag,
-        "Cache-Control": "public, no-cache"
-      }
+      height: 1412
     }
-  );
+  ).body;
+
+  // Transform the stream into a string
+  const reader = stream.getReader();
+  let data = "";
+  let stop = false;
+  while (!stop) {
+    const { done, value } = await reader.read();
+    if (!done) data += value;
+    stop = done;
+  }
+
+  return data;
+}
+
+export async function GET(request, context) {
+  const { chainId, offerId } = await context.params;
+
+  const ads = await getValidatedAds({
+    chainId,
+    adOfferId: offerId,
+    options: {
+      populate: false
+    }
+  });
+
+  if (!ads) {
+    return new Response("No offer found", {
+      status: 401
+    });
+  }
+
+  const etag = generateSimpleETag(ads);
+
+  const headersList = await headers();
+  const ifNoneMatch = headersList.get("If-None-Match");
+
+  // In case the ETag matches, we return a 304
+  if (ifNoneMatch === etag) {
+    return new Response(null, { status: 304 });
+  }
+
+  const searchParams = request.nextUrl.searchParams;
+  const includeAvailable = searchParams.get("includeAvailable") === "false" ? false : true;
+  const includeReserved = searchParams.get("includeReserved") === "false" ? false : true;
+
+  // Declare the memoized function
+  const memoized = memoize(_GET, {
+    revalidateTags: [`${chainId}-adOffer-${offerId}`],
+    log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
+  });
+
+  // Get the data string memoized
+  const dataString = await memoized(includeAvailable, includeReserved, ads);
+
+  // Transform the string into a buffer
+  const buffer = new Uint8Array(dataString.split(",").map((char) => parseInt(char)));
+
+  // Return the response
+  return new Response(buffer, {
+    headers: {
+      "Content-Type": "image/png",
+      "Cache-Control": "public, no-cache",
+      Etag: etag
+    }
+  });
 }
