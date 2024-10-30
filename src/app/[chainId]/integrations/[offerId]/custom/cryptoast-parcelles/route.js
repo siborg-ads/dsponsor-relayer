@@ -322,11 +322,6 @@ async function _GET(includeAvailable, includeReserved, ads) {
   return data;
 }
 
-export const memoized = memoize(_GET, {
-  revalidateTags: (chainId, offerId) => [`${chainId}-adOffer-${offerId}`],
-  log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
-});
-
 export async function GET(request, context) {
   const { chainId, offerId } = await context.params;
 
@@ -358,8 +353,14 @@ export async function GET(request, context) {
   const includeAvailable = searchParams.get("includeAvailable") === "false" ? false : true;
   const includeReserved = searchParams.get("includeReserved") === "false" ? false : true;
 
+  // Declare the memoized function
+  const memoized = memoize(_GET, {
+    revalidateTags: [`${chainId}-adOffer-${offerId}`],
+    log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
+  });
+
   // Get the data string memoized
-  const dataString = await memoized(includeAvailable, includeReserved, ads, chainId, offerId);
+  const dataString = await memoized(includeAvailable, includeReserved, ads);
 
   // Transform the string into a buffer
   const buffer = new Uint8Array(dataString.split(",").map((char) => parseInt(char)));
