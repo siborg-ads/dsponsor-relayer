@@ -312,17 +312,18 @@ async function _GET(includeAvailable, includeReserved, ads) {
   // Transform the stream into a string
   const reader = stream.getReader();
   let data = "";
-  while (true) {
+  let stop = false;
+  while (!stop) {
     const { done, value } = await reader.read();
-    if (done) break;
-    data += value;
+    if (!done) data += value;
+    stop = done;
   }
 
   return data;
 }
 
 export const memoized = memoize(_GET, {
-  revalidateTags: ["cryptoast-parcelles"],
+  revalidateTags: (chainId, offerId) => [`${chainId}-adOffer-${offerId}`],
   log: process.env.NEXT_CACHE_LOGS ? process.env.NEXT_CACHE_LOGS.split(",") : []
 });
 
@@ -358,7 +359,7 @@ export async function GET(request, context) {
   const includeReserved = searchParams.get("includeReserved") === "false" ? false : true;
 
   // Get the data string memoized
-  const dataString = await memoized(includeAvailable, includeReserved, ads);
+  const dataString = await memoized(includeAvailable, includeReserved, ads, chainId, offerId);
 
   // Transform the string into a buffer
   const buffer = new Uint8Array(dataString.split(",").map((char) => parseInt(char)));
