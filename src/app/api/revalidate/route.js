@@ -3,6 +3,9 @@ import { revalidateTag } from "next/cache";
 import { waitUntil } from "@vercel/functions";
 import { getActivity, getAllOffers } from "@/queries/activity";
 import { getProfile } from "@/queries/account";
+import { unstable_after as after } from "next/server";
+import { getValidatedAds } from "@/queries/ads";
+import { generateParcelle, uploadParcelle } from "@/utils/parcelles";
 
 export async function POST(request) {
   const { tags } = await request.json();
@@ -107,6 +110,22 @@ export async function POST(request) {
         }
       }
     }
+  }
+
+  if (tags?.some((tag) => tag === "11155111-adOffer-70")) {
+    console.log("revalidate parcelle");
+    after(async () => {
+      const ads = await getValidatedAds({
+        chainId: "11155111",
+        adOfferId: "70",
+        options: {
+          populate: false
+        }
+      });
+
+      const parcelle = await generateParcelle(ads);
+      await uploadParcelle(parcelle);
+    });
   }
 
   return Response.json({
