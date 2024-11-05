@@ -55,7 +55,6 @@ export async function executeQuery(chainId, query, variables, options) {
     body: JSON.stringify({ query, variables })
   };
 
-  /*
   if (options?.next) {
     requestInit.next = options.next;
     if (
@@ -70,8 +69,8 @@ export async function executeQuery(chainId, query, variables, options) {
   } else {
     requestInit.cache = options?.cache ? options.cache : "no-store";
   }
-  */
-  requestInit.cache = "no-store";
+
+  // requestInit.cache = "no-store";
 
   console.time("requestInit");
   const request = await fetch(url, requestInit);

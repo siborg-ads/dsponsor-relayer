@@ -53,7 +53,7 @@ const config = {
     rpcURL: "https://mainnet.base.org",
     shield3RpcURL:
       "https://rpc.shield3.com/v3/base-mainnet/rzRHl7c0292FDuzuI6kTp6CYYrpSpSFZ7i5DMLzm/rpc",
-    subgraphURL: `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/dsponsors-team--672881/dsponsor-subgraph/version/2.0.6/api`,
+    subgraphURL: `https://subgraph.satsuma-prod.com/${process.env.SUBGRAPH_ALCHEMY_KEY}/dsponsors-team--672881/dsponsor-subgraph/version/2.0.7/api`,
 
     smartContracts: {
       DSPONSOR_ADMIN: {
