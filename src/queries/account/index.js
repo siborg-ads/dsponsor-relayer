@@ -1,11 +1,51 @@
 import { getAddress } from "ethers";
+import { Alchemy, Network } from "alchemy-sdk";
 import { executeQuery } from "@/queries/subgraph";
 
+export async function getHoldingsFromAlchemy(chainId, userAddress) {
+  let ownedNfts = [];
+
+  const network =
+    Number(chainId) === 8453
+      ? Network.BASE_MAINNET
+      : Number(chainId) === 11155111
+        ? Network.ETH_SEPOLIA
+        : undefined;
+
+  if (network) {
+    const config = {
+      apiKey: process.env.ALCHEMY_API_KEY,
+      network
+    };
+    const alchemy = new Alchemy(config);
+
+    let pageKey = null;
+    do {
+      const result = await alchemy.nft.getNftsForOwner(userAddress, {
+        pageKey,
+        omitMetadata: true
+      });
+      pageKey = result.pageKey;
+      ownedNfts = ownedNfts.concat(result.ownedNfts);
+    } while (pageKey);
+  }
+
+  const nftIds = {};
+  for (const { contractAddress, tokenId } of ownedNfts) {
+    nftIds[`${contractAddress}-${tokenId}`.toLowerCase()] = true;
+  }
+  return nftIds;
+}
+
 export async function getProfile(chainId, userAddress) {
+  const holdings = await getHoldingsFromAlchemy(chainId, userAddress);
+
+  const tokenNftIds = Object.keys(holdings);
+
   const {
     offerIds
     // lastUpdate
-  } = await getProfileOfferIds(chainId, userAddress);
+  } = await getProfileOfferIds(chainId, userAddress, tokenNftIds);
   const getOffersProfileQuery = /* GraphQL */ `
     query getOffersProfile($offerIds: [String!], $userAddress: Bytes) {
       adOffers(
@@ -35,16 +75,37 @@ export async function getProfile(chainId, userAddress) {
     next: { tags }
   };
 
-  return executeQuery(chainId, getOffersProfileQuery, { offerIds, userAddress }, options);
+  const result = await executeQuery(
+    chainId,
+    getOffersProfileQuery,
+    { offerIds, userAddress },
+    options
+  );
+
+  if (result?.data?.adOffers) {
+    for (let i = 0; i < result.data.adOffers.length; i++) {
+      if (result.data.adOffers[i]?.nftContract?.tokens?.length) {
+        for (let j = 0; j < result.data.adOffers[i].nftContract.tokens.length; j++) {
+          if (holdings[result.data.adOffers[i].nftContract.tokens[j].id.toLowerCase()]) {
+            result.data.adOffers[i].nftContract.tokens[j].owner = userAddress;
+          }
+        }
+      }
+    }
+  }
+  return result;
 }
 
-async function getProfileOfferIds(chainId, userAddress) {
+async function getProfileOfferIds(chainId, userAddress, tokenNftIds) {
+  tokenNftIds = Array.isArray(tokenNftIds) ? tokenNftIds : [];
+
   const relatedProfileOfferIdsQuery = /* GraphQL */ `
-    query relatedProfileOfferIds($userAddress: Bytes) {
+    query relatedProfileOfferIds($userAddress: Bytes, $tokenNftIds: [String!]) {
       tokens(
         first: 1000
         where: {
           or: [
+            { id_in: $tokenNftIds }
             { owner: $userAddress }
             { user_: { user: $userAddress } }
             { marketplaceListings_: { and: [{ lister: $userAddress }, { status: CREATED }] } }
@@ -73,6 +134,14 @@ async function getProfileOfferIds(chainId, userAddress) {
     populate: false,
     next: { tags: [`${chainId}-userAddress-${getAddress(userAddress)}`] }
   };
+
+  const q = await executeQuery(
+    chainId,
+    relatedProfileOfferIdsQuery,
+    { userAddress, tokenNftIds },
+    options
+  );
+
   const {
     data: {
       tokens,
@@ -81,7 +150,7 @@ async function getProfileOfferIds(chainId, userAddress) {
         block: { timestamp }
       }
     }
-  } = await executeQuery(chainId, relatedProfileOfferIdsQuery, { userAddress }, options);
+  } = q;
 
   const offerIds = new Set();
 

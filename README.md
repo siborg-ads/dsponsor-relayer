@@ -35,6 +35,9 @@ The Relayer App provides API endpoints and UI components for the [DSponsor ecosy
 
 ```env
 # required
+ALCHEMY_API_KEY=xxxxxxxx
+CLOUDFLARE_ID=xxxxxxxxxxx
+CLOUDFLARE_API_KEY=xxxxxxxxxxxx
 COINGECKO_API_KEY=CG-xxxxxxxxxxxx
 
 # from src/config, you may need it
