@@ -270,11 +270,12 @@ export async function generateParcelle(ads) {
 }
 
 export async function uploadParcelle(blob, chainId, adOfferId) {
+  const imgName = `${imageID}-${chainId}-${adOfferId}`;
   const clouflare_ID = process.env.CLOUDFLARE_ID;
   const clouflare_API_KEY = process.env.CLOUDFLARE_API_KEY;
   try {
     await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${clouflare_ID}/images/v1/${imageID}-${chainId}-${adOfferId}`,
+      `https://api.cloudflare.com/client/v4/accounts/${clouflare_ID}/images/v1/${imgName}`,
       {
         method: "DELETE",
         headers: {
@@ -288,7 +289,7 @@ export async function uploadParcelle(blob, chainId, adOfferId) {
 
   const formData = new FormData();
   formData.append("file", blob, "image.png");
-  formData.append("id", imageID);
+  formData.append("id", imgName);
 
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${clouflare_ID}/images/v1`,
