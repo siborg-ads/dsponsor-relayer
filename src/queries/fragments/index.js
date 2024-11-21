@@ -190,6 +190,7 @@ export const RevenueTransactionFragment = /* GraphQL */ `
 
 export const TokenFragment = /* GraphQL */ `
   fragment TokenFragment on Token {
+    id
     tokenId
     setInAllowList
     owner
