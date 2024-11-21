@@ -112,19 +112,23 @@ export async function POST(request) {
     }
   }
 
-  if (tags?.some((tag) => tag === "11155111-adOffer-70")) {
-    console.log("revalidate parcelle");
+  const parcelleTag = tags?.find(
+    (tag) => tag === "11155111-adOffer-70" || tag === "8453-adOffer-37"
+  );
+  if (parcelleTag) {
+    const [chainId, , adOfferId] = parcelleTag.split("-");
+    console.log("revalidate parcelle", { chainId, adOfferId });
     after(async () => {
       const ads = await getValidatedAds({
-        chainId: "11155111",
-        adOfferId: "70",
+        chainId,
+        adOfferId,
         options: {
           populate: false
         }
       });
 
       const parcelle = await generateParcelle(ads);
-      await uploadParcelle(parcelle);
+      await uploadParcelle(parcelle, chainId, adOfferId);
     });
   }
 
