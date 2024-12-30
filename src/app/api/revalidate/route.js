@@ -119,6 +119,7 @@ export async function POST(request) {
     const [chainId, , adOfferId] = parcelleTag.split("-");
     console.log("revalidate parcelle", { chainId, adOfferId });
     after(async () => {
+      console.log("revalidate parcelle after", { chainId, adOfferId });
       const ads = await getValidatedAds({
         chainId,
         adOfferId,
@@ -128,7 +129,11 @@ export async function POST(request) {
       });
 
       const parcelle = await generateParcelle(ads);
+
+      console.log("parcelle updated", parcelle);
+
       await uploadParcelle(parcelle, chainId, adOfferId);
+      console.log("parcelle uploaded");
     });
   }
 

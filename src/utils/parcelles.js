@@ -291,6 +291,8 @@ export async function uploadParcelle(blob, chainId, adOfferId) {
   formData.append("file", blob, "image.png");
   formData.append("id", imgName);
 
+  console.log("parcelle ready to upload", formData);
+
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${clouflare_ID}/images/v1`,
     {
