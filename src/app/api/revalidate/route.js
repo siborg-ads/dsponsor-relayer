@@ -3,7 +3,10 @@ import { revalidateTag } from "next/cache";
 import { waitUntil } from "@vercel/functions";
 import { getActivity, getAllOffers } from "@/queries/activity";
 import { getProfile } from "@/queries/account";
-import { unstable_after as after } from "next/server";
+import {
+  //  unstable_after as
+  after
+} from "next/server";
 import { getValidatedAds } from "@/queries/ads";
 import { generateParcelle, uploadParcelle } from "@/utils/parcelles";
 

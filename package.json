@@ -17,7 +17,7 @@
     "ethers": "^6.12.1",
     "frog": "^0.11.4",
     "hono": "^4.3.11",
-    "next": "^15.0.0",
+    "next": "^15.1.3",
     "nextjs-better-unstable-cache": "^1.1.0",
     "numeral": "^2.0.6",
     "react": "^18.3.1",
