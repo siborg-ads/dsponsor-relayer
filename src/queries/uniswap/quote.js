@@ -31,9 +31,6 @@ async function _getEthQuote(
     tokenOutAddr = getAddress(tokenOutAddr);
   }
 
-  const timeTracking = Date.now().valueOf();
-  console.time(`getEthQuote-${timeTracking}`);
-
   const uniswapV3QuoterAddr = config?.[chainId]?.smartContracts?.UNISWAP_QUOTER?.address;
   const WNATIVE_ADDR = config?.[chainId]?.smartContracts?.WNATIVE?.address;
   const USDC_ADDR = config?.[chainId]?.smartContracts?.USDC?.address;
@@ -179,7 +176,6 @@ async function _getEthQuote(
     //  console.error("Quote error", chainId, tokenOutAddr, amountOut, slippagePerCent, e);
   }
 
-  console.timeEnd(`getEthQuote-${timeTracking}`);
   const {
     amountInEth: amountInEthFormatted,
     amountInEthWithSlippage: amountInEthWithSlippageFormatted

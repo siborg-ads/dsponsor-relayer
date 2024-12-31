@@ -68,12 +68,10 @@ export const getCurrencyInfos = async (chainId, currency) => {
         const signer = ethers.Wallet.createRandom().connect(provider);
         const ERC20Contract = new ethers.Contract(currency, ERC20.abi, signer);
 
-        console.time("decimals");
         [decimals, symbol] = await Promise.all([
           ERC20Contract.decimals.call(),
           ERC20Contract.symbol()
         ]);
-        console.timeEnd("decimals");
       } catch (e) {
         console.error("Error getting decimals and symbol", chainId, currency);
         decimals = BigInt("18");

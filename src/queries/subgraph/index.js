@@ -72,17 +72,13 @@ export async function executeQuery(chainId, query, variables, options) {
 
   // requestInit.cache = "no-store";
 
-  console.time("requestInit");
   const request = await fetch(url, requestInit);
   const result = await request.json();
-  console.timeEnd("requestInit");
 
-  console.time("populate");
   const populate = typeof options?.populate === "undefined" ? true : options.populate;
   if (populate && result?.data) {
     await populateSubgraphResult(chainId, result);
   }
-  console.timeEnd("populate");
 
   return result;
 }
