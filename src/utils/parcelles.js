@@ -1,4 +1,25 @@
 import { ImageResponse } from "next/og";
+import sharp from "sharp";
+
+async function isWebp(url) {
+  const head = await fetch(url, { method: "HEAD", cache: "force-cache" });
+  const contentType = head.headers.get("content-type") || "";
+  return contentType.includes("image/webp");
+}
+
+async function fetchAndConvertIfWebp(url) {
+  // If it’s WebP
+  if (await isWebp(url)) {
+    // Fetch and convert
+    const response = await fetch(url);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    return await sharp(buffer).png().toBuffer();
+  } else {
+    // Just return the original data
+    // const response = await fetch(url);
+    // return Buffer.from(await response.arrayBuffer());
+  }
+}
 
 export const runtime = "edge";
 const imageID = "cryptoast-parcelle";
@@ -161,6 +182,22 @@ const LOOKUP_TABLE = [
 export async function generateParcelle(ads) {
   let current = 0;
 
+  console.log("ready to convert");
+
+  await Promise.all(
+    Object.keys(ads).map(async (key) => {
+      if (ads[key] && ads[key]["imageURL-1:1"]) {
+        const data = ads[key]["imageURL-1:1"];
+        if (data?.state === "CURRENT_ACCEPTED" && data.data) {
+          const buffer = await fetchAndConvertIfWebp(data.data);
+          ads[key]["imageURL-1:1"].imgData = buffer ? buffer.toString("base64") : null;
+        }
+      }
+    })
+  );
+
+  console.log("converted");
+
   const stream = new ImageResponse(
     (
       <div
@@ -205,7 +242,7 @@ export async function generateParcelle(ads) {
                 >
                   {data.state === "CURRENT_ACCEPTED" && data.data ? (
                     <img
-                      src={data.data}
+                      src={data.imgData ? `data:image/png;base64,${data.imgData}` : data.data}
                       style={{
                         width,
                         height,
@@ -264,8 +301,9 @@ export async function generateParcelle(ads) {
     }
   ).blob();
 
+  console.log("parcelle ready");
   const blob = await stream;
-
+  console.log("blob generated");
   return blob;
 }
 

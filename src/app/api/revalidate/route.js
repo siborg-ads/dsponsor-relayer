@@ -131,6 +131,7 @@ export async function POST(request) {
         }
       });
 
+      console.log("before generateParcelle");
       const parcelle = await generateParcelle(ads);
 
       console.log("parcelle updated", parcelle);
