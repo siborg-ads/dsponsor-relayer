@@ -8,14 +8,12 @@ async function isWebp(url) {
 }
 
 async function fetchAndConvertIfWebp(url) {
-  // If it’s WebP
   if (await isWebp(url)) {
-    // Fetch and convert
     const response = await fetch(url);
     const buffer = Buffer.from(await response.arrayBuffer());
     return await sharp(buffer).png().toBuffer();
   } else {
-    // Just return the original data
+    // If it's not WebP, you can just return null or the original data
     // const response = await fetch(url);
     // return Buffer.from(await response.arrayBuffer());
   }
@@ -23,8 +21,18 @@ async function fetchAndConvertIfWebp(url) {
 
 export const runtime = "edge";
 const imageID = "cryptoast-parcelle";
-const width = 95;
-const height = 95;
+
+// Double the original tile dimensions
+const tileWidth = 95 * 2;
+const tileHeight = 95 * 2;
+
+// Adjust these if you want to position them differently
+const offsetTop = 230.6 * 2;
+const offsetLeft = 278 * 2;
+
+// Main canvas size is now doubled
+const canvasWidth = 1980 * 2;
+const canvasHeight = 1412 * 2;
 
 const LOOKUP_TABLE = [
   false,
@@ -182,8 +190,6 @@ const LOOKUP_TABLE = [
 export async function generateParcelle(ads) {
   let current = 0;
 
-  console.log("ready to convert");
-
   await Promise.all(
     Object.keys(ads).map(async (key) => {
       if (ads[key] && ads[key]["imageURL-1:1"]) {
@@ -196,20 +202,22 @@ export async function generateParcelle(ads) {
     })
   );
 
-  console.log("converted");
-
   const stream = new ImageResponse(
     (
       <div
         style={{
           position: "relative",
-          width: "1980px",
+          width: `${canvasWidth}px`,
           display: "flex"
         }}
       >
+        {/* 
+          If your background image is only 1980 wide, scaling it up will stretch it. 
+          If you have a larger image, swap it here or let it stretch. 
+        */}
         <img
           src="https://crdev.cryptoast.net/wp-content/uploads/2023/10/map-number.png"
-          width="1980"
+          width={canvasWidth}
           style={{
             display: "block"
           }}
@@ -219,24 +227,23 @@ export async function generateParcelle(ads) {
             display: "flex",
             flexWrap: "wrap",
             position: "absolute",
-            top: 230.6,
-            left: 278,
-            width: width * 15,
-            height: height * 10
+            top: offsetTop,
+            left: offsetLeft,
+            width: tileWidth * 15,
+            height: tileHeight * 10
           }}
         >
           {Array.from({ length: 150 }).map((_, index) => {
             if (LOOKUP_TABLE[index]) {
               current++;
-
               const data = ads[current]["imageURL-1:1"];
 
               return (
                 <div
                   key={index}
                   style={{
-                    width,
-                    height,
+                    width: tileWidth,
+                    height: tileHeight,
                     display: "flex"
                   }}
                 >
@@ -244,8 +251,8 @@ export async function generateParcelle(ads) {
                     <img
                       src={data.imgData ? `data:image/png;base64,${data.imgData}` : data.data}
                       style={{
-                        width,
-                        height,
+                        width: tileWidth,
+                        height: tileHeight,
                         objectFit: "cover"
                       }}
                     />
@@ -269,7 +276,7 @@ export async function generateParcelle(ads) {
                         style={{
                           backgroundImage: `linear-gradient(90deg, #FFFFFF,#FFFFFF)`,
                           backgroundClip: "text",
-                          "-webkit-background-clip": "text",
+                          WebkitBackgroundClip: "text",
                           color: "transparent"
                         }}
                       >
@@ -284,8 +291,8 @@ export async function generateParcelle(ads) {
                 <div
                   key={index}
                   style={{
-                    width,
-                    height,
+                    width: tileWidth,
+                    height: tileHeight,
                     display: "flex"
                   }}
                 />
@@ -296,14 +303,12 @@ export async function generateParcelle(ads) {
       </div>
     ),
     {
-      width: 1980,
-      height: 1412
+      width: canvasWidth,
+      height: canvasHeight
     }
   ).blob();
 
-  console.log("parcelle ready");
   const blob = await stream;
-  console.log("blob generated");
   return blob;
 }
 
@@ -311,6 +316,7 @@ export async function uploadParcelle(blob, chainId, adOfferId) {
   const imgName = `${imageID}-${chainId}-${adOfferId}`;
   const clouflare_ID = process.env.CLOUDFLARE_ID;
   const clouflare_API_KEY = process.env.CLOUDFLARE_API_KEY;
+
   try {
     await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${clouflare_ID}/images/v1/${imgName}`,
@@ -328,8 +334,6 @@ export async function uploadParcelle(blob, chainId, adOfferId) {
   const formData = new FormData();
   formData.append("file", blob, "image.png");
   formData.append("id", imgName);
-
-  console.log("parcelle ready to upload", formData);
 
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${clouflare_ID}/images/v1`,
