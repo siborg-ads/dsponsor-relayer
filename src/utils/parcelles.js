@@ -22,17 +22,19 @@ async function fetchAndConvertIfWebp(url) {
 export const runtime = "edge";
 const imageID = "cryptoast-parcelle";
 
+const multiplier = 4;
+
 // Double the original tile dimensions
-const tileWidth = 95 * 2;
-const tileHeight = 95 * 2;
+const tileWidth = Math.round(95 * multiplier);
+const tileHeight = Math.round(95 * multiplier);
 
 // Adjust these if you want to position them differently
-const offsetTop = 230.6 * 2;
-const offsetLeft = 278 * 2;
+const offsetTop = Math.round(230.6 * multiplier);
+const offsetLeft = Math.round(278 * multiplier);
 
 // Main canvas size is now doubled
-const canvasWidth = 1980 * 2;
-const canvasHeight = 1412 * 2;
+const canvasWidth = Math.round(1980 * multiplier);
+const canvasHeight = Math.round(1412 * multiplier);
 
 const LOOKUP_TABLE = [
   false,
@@ -266,7 +268,7 @@ export async function generateParcelle(ads) {
                         justifyContent: "center",
                         flexDirection: "column",
                         backgroundImage: `linear-gradient(to bottom, #2A2833, #2A2833)`,
-                        fontSize: `54px`,
+                        fontSize: 54 * multiplier,
                         letterSpacing: -2,
                         fontWeight: 900,
                         textAlign: "center"
@@ -308,8 +310,21 @@ export async function generateParcelle(ads) {
     }
   ).blob();
 
-  const blob = await stream;
-  return blob;
+  const rawBlob = await stream;
+
+  const arrayBuffer = await rawBlob.arrayBuffer();
+  const inputBuffer = Buffer.from(arrayBuffer);
+
+  // Set actual 300 DPI
+  const finalBuffer = await sharp(inputBuffer)
+    .withMetadata({ density: 300 }) // set 300 DPI in metadata
+    .png()
+    .toBuffer();
+
+  const finalBlob = new Blob([finalBuffer], { type: "image/png" });
+  return finalBlob;
+
+  // return rawBlob;
 }
 
 export async function uploadParcelle(blob, chainId, adOfferId) {
